@@ -257,6 +257,12 @@
             <artifactId>spring-boot-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- mikrotik -->
+        <dependency>
+		  <groupId>me.legrange</groupId>
+		  <artifactId>mikrotik</artifactId>
+		  <version>3.0.7</version>
+		</dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>

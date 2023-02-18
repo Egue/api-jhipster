@@ -1,6 +1,7 @@
 package com.comunicamosmas.api.repository;
 
 import com.comunicamosmas.api.domain.User;
+import com.comunicamosmas.api.domain.Usuario;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
