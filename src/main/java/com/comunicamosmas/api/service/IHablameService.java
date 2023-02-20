@@ -1,9 +1,8 @@
 package com.comunicamosmas.api.service;
 
-import com.comunicamosmas.api.web.rest.vm.ClassHablame;
-import com.comunicamosmas.api.web.rest.vm.ClassResponseHablame;
-import java.util.List;
+import com.comunicamosmas.api.service.dto.ClassHablameDTO;
+import com.comunicamosmas.api.service.dto.ClassResponseHablameDTO;  
 
 public interface IHablameService {
-    public ClassResponseHablame msmPriority(ClassHablame classHablame);
+    public ClassResponseHablameDTO msmPriority(ClassHablameDTO classHablame);
 }

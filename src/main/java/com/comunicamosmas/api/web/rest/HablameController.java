@@ -5,8 +5,8 @@ import com.comunicamosmas.api.service.EstacionServiceImpl;
 import com.comunicamosmas.api.service.IEstacionService;
 import com.comunicamosmas.api.service.IHablameService;
 import com.comunicamosmas.api.service.IOrdenService;
-import com.comunicamosmas.api.web.rest.vm.ClassHablame;
-import com.comunicamosmas.api.web.rest.vm.ClassResponseHablame;
+import com.comunicamosmas.api.service.dto.ClassHablameDTO;
+import com.comunicamosmas.api.service.dto.ClassResponseHablameDTO;  
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +50,7 @@ public class HablameController {
             //encontrar telefono
             Estacion estacion = estacionService.findById(idEstacion);
 
-            ClassHablame classHablame = new ClassHablame();
+            ClassHablameDTO classHablame = new ClassHablameDTO();
             String telefono = "57" + ordenService.findTelefonoByIdOrden(idOrden);
             String mensage =
                 "Control + te Informa: Para orden " +
@@ -74,7 +74,7 @@ public class HablameController {
             classHablame.setSms(mensage);
             classHablame.setToNumber(telefono);
 
-            ClassResponseHablame result = hablameService.msmPriority(classHablame);
+            ClassResponseHablameDTO result = hablameService.msmPriority(classHablame);
 
             response.put("response", result);
 

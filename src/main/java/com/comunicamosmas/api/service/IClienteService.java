@@ -1,7 +1,6 @@
 package com.comunicamosmas.api.service;
 
-import com.comunicamosmas.api.domain.Cliente;
-import com.comunicamosmas.api.web.rest.vm.IListContratoVM;
+import com.comunicamosmas.api.domain.Cliente; 
 import java.util.List;
 
 public interface IClienteService {

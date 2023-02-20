@@ -5,8 +5,8 @@ import com.comunicamosmas.api.domain.EnumOrdenInstalacion;
 import com.comunicamosmas.api.domain.Orden;
 import com.comunicamosmas.api.repository.IAdminDao;
 import com.comunicamosmas.api.repository.IOrdenDao;
-import com.comunicamosmas.api.web.rest.vm.OrdenForInstalacionFindByIdOrden;
-import com.comunicamosmas.api.web.rest.vm.OrdenInstalacion;
+import com.comunicamosmas.api.service.dto.OrdenForInstalacionFindByIdOrdenDTO;
+import com.comunicamosmas.api.service.dto.OrdenInstalacionDTO; 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,14 +50,14 @@ public class OrdenServiceImpl implements IOrdenService {
     }
 
     @Override
-    public List<OrdenInstalacion> ordenInstalacion() {
-        return (List<OrdenInstalacion>) ordenDao.ordenInstalacion();
+    public List<OrdenInstalacionDTO> ordenInstalacion() {
+        return (List<OrdenInstalacionDTO>) ordenDao.ordenInstalacion();
     }
 
     @Override
-    public OrdenForInstalacionFindByIdOrden ordenForInstalacionFindByIdOrden(Long id) {
+    public OrdenForInstalacionFindByIdOrdenDTO ordenForInstalacionFindByIdOrden(Long id) {
         // TODO Auto-generated method stub
-        return (OrdenForInstalacionFindByIdOrden) ordenDao.ordenForInstalacionFindByIdOrden(id);
+        return (OrdenForInstalacionFindByIdOrdenDTO) ordenDao.ordenForInstalacionFindByIdOrden(id);
     }
 
     @Override
@@ -67,8 +67,8 @@ public class OrdenServiceImpl implements IOrdenService {
     }
 
     @Override
-    public List<OrdenInstalacion> getListFindBetwee(String valor1, String valor2) {
+    public List<OrdenInstalacionDTO> getListFindBetwee(String valor1, String valor2) {
         // TODO Auto-generated method stub
-        return (List<OrdenInstalacion>) ordenDao.getListFindBetwee(valor1, valor2);
+        return (List<OrdenInstalacionDTO>) ordenDao.getListFindBetwee(valor1, valor2);
     }
 }

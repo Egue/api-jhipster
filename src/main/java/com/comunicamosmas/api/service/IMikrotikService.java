@@ -4,7 +4,7 @@ import com.comunicamosmas.api.domain.MikrotikHijoSimpleQueue;
 import com.comunicamosmas.api.domain.MikrotikPadreSimpleQueue;
 import com.comunicamosmas.api.domain.MikrotikTarifaReuso;
 import com.comunicamosmas.api.domain.WinmaxPass;
-import com.comunicamosmas.api.web.rest.vm.ClassError;
+import com.comunicamosmas.api.service.dto.ClassErrorDTO; 
 import java.util.List;
 import java.util.Map;
 import me.legrange.mikrotik.ApiConnectionException;
@@ -18,13 +18,13 @@ public interface IMikrotikService {
 
     public void createPadre(MikrotikTarifaReuso mikrotikTarifaReuso) throws MikrotikApiException;
 
-    public ClassError instalacion(Long idPlan, Long idEstacion, Long idIp, Long contrato, Long tecnologia);
+    public ClassErrorDTO instalacion(Long idPlan, Long idEstacion, Long idIp, Long contrato, Long tecnologia);
 
     public List<Map<String, String>> queueSimpleFindByContrato(Long idContrato, Long idEstacion) throws MikrotikApiException;
 
     public List<Map<String, String>> pppProfiles(Long idEstacion) throws MikrotikApiException;
 
-    public ClassError pppSecretsNew(Long idAppMaster, Long idContrato, Long idEstacion, String name, String nameSecrect, String pass);
+    public ClassErrorDTO pppSecretsNew(Long idAppMaster, Long idContrato, Long idEstacion, String name, String nameSecrect, String pass);
 
     public void test(Long idEstacion, String ip, Long idContrato) throws MikrotikApiException;
 

@@ -1,7 +1,7 @@
 package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.MikrotikIp;
-import com.comunicamosmas.api.web.rest.vm.ClassError;
+import com.comunicamosmas.api.service.dto.ClassErrorDTO; 
 import java.util.List;
 
 public interface IMikrotikIpService {
@@ -17,7 +17,7 @@ public interface IMikrotikIpService {
 
     public void updatedStatus(Long id);
 
-    public ClassError deleteByIdSegmento(Long id);
+    public ClassErrorDTO deleteByIdSegmento(Long id);
 
     public void deleteById(Long idIp);
 

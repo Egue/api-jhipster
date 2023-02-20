@@ -1,7 +1,7 @@
 package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.MikrotikSegmentoIp;
-import com.comunicamosmas.api.web.rest.vm.ISegmentoWithPool;
+import com.comunicamosmas.api.service.dto.SegmentoWithPoolDTO; 
 import java.util.List;
 
 public interface IMikrotikSegmentoIpService {
@@ -21,7 +21,7 @@ public interface IMikrotikSegmentoIpService {
 
     public List<MikrotikSegmentoIp> findByIdPool(Long idPool);
 
-    public List<ISegmentoWithPool> findByidPoolAndEstado(Long idPool);
+    public List<SegmentoWithPoolDTO> findByidPoolAndEstado(Long idPool);
 
     public void deleteById(Long id);
 }

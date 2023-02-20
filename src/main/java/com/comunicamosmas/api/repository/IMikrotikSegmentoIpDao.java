@@ -1,7 +1,7 @@
 package com.comunicamosmas.api.repository;
 
 import com.comunicamosmas.api.domain.MikrotikSegmentoIp;
-import com.comunicamosmas.api.web.rest.vm.ISegmentoWithPool;
+import com.comunicamosmas.api.service.dto.SegmentoWithPoolDTO; 
 import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -28,7 +28,7 @@ public interface IMikrotikSegmentoIpDao extends CrudRepository<MikrotikSegmentoI
         "where mikrotik_pool.id_pool = :idPool AND ms.estado = 'vacio'",
         nativeQuery = true
     )
-    public List<ISegmentoWithPool> findByidPoolAndEstado(Long idPool);
+    public List<SegmentoWithPoolDTO> findByidPoolAndEstado(Long idPool);
 
     @Query(
         value = "SELECT count(ms.id_estacion) as ip FROM mikrotik_segmento_ip ms\r\n" +

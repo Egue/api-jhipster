@@ -1,7 +1,8 @@
 package com.comunicamosmas.api.repository;
 
 import com.comunicamosmas.api.domain.Contrato;
-import com.comunicamosmas.api.web.rest.vm.IListContratoVM;
+import com.comunicamosmas.api.service.dto.DatosClienteDTO;
+import com.comunicamosmas.api.service.dto.ListContratoDTO; 
 import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -32,5 +33,36 @@ public interface IContratoDao extends CrudRepository<Contrato, Long> {
         "WHERE clientes.id_cliente = :idCliente",
         nativeQuery = true
     )
-    public List<IListContratoVM> findByIdCliente(@Param(value = "idCliente") Long idCliente);
+    public List<ListContratoDTO> findByIdCliente(@Param(value = "idCliente") Long idCliente);
+    
+    /**
+     * consultar para cargar los datos de conctacto del cliente*/
+    @Query(value="SELECT \n"
+    		+ "co.id_contrato idContrato, \n"
+    		+ "co.estrato,\n"
+    		+ "case\n"
+    		+ "	when cl.tipo_cliente = 'J' then cl.razon_social\n"
+    		+ "    when cl.tipo_cliente = 'N' then CONCAT(cl.apellido_paterno , ' ',cl.apellido_materno , ' ',cl.nombre_primer , ' ',cl.nombre_segundo)\n"
+    		+ "    end  as nombreCliente,\n"
+    		+ "cl.documento,\n"
+    		+ "cl.celular_a as celularA,\n"
+    		+ "cl.celular_b as celularB,\n"
+    		+ "cl.mail,\n"
+    		+ "ta.nombre nombreTarifa, \n"
+    		+ "ta.velocidad,\n"
+    		+ "FORMAT(ta.valor , 2)as  valor ,\n"
+    		+ "dir.longitud as longDireccion,\n"
+    		+ "dir.latitud as latDireccion,\n"
+    		+ "es.latitud as latEstacion,\n"
+    		+ "es.longitud as longEstacion,\n"
+    		+ "concat(dir.tipo,' / ',dir.a_tipo,' ',dir.a_numero,' ',dir.a_letra,' ',dir.b_tipo,' ',dir.b_numero,' ',dir.b_letra,' ',dir.numero,' / ',dir.nota,' / ',dir.barrio) as direccionServicio\n"
+    		+ "\n"
+    		+ "FROM controlmas.contratos co\n"
+    		+ "\n"
+    		+ "inner join clientes cl on cl.id_cliente = co.id_cliente\n"
+    		+ "inner join tarifas ta on ta.id_tarifa = co.id_tarifa_promo\n"
+    		+ "inner join direcciones dir on dir.id_direccion = co.id_direccion_servicio\n"
+    		+ "inner join estaciones es on es.id_estacion = co.id_estacion\n"
+    		+ "where co.id_contrato = :idContrato" , nativeQuery=true)
+    public DatosClienteDTO datosClienteByIdContrato(@Param(value="idContrato") Long idContrato);
 }

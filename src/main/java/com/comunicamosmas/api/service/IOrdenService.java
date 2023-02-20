@@ -1,8 +1,8 @@
 package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.Orden;
-import com.comunicamosmas.api.web.rest.vm.OrdenForInstalacionFindByIdOrden;
-import com.comunicamosmas.api.web.rest.vm.OrdenInstalacion;
+import com.comunicamosmas.api.service.dto.OrdenForInstalacionFindByIdOrdenDTO;
+import com.comunicamosmas.api.service.dto.OrdenInstalacionDTO; 
 import java.util.List;
 
 public interface IOrdenService {
@@ -18,11 +18,11 @@ public interface IOrdenService {
     //buscar por id
     public Orden findById(Long id);
 
-    public List<OrdenInstalacion> ordenInstalacion();
+    public List<OrdenInstalacionDTO> ordenInstalacion();
 
-    public OrdenForInstalacionFindByIdOrden ordenForInstalacionFindByIdOrden(Long id);
+    public OrdenForInstalacionFindByIdOrdenDTO ordenForInstalacionFindByIdOrden(Long id);
 
     public String findTelefonoByIdOrden(Long idOrden);
 
-    public List<OrdenInstalacion> getListFindBetwee(String valor1, String valor2);
+    public List<OrdenInstalacionDTO> getListFindBetwee(String valor1, String valor2);
 }

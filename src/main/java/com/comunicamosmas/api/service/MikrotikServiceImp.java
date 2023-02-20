@@ -7,7 +7,7 @@ import com.comunicamosmas.api.domain.MikrotikIp;
 import com.comunicamosmas.api.domain.MikrotikPadreSimpleQueue;
 import com.comunicamosmas.api.domain.MikrotikTarifaReuso;
 import com.comunicamosmas.api.domain.WinmaxPass;
-import com.comunicamosmas.api.web.rest.vm.ClassError;
+import com.comunicamosmas.api.service.dto.ClassErrorDTO;  
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -75,8 +75,8 @@ public class MikrotikServiceImp implements IMikrotikService {
 
     @SuppressWarnings("null")
     @Override
-    public ClassError instalacion(Long idPlan, Long idEstacion, Long idIp, Long contrato, Long tecnologia) {
-        ClassError error = new ClassError();
+    public ClassErrorDTO instalacion(Long idPlan, Long idEstacion, Long idIp, Long contrato, Long tecnologia) {
+        ClassErrorDTO error = new ClassErrorDTO();
         //consultar si ya existe el contrato o ip registrada
         //recuperar estacion
         Estacion estacion = estacionService.findById(idEstacion);
@@ -291,8 +291,8 @@ public class MikrotikServiceImp implements IMikrotikService {
     }
 
     @Override
-    public ClassError pppSecretsNew(Long idAppMaster, Long idContrato, Long idEstacion, String name, String nameSecrect, String pass) {
-        ClassError error = new ClassError();
+    public ClassErrorDTO pppSecretsNew(Long idAppMaster, Long idContrato, Long idEstacion, String name, String nameSecrect, String pass) {
+        ClassErrorDTO error = new ClassErrorDTO();
         //consultar si ya existe el contrato
         Long count = winmaxPassService.countFindByIdContrato(idContrato);
         if (count > 0) {

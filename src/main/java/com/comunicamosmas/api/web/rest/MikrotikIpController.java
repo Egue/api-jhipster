@@ -3,7 +3,7 @@ package com.comunicamosmas.api.web.rest;
 import com.comunicamosmas.api.domain.MikrotikIp;
 import com.comunicamosmas.api.service.IMikrotikIpService;
 import com.comunicamosmas.api.service.IMikrotikSegmentoIpService;
-import com.comunicamosmas.api.web.rest.vm.ClassError;
+import com.comunicamosmas.api.service.dto.ClassErrorDTO; 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,8 +71,8 @@ public class MikrotikIpController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            ClassError error = mikrotikIpService.deleteByIdSegmento(id);
-            if (error.getError()) {
+            ClassErrorDTO error = mikrotikIpService.deleteByIdSegmento(id);
+            if (error.isError()) {
                 response.put("response", error.getMsm());
 
                 return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);

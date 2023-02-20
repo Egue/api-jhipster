@@ -2,8 +2,8 @@ package com.comunicamosmas.api.repository;
 
 import com.comunicamosmas.api.domain.EnumOrdenInstalacion;
 import com.comunicamosmas.api.domain.Orden;
-import com.comunicamosmas.api.web.rest.vm.OrdenForInstalacionFindByIdOrden;
-import com.comunicamosmas.api.web.rest.vm.OrdenInstalacion;
+import com.comunicamosmas.api.service.dto.OrdenForInstalacionFindByIdOrdenDTO;
+import com.comunicamosmas.api.service.dto.OrdenInstalacionDTO; 
 import java.util.List;
 import javax.persistence.Tuple;
 import org.springframework.data.jpa.repository.Query;
@@ -25,7 +25,7 @@ public interface IOrdenDao extends CrudRepository<Orden, Long> {
         "WHERE tt.servicio = 1 AND o.tipo_orden = 1 AND o.estado IN (0,1,2,3) and o.anulada = 0 AND o.winmax=0 AND o.id_usuario_ejecuta > 0",
         nativeQuery = true
     )
-    public List<OrdenInstalacion> ordenInstalacion();
+    public List<OrdenInstalacionDTO> ordenInstalacion();
 
     @Query(
         value = "SELECT o.id_orden as idOrden , o.id_contrato as idContrato, concat(c.apellido_paterno , ' ', c.nombre_primer , ' ', c.nombre_segundo) as nombreCliente,\n" +
@@ -45,7 +45,7 @@ public interface IOrdenDao extends CrudRepository<Orden, Long> {
         "WHERE tt.servicio = 1 AND o.id_orden  = ?",
         nativeQuery = true
     )
-    public OrdenForInstalacionFindByIdOrden ordenForInstalacionFindByIdOrden(Long id);
+    public OrdenForInstalacionFindByIdOrdenDTO ordenForInstalacionFindByIdOrden(Long id);
 
     @Query(
         value = "SELECT u.telefono FROM ordenes o INNER JOIN usuarios u ON u.id_usuario = o.id_usuario_ejecuta WHERE" + " o.id_orden = ?",
@@ -69,5 +69,5 @@ public interface IOrdenDao extends CrudRepository<Orden, Long> {
         " AND o.fechaf_registra BETWEEN :valor1 AND :valor2",
         nativeQuery = true
     )
-    public List<OrdenInstalacion> getListFindBetwee(String valor1, String valor2);
+    public List<OrdenInstalacionDTO> getListFindBetwee(String valor1, String valor2);
 }

@@ -1,8 +1,8 @@
 package com.comunicamosmas.api.web.rest;
 
 import com.comunicamosmas.api.service.IOrdenService;
-import com.comunicamosmas.api.web.rest.vm.OrdenForInstalacionFindByIdOrden;
-import com.comunicamosmas.api.web.rest.vm.OrdenInstalacion;
+import com.comunicamosmas.api.service.dto.OrdenForInstalacionFindByIdOrdenDTO;
+import com.comunicamosmas.api.service.dto.OrdenInstalacionDTO;  
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +29,7 @@ public class OrdenesController {
     public ResponseEntity<?> listInstacion() {
         Map<String, Object> response = new HashMap<>();
         try {
-            List<OrdenInstalacion> ordenInstalacion = ordenService.ordenInstalacion();
+            List<OrdenInstalacionDTO> ordenInstalacion = ordenService.ordenInstalacion();
 
             response.put("response", ordenInstalacion);
 
@@ -45,7 +45,7 @@ public class OrdenesController {
     public ResponseEntity<?> findByIdOrdeForInstalacion(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
         try {
-            OrdenForInstalacionFindByIdOrden orden = ordenService.ordenForInstalacionFindByIdOrden(id);
+            OrdenForInstalacionFindByIdOrdenDTO orden = ordenService.ordenForInstalacionFindByIdOrden(id);
 
             response.put("response", orden);
 
@@ -63,7 +63,7 @@ public class OrdenesController {
     public ResponseEntity<?> instalacionBetween(@RequestParam String valor1, @RequestParam String valor2) {
         Map<String, Object> response = new HashMap<>();
         try {
-            List<OrdenInstalacion> result = ordenService.getListFindBetwee(valor1, valor2);
+            List<OrdenInstalacionDTO> result = ordenService.getListFindBetwee(valor1, valor2);
             response.put("response", result);
 
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);

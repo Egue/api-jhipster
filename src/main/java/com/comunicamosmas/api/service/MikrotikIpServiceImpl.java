@@ -2,7 +2,7 @@ package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.MikrotikIp;
 import com.comunicamosmas.api.repository.IMikrotikIpDao;
-import com.comunicamosmas.api.web.rest.vm.ClassError;
+import com.comunicamosmas.api.service.dto.ClassErrorDTO; 
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,10 +125,10 @@ public class MikrotikIpServiceImpl implements IMikrotikIpService {
     }
 
     @Override
-    public ClassError deleteByIdSegmento(Long idSegmento) {
+    public ClassErrorDTO deleteByIdSegmento(Long idSegmento) {
         //buscar por el id si existen activos
         int count = mikrotikIpDao.countActiveByIdSegmento(idSegmento);
-        ClassError error = new ClassError();
+        ClassErrorDTO error = new ClassErrorDTO();
         if (count > 0) {
             error.setError(true);
             error.setMsm("Existen ip usadas");

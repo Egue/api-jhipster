@@ -1,8 +1,6 @@
 package com.comunicamosmas.api.service;
-
-import com.comunicamosmas.api.domain.Admin;
-import com.comunicamosmas.api.domain.Cliente;
-import com.comunicamosmas.api.repository.IAdminDao;
+ 
+import com.comunicamosmas.api.domain.Cliente; 
 import com.comunicamosmas.api.repository.IClienteDao;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;

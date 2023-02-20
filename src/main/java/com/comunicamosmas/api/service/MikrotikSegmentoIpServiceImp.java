@@ -2,7 +2,7 @@ package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.MikrotikSegmentoIp;
 import com.comunicamosmas.api.repository.IMikrotikSegmentoIpDao;
-import com.comunicamosmas.api.web.rest.vm.ISegmentoWithPool;
+import com.comunicamosmas.api.service.dto.SegmentoWithPoolDTO; 
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,7 +115,7 @@ public class MikrotikSegmentoIpServiceImp implements IMikrotikSegmentoIpService 
     }
 
     @Override
-    public List<ISegmentoWithPool> findByidPoolAndEstado(Long idPool) {
+    public List<SegmentoWithPoolDTO> findByidPoolAndEstado(Long idPool) {
         // TODO Auto-generated method stub
         return mikrotikSegmentoIpDao.findByidPoolAndEstado(idPool);
     }
