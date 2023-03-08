@@ -1,16 +1,18 @@
 package com.comunicamosmas.api.service.dto;
 
+import java.math.BigInteger;
+
 public class DatosClienteDTO {
 	
-	public Long idContrato;
-	public String estrato;
+	public Integer idContrato;
+	public Integer estrato;
 	public String nombreCliente;
-	public String documento; 
+	public BigInteger documento; 
 	public String celularA;
 	public String celularB;
 	public String mail;
 	public String nombreTarifa;
-	public String velocidad;
+	public Integer velocidad;
 	public String valor;
 	public String longDireccion; 
 	public String latDireccion;
@@ -22,8 +24,8 @@ public class DatosClienteDTO {
 	public DatosClienteDTO() {
 		 
 	}
-	public DatosClienteDTO(Long idContrato, String estrato, String nombreCliente, String documento, String celularA,
-			String celularB, String mail, String nombreTarifa, String velocidad, String valor, String longDireccion,
+	public DatosClienteDTO(Integer idContrato, Integer estrato, String nombreCliente, BigInteger documento, String celularA,
+			String celularB, String mail, String nombreTarifa, Integer velocidad, String valor, String longDireccion,
 			String latDireccion, String longEstacion, String latEstacion, String direccionServicio) {
 		 
 		this.idContrato = idContrato;
@@ -42,16 +44,16 @@ public class DatosClienteDTO {
 		this.latEstacion = latEstacion;
 		this.direccionServicio = direccionServicio;
 	}
-	public Long getIdContrato() {
+	public Integer getIdContrato() {
 		return idContrato;
 	}
-	public void setIdContrato(Long idContrato) {
+	public void setIdContrato(Integer idContrato) {
 		this.idContrato = idContrato;
 	}
-	public String getEstrato() {
+	public Integer getEstrato() {
 		return estrato;
 	}
-	public void setEstrato(String estrato) {
+	public void setEstrato(Integer estrato) {
 		this.estrato = estrato;
 	}
 	public String getNombreCliente() {
@@ -60,10 +62,10 @@ public class DatosClienteDTO {
 	public void setNombreCliente(String nombreCliente) {
 		this.nombreCliente = nombreCliente;
 	}
-	public String getDocumento() {
+	public BigInteger getDocumento() {
 		return documento;
 	}
-	public void setDocumento(String documento) {
+	public void setDocumento(BigInteger documento) {
 		this.documento = documento;
 	}
 	public String getCelularA() {
@@ -90,10 +92,10 @@ public class DatosClienteDTO {
 	public void setNombreTarifa(String nombreTarifa) {
 		this.nombreTarifa = nombreTarifa;
 	}
-	public String getVelocidad() {
+	public Integer getVelocidad() {
 		return velocidad;
 	}
-	public void setVelocidad(String velocidad) {
+	public void setVelocidad(Integer velocidad) {
 		this.velocidad = velocidad;
 	}
 	public String getValor() {

@@ -3,16 +3,16 @@ package com.comunicamosmas.api.service.dto;
 public class ListContratoDTO {
 	private String nombreMunicipio;
 	private String nombreServicio;
-	private String idContrato;
+	private Integer idContrato;
 	private String barrio;
 	private String direccion;
 	private String estado;
 	
 	public ListContratoDTO() {
-		 
+		
 	}
 
-	public ListContratoDTO(String nombreMunicipio, String nombreServicio, String idContrato, String barrio,
+	public ListContratoDTO(String nombreMunicipio, String nombreServicio, Integer idContrato, String barrio,
 			String direccion, String estado) {
 		 
 		this.nombreMunicipio = nombreMunicipio;
@@ -39,11 +39,11 @@ public class ListContratoDTO {
 		this.nombreServicio = nombreServicio;
 	}
 
-	public String getIdContrato() {
+	public Integer getIdContrato() {
 		return idContrato;
 	}
 
-	public void setIdContrato(String idContrato) {
+	public void setIdContrato(Integer idContrato) {
 		this.idContrato = idContrato;
 	}
 

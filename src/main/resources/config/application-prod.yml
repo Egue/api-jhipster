@@ -33,9 +33,9 @@ spring:
       enabled: false
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://172.17.0.1:33306/api?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
-    username: root
-    password: mysql
+    url: jdbc:mysql://10.111.39.3:3306/controlmas?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+    username: LNWW(345
+    password: 9C9UAaqKecHRZA79
     hikari:
       poolName: Hikari
       auto-commit: false

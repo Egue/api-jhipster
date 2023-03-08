@@ -4,7 +4,13 @@ import com.comunicamosmas.api.domain.MikrotikHijoSimpleQueue;
 import com.comunicamosmas.api.domain.MikrotikPadreSimpleQueue;
 import com.comunicamosmas.api.domain.MikrotikTarifaReuso;
 import com.comunicamosmas.api.domain.WinmaxPass;
-import com.comunicamosmas.api.service.dto.ClassErrorDTO; 
+import com.comunicamosmas.api.service.dto.ClassErrorDTO;
+import com.comunicamosmas.api.service.dto.MikrotikPPPActiveDTO;
+import com.comunicamosmas.api.service.dto.MikrotikPPPProfileDTO;
+import com.comunicamosmas.api.service.dto.MikrotikPPPSecretDTO;
+import com.comunicamosmas.api.service.dto.MikrotikQueueSimpleDTO;
+import com.comunicamosmas.api.service.dto.ValorStringDTO;
+
 import java.util.List;
 import java.util.Map;
 import me.legrange.mikrotik.ApiConnectionException;
@@ -45,4 +51,22 @@ public interface IMikrotikService {
 
     //actualiza remote adddes
     public WinmaxPass updatedRemoteAddress(Long id, Long idEstacion, Long idIp) throws MikrotikApiException;
+    /**QUEUESIMPLE*/
+    public List<MikrotikQueueSimpleDTO> QueueSimpleAll(Long idEstacion) throws MikrotikApiException;
+    
+    /**
+     * consulta los profiles del pppOE de cada estacion*/
+    public List<MikrotikPPPProfileDTO> profileByIdEstacion(Long idEstacion) throws MikrotikApiException;
+    //active ppp
+    public List<MikrotikPPPActiveDTO> pppoeActive(Long idEstacion) throws MikrotikApiException;
+    //active find name
+    public ValorStringDTO pppoeActiveFindByName(Long idEstacion , Long idContrato)throws MikrotikApiException;
+    //remove active
+    public void pppoeActiveRemoveById(Long idEstacion , String idrb)throws MikrotikApiException;
+    //secret del pppoe
+    public List<MikrotikPPPSecretDTO> pppoeSecrectFindAll(Long idEstacion)throws MikrotikApiException;
+    //buscar por name un perfil
+    public ValorStringDTO pppeoSecretFindByName(Long idContrato , Long idEstacion) throws MikrotikApiException;
+    //change progile
+    public List<Map<String, String>> pppoeSecretChangeProfile(Long idContrato , Long idTarifa , String idrb , Long idUser , Long idMigracion)throws MikrotikApiException;
 }

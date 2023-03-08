@@ -1,7 +1,13 @@
 package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.Tarifa;
+import com.comunicamosmas.api.service.dto.DisctVelocidadDTO;
+import com.comunicamosmas.api.service.dto.TarifasForCambioDTO;
+import com.comunicamosmas.api.service.dto.valorDTO;
+
 import java.util.List;
+
+import org.springframework.data.repository.query.Param;
 
 public interface ITarifaService {
     //listar todos
@@ -15,4 +21,10 @@ public interface ITarifaService {
 
     //buscar por id
     public Tarifa findById(Long id);
+    
+    public List<DisctVelocidadDTO> findVelocidadDisctByIdServicio(Long idServicio , Long idTecnologia);
+    
+    public List<TarifasForCambioDTO> tarifasForCambio( Long idServicio ,  Long velocidad , Long tipoTarifa , Long idTecnologia , Long valor);
+    
+    public List<valorDTO> findTarifaValor(Long idServicio, Long velocidad, Long tipoTarifa , Long idTecnologia);
 }

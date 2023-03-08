@@ -1,14 +1,24 @@
 package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.Cliente;
+import com.comunicamosmas.api.domain.Contrato;
 import com.comunicamosmas.api.domain.Estacion;
+import com.comunicamosmas.api.domain.MigracionTarifa;
 import com.comunicamosmas.api.domain.MikrotikHijoSimpleQueue;
 import com.comunicamosmas.api.domain.MikrotikIp;
 import com.comunicamosmas.api.domain.MikrotikPadreSimpleQueue;
 import com.comunicamosmas.api.domain.MikrotikTarifaReuso;
+import com.comunicamosmas.api.domain.Tarifa;
 import com.comunicamosmas.api.domain.WinmaxPass;
-import com.comunicamosmas.api.service.dto.ClassErrorDTO;  
-import java.util.HashMap;
+import com.comunicamosmas.api.service.dto.ClassErrorDTO;
+import com.comunicamosmas.api.service.dto.MikrotikPPPActiveDTO;
+import com.comunicamosmas.api.service.dto.MikrotikPPPProfileDTO;
+import com.comunicamosmas.api.service.dto.MikrotikPPPSecretDTO;
+import com.comunicamosmas.api.service.dto.MikrotikQueueSimpleDTO;
+import com.comunicamosmas.api.service.dto.ValorStringDTO;
+import com.comunicamosmas.api.service.dto.valorDTO;
+
+import java.util.ArrayList; 
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -16,10 +26,8 @@ import java.util.UUID;
 import javax.net.SocketFactory;
 import me.legrange.mikrotik.ApiConnection;
 import me.legrange.mikrotik.ApiConnectionException;
-import me.legrange.mikrotik.MikrotikApiException;
-import me.legrange.mikrotik.ResultListener;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import me.legrange.mikrotik.MikrotikApiException; 
+import org.springframework.beans.factory.annotation.Autowired; 
 import org.springframework.stereotype.Service;
 
 @Service
@@ -48,6 +56,15 @@ public class MikrotikServiceImp implements IMikrotikService {
     @Autowired
     IWinmaxPassService winmaxPassService;
 
+    @Autowired
+    IContratoService contratoService;
+    
+    @Autowired
+    ITarifaService tarifaService;
+    
+    @Autowired
+    IMigracionTarifaService migracionTarifaService;
+    
     ApiConnection apiConnection;
 
     @Override
@@ -242,7 +259,8 @@ public class MikrotikServiceImp implements IMikrotikService {
             sub = limitSubida + "M";
         } else {
             float temp = Float.parseFloat(velocidadSubida[0]);
-            float result = (temp / reuso) * 1000;
+            //float result = (temp / reuso) * 1000;
+            float result = (temp * 1024) / reuso;
             limitSubida = (int) result;
             sub = limitSubida + "k";
         }
@@ -252,7 +270,8 @@ public class MikrotikServiceImp implements IMikrotikService {
             baj = limitBajada + "M";
         } else {
             float temp = Float.parseFloat(velocidadBajada[0]);
-            float result = (temp / reuso) * 1000;
+           // float result = (temp / reuso) * 1000;
+            float result = (temp * 1024) / reuso;
             limitBajada = (int) result;
             baj = limitBajada + "k";
         }
@@ -601,7 +620,13 @@ public class MikrotikServiceImp implements IMikrotikService {
         hijo.setQueue("pcq-upload-default/pcq-download-default");
         hijo.setTarget(ip.getIp());
         mikrotikHijoSimpleQueueService.save(hijo);
-
+        //actualizar el padre
+       /* Long reuso = padre.getReuso() + 1;
+        String target = padre.getTarget() + "," + idIp;
+        padre.setTarget(target);
+        padre.setReuso(reuso);
+        padreSimpleQueueService.save(padre);*/
+        
         return hijo;
     }
 
@@ -647,4 +672,194 @@ public class MikrotikServiceImp implements IMikrotikService {
         this.logout();
         return padre;
     }
+
+	@Override
+	public List<MikrotikPPPProfileDTO> profileByIdEstacion(Long idEstacion) throws MikrotikApiException{
+		//informacion de estacion
+		Estacion estacion = estacionService.findById(idEstacion);
+		this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(), estacion.getApiPort());
+		String command = "/ppp/profile/print";
+		List<Map<String, String>> result =  apiConnection.execute(command);
+		this.logout();
+		 //recorrer lista y mappear result en MikrotikPPPProfileDTO
+		List<MikrotikPPPProfileDTO> pppoe = new ArrayList<>();
+		for(Map<String, String> map : result)
+		{
+			MikrotikPPPProfileDTO object = new MikrotikPPPProfileDTO();
+			object.setId((String) map.get(".id"));
+			object.setLocalAddress((String) map.get("local-address"));
+			object.setName((String) map.get("name"));
+			object.setRateLimit((String) map.get("rate-limit"));
+			object.setRemoteAddress((String) map.get("remote-address"));
+			pppoe.add(object);
+		}
+		return pppoe;
+	}
+
+	@Override
+	public List<MikrotikPPPActiveDTO> pppoeActive(Long idEstacion)throws MikrotikApiException {
+		// TODO Auto-generated method stub
+		Estacion estacion = estacionService.findById(idEstacion);
+		this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(), estacion.getApiPort());
+		String command = "/ppp/active/print";
+		List<Map<String, String>> result =  apiConnection.execute(command); 
+		this.logout();
+		//mapear resultados
+		List<MikrotikPPPActiveDTO> pppoeActive = new ArrayList<>();
+		for(Map<String, String> map : result)
+		{
+			MikrotikPPPActiveDTO object = new MikrotikPPPActiveDTO();
+			
+			object.setAddress((String) map.get("address"));
+			object.setCallerId((String) map.get("caller-id"));
+			object.setComment((String) map.get("comment"));
+			object.setId((String) map.get(".id"));
+			object.setName((String) map.get("name"));
+			object.setService((String) map.get("service"));
+			object.setUptime((String) map.get("uptime"));
+			
+			pppoeActive.add(object);
+		}
+		
+		return pppoeActive;
+	}
+
+	@Override
+	public ValorStringDTO pppeoSecretFindByName(Long idContrato , Long idEstacion)
+			throws MikrotikApiException {
+		//buscar informacion de la estacion
+		Estacion estacion = estacionService.findById(idEstacion);
+		//buscar name en winmapas
+		WinmaxPass winmax = winmaxPassService.findByIdContrato(idContrato);
+		//
+		this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(), estacion.getApiPort());
+		String command = "/ppp/secret/print where name="+ winmax.getUsuario();
+		List<Map<String, String>> result =  apiConnection.execute(command);
+		
+		this.logout();
+		ValorStringDTO valor = new  ValorStringDTO();
+		for(Map<String , String > rs : result)
+		{
+			valor.setValor((String) rs.get(".id"));
+		}
+		return valor;
+	}
+
+	@Override
+	public List<Map<java.lang.String, java.lang.String>> pppoeSecretChangeProfile(Long idContrato,
+			Long idTarifa, java.lang.String idrb , Long idUser , Long idMigracion) throws MikrotikApiException {
+		//estaicon
+		Contrato contrato = contratoService.findById(idContrato);
+		
+		Estacion estacion = estacionService.findById(contrato.getIdEstacion());
+		
+		Tarifa tarifa = tarifaService.findById(idTarifa);
+		
+		this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(), estacion.getApiPort());
+		
+		String command = "/ppp/secret/set .id="+idrb+" profile="+tarifa.getCodigoMikrotik();
+		List<Map<String, String>> result =  apiConnection.execute(command);
+		this.logout();
+		
+		
+		
+		MigracionTarifa  migracion = migracionTarifaService.findById(idMigracion);
+		migracion.setIdAdmin(idUser);
+		migracion.setEstado(1L);
+		migracionTarifaService.save(migracion);
+		
+		//actualizar contrato
+				contrato.setIdTarifa(idTarifa);
+				contrato.setIdTarifaPromo(idTarifa);
+				
+				Contrato save = contratoService.save(contrato);
+		
+		return result;
+	}
+
+	@Override
+	public ValorStringDTO pppoeActiveFindByName(Long idEstacion, Long idContrato) throws MikrotikApiException {
+		// TODO Auto-generated method stub
+		Estacion estacion = estacionService.findById(idEstacion);
+		WinmaxPass winmax = winmaxPassService.findByIdContrato(idContrato);
+		this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(), estacion.getApiPort());
+		String command = "/ppp/active/print where name="+winmax.getUsuario();
+		List<Map<String, String>> result =  apiConnection.execute(command);
+		this.logout();
+		
+		//
+		ValorStringDTO valor = new ValorStringDTO();
+		for(Map<String, String> rs : result)
+		{
+			valor.setValor((String) rs.get(".id"));
+		}
+		return valor;
+	}
+
+	@Override
+	public void pppoeActiveRemoveById(Long idEstacion, java.lang.String idrb) throws MikrotikApiException {
+		
+		Estacion estacion = estacionService.findById(idEstacion);
+		this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(), estacion.getApiPort());
+		String command = "/ppp/active/remove .id="+idrb;
+		apiConnection.execute(command);
+		this.logout();
+	}
+
+	@Override
+	public List<MikrotikPPPSecretDTO>  pppoeSecrectFindAll(Long idEstacion)
+			throws MikrotikApiException {
+		Estacion estacion = estacionService.findById(idEstacion);
+		this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(), estacion.getApiPort());
+		String command = "/ppp/secret/print";
+		List<Map<String, String>> result =  apiConnection.execute(command);
+		this.logout();
+		List<MikrotikPPPSecretDTO> secret = new ArrayList<>();
+		for(Map<String , String> rs : result)
+		{
+			MikrotikPPPSecretDTO object = new MikrotikPPPSecretDTO();
+			
+			object.setId((String) rs.get(".id"));
+			object.setCallerId((String) rs.get("caller-id"));;
+			object.setComment((String) rs.get("comment"));
+			object.setDisable((String) rs.get("disabled"));
+			object.setIpv6((String) rs.get("ipv6-routes)"));
+			object.setLastCallerId((String) rs.get("last-caller-id"));;
+			object.setLastLoggedOut((String) rs.get("last-logged-out"));
+			object.setName((String) rs.get("name"));
+			object.setProfile((String) rs.get("profile"));
+			object.setService((String) rs.get("service"));
+			
+			secret.add(object);
+		}
+		return secret;
+	}
+
+	@Override
+	public List<MikrotikQueueSimpleDTO> QueueSimpleAll(Long idEstacion) throws MikrotikApiException {
+		Estacion estacion = estacionService.findById(idEstacion);
+		this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(), estacion.getApiPort());
+		String command = "/queue/simple/print";
+		
+		List<Map<String, String>> result =  apiConnection.execute(command);
+		this.logout();
+		List<MikrotikQueueSimpleDTO> simple = new ArrayList<>();
+		for(Map<String, String> rs: result)
+		{
+			MikrotikQueueSimpleDTO object = new MikrotikQueueSimpleDTO();
+			object.setId((String) rs.get(".id"));
+			object.setComment((String) rs.get("comment"));
+			object.setDisable((String) rs.get("disabled"));
+			object.setDroppend((String) rs.get("dropped"));
+			object.setLimitAt((String) rs.get("limit-at"));
+			object.setMaxLimit((String) rs.get("max-limit"));
+			object.setName((String) rs.get("name"));
+			object.setParent((String) rs.get("parent"));
+			object.setPriory((String) rs.get("prioryty"));
+			object.setQueue((String) rs.get("queue"));
+			object.setTarget((String) rs.get("target"));
+			simple.add(object);
+		}
+		return simple;
+	}
 }

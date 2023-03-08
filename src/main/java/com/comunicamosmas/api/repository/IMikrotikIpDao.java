@@ -4,16 +4,17 @@ import com.comunicamosmas.api.domain.MikrotikIp;
 import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 public interface IMikrotikIpDao extends CrudRepository<MikrotikIp, Long> {
     @Query(value = "SELECT * FROM mikrotik_ip mp WHERE mp.id_segmento_ip = ?", nativeQuery = true)
     public List<MikrotikIp> findAllBySegmentoIp(Long idSegmentoIp);
 
     @Query(value = "SELECT * FROM mikrotik_ip mp WHERE mp.id_segmento_ip =:idSegmentoIp AND mp.estado <> 1", nativeQuery = true)
-    public List<MikrotikIp> findAllBySegmentoIpStatus(Long idSegmentoIp);
+    public List<MikrotikIp> findAllBySegmentoIpStatus(@Param("idSegmentoIp")Long idSegmentoIp);
 
-    @Query(value = "SELECT count(id_ip) as ip FROM mikrotik_ip mp WHERE mp.estado=1  AND mp.id_segmento_ip = ?", nativeQuery = true)
-    public int countActiveByIdSegmento(Long idSegmento);
+    @Query(value = "SELECT count(id_ip) as ip FROM mikrotik_ip mp WHERE mp.estado=1  AND mp.id_segmento_ip = :idSegmento", nativeQuery = true)
+    public int countActiveByIdSegmento(@Param("idSegmento")Long idSegmento);
 
     @Query(
         value = "SELECT mi.id_ip , mi.id_segmento_ip , mi.ip, mi.estado FROM mikrotik_ip mi\r\n" +
@@ -22,5 +23,5 @@ public interface IMikrotikIpDao extends CrudRepository<MikrotikIp, Long> {
         "where ms.id_pool = :idPool and mi.estado != 1 limit 0,1",
         nativeQuery = true
     )
-    public List<MikrotikIp> findByIdPool(Long idPool);
+    public List<MikrotikIp> findByIdPool(@Param("idPool")Long idPool);
 }

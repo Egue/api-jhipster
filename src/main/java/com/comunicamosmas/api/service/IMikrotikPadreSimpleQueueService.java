@@ -1,6 +1,8 @@
 package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.MikrotikPadreSimpleQueue;
+import com.comunicamosmas.api.service.dto.SimpleQueueFindReusoDTO;
+
 import java.util.List;
 
 public interface IMikrotikPadreSimpleQueueService {
@@ -15,4 +17,8 @@ public interface IMikrotikPadreSimpleQueueService {
     public void updatedTargetReuso(String target, Long id);
 
     public MikrotikPadreSimpleQueue findById(Long id);
+    
+    public SimpleQueueFindReusoDTO simpleQueueInfoComponent(Long idContrato);
+    
+    public void eliminarTarget(Long idPadre, String ip);
 }

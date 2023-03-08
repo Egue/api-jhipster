@@ -8,8 +8,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface IMikrotikSegmentoIpDao extends CrudRepository<MikrotikSegmentoIp, Long> {
-    @Query(value = "SELECT * FROM mikrotik_segmento_ip m WHERE m.id_estacion = ?", nativeQuery = true)
-    public List<MikrotikSegmentoIp> findByIdEstacion(Long id);
+    @Query(value = "SELECT * FROM mikrotik_segmento_ip m WHERE m.id_estacion = :id", nativeQuery = true)
+    public List<MikrotikSegmentoIp> findByIdEstacion(@Param("id")Long id);
 
     @Query(
         value = "SELECT count(segmento) FROM mikrotik_segmento_ip ms WHERE ms.id_estacion = :idEstacion AND ms.segmento = :segmento",
@@ -17,8 +17,8 @@ public interface IMikrotikSegmentoIpDao extends CrudRepository<MikrotikSegmentoI
     )
     public int countFindByIdEstacionAndName(@Param("idEstacion") Long idEstacion, @Param("segmento") String segmento);
 
-    @Query(value = "SELECT * FROM mikrotik_segmento_ip ms WHERE ms.id_pool = ?", nativeQuery = true)
-    public List<MikrotikSegmentoIp> findByIdPool(Long idPool);
+    @Query(value = "SELECT * FROM mikrotik_segmento_ip ms WHERE ms.id_pool = :idPool", nativeQuery = true)
+    public List<MikrotikSegmentoIp> findByIdPool(@Param("idPool")Long idPool);
 
     @Query(
         value = "SELECT\n" +
@@ -28,7 +28,7 @@ public interface IMikrotikSegmentoIpDao extends CrudRepository<MikrotikSegmentoI
         "where mikrotik_pool.id_pool = :idPool AND ms.estado = 'vacio'",
         nativeQuery = true
     )
-    public List<SegmentoWithPoolDTO> findByidPoolAndEstado(Long idPool);
+    public List<SegmentoWithPoolDTO> findByidPoolAndEstado(@Param("idPool")Long idPool);
 
     @Query(
         value = "SELECT count(ms.id_estacion) as ip FROM mikrotik_segmento_ip ms\r\n" +
@@ -36,5 +36,5 @@ public interface IMikrotikSegmentoIpDao extends CrudRepository<MikrotikSegmentoI
         "where estaciones.api_ip = :ip and  ms.segmento = :segmento",
         nativeQuery = true
     )
-    public int countDFindIpByPublic(String ip, String segmento);
+    public int countDFindIpByPublic(@Param("ip")String ip, @Param("segmento")String segmento);
 }

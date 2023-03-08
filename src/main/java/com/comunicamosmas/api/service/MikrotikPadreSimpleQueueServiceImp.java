@@ -4,6 +4,9 @@ import com.comunicamosmas.api.domain.MikrotikPadreSimpleQueue;
 import com.comunicamosmas.api.domain.MikrotikSegmentoIp;
 import com.comunicamosmas.api.repository.IMikrotikPadreSimpleQueueDao;
 import com.comunicamosmas.api.repository.IMikrotikSegmentoIpDao;
+import com.comunicamosmas.api.service.dto.SimpleQueueFindReusoDTO;
+
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -65,4 +68,30 @@ public class MikrotikPadreSimpleQueueServiceImp implements IMikrotikPadreSimpleQ
     public MikrotikPadreSimpleQueue findByIdPlanAndReuso(Long idPlan, Long reuso, Long idEstacion) {
         return mikrotikPadreSimpleDao.findByIdPlanAndReuso(idPlan, reuso, idEstacion);
     }
+
+	@Override
+	public SimpleQueueFindReusoDTO simpleQueueInfoComponent(Long idContrato) {
+		
+		List<Object[]> result = mikrotikPadreSimpleDao.simpleQueueInfoComponent(idContrato);
+		SimpleQueueFindReusoDTO simpleQueue = new SimpleQueueFindReusoDTO();
+		
+		for(Object[] rs : result)
+		{
+			simpleQueue.setIdContrato((Integer) rs[0]);
+			simpleQueue.setIdEstacion((Integer) rs[1]);
+			simpleQueue.setVelocidad((Integer) rs[2]);
+			simpleQueue.setNombreTecnologia((String) rs[3]);
+			simpleQueue.setIdWinmaxPass((Integer) rs[4]);
+		}
+		return simpleQueue;
+	}
+
+	@Override
+	public void eliminarTarget(Long idPadre, String ip) {
+		MikrotikPadreSimpleQueue result = mikrotikPadreSimpleDao.findById(idPadre).orElse(null);
+		Long reduccion = result.getReuso() - 1;
+		result.setReuso(reduccion);
+		//pendiente eliminar de una target
+		
+	}
 }

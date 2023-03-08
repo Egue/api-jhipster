@@ -4,6 +4,7 @@ import com.comunicamosmas.api.domain.Contrato;
 import com.comunicamosmas.api.service.dto.DatosClienteDTO;
 import com.comunicamosmas.api.service.dto.ListContratoDTO; 
 import java.util.List;
+import java.util.Optional;
 
 public interface IContratoService {
     //listar todos
