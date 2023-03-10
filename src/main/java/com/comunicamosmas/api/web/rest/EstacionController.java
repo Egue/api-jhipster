@@ -2,6 +2,8 @@ package com.comunicamosmas.api.web.rest;
 
 import com.comunicamosmas.api.domain.Estacion;
 import com.comunicamosmas.api.service.IEstacionService;
+import com.comunicamosmas.api.service.dto.EstacionDTO;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,13 +47,13 @@ public class EstacionController {
     }
 
     /**
-     * ENDPOINT all**/
-    @GetMapping("/estaciones/all")
-    public ResponseEntity<?> list() {
+     * ENDPOINT all por estado activos 1 inactivo 0**/
+    @GetMapping("/estaciones/all/{id}")
+    public ResponseEntity<?> list(@PathVariable Long id) {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            List<Estacion> estaciones = estacionService.findAll();
+            List<EstacionDTO> estaciones = estacionService.findAllDTO(id);
 
             response.put("response", estaciones);
 

@@ -63,4 +63,28 @@ public interface IMigracionTarifaDao extends CrudRepository<MigracionTarifa, Lon
 				+ "inner join usuarios on usuarios.id_usuario = migra.id_usuario\n"
 				+ "where migra.id_contrato = :idContrato AND migra.estado = 0" , nativeQuery=true)
 		public List<Object[]> findMigraByIdContrato(@Param("idContrato") Long idContrato);
+		
+		@Query(value="SELECT \n"
+				+ "migra.id_migracion as idMigracion, \n"
+				+ "migra.id_contrato as idContrato,\n"
+				+ "migra.id_tarifa_general as idGeneralAntes,\n"
+				+ "migra.id_tarifa_promo as idPromoAntes,\n"
+				+ "migra.id_tarifa_general_new as idGeneralNew,\n"
+				+ "migra.id_tarifa_promo_new as idPromoNew,\n"
+				+ "migra.id_servicio as idServicio,\n"
+				+ "migra.id_empresa as idEmpresa,\n"
+				+ "concat(ta_ge.nombre,'/',ta_ge.velocidad,'/',ta_ge.codigo_mikrotik) as tarifaAnteriorGeneral,\n"
+				+ "concat(ta_pro.nombre,'/',ta_pro.velocidad,'/',ta_pro.codigo_mikrotik) as tarifaAnteriorPromo,\n"
+				+ "concat(ta_ge_new.nombre,'/',ta_ge_new.velocidad,'/',ta_ge_new.codigo_mikrotik) as tarifaNewGeneral,\n"
+				+ "concat(ta_pro_new.nombre,'/',ta_pro_new.velocidad,'/',ta_pro_new.codigo_mikrotik) as tarifaNewPro,\n"
+				+ "concat(usuarios.nombre,'/',usuarios.apellidos) as usuario,\n"
+				+ "migra.justificacion\n"
+				+ "from migracion_tarifas migra\n"
+				+ "inner join tarifas ta_ge on ta_ge.id_tarifa = migra.id_tarifa_general\n"
+				+ "inner join tarifas ta_pro on ta_pro.id_tarifa = migra.id_tarifa_promo\n"
+				+ "inner join tarifas ta_ge_new on ta_ge_new.id_tarifa = migra.id_tarifa_general_new\n"
+				+ "inner join tarifas ta_pro_new on ta_pro_new.id_tarifa = migra.id_tarifa_promo_new\n"
+				+ "inner join usuarios on usuarios.id_usuario = migra.id_usuario\n"
+				+ "where migra.id_contrato = :idContrato" , nativeQuery=true)
+		public List<Object[]> findAllmigracionByContrato(@Param("idContrato") Long idContrato);
 }

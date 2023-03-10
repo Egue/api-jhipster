@@ -1,6 +1,8 @@
 package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.Estacion;
+import com.comunicamosmas.api.service.dto.EstacionDTO;
+
 import java.util.List;
 
 public interface IEstacionService {
@@ -17,4 +19,6 @@ public interface IEstacionService {
     public Estacion findById(Long id);
 
     public List<Estacion> findByNombreAndIdServicio(String nombreEstacion, Long idServicio);
+    
+    public List<EstacionDTO> findAllDTO(Long estado);
 }

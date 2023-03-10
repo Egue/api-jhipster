@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface IMigracionTarifaService {
     //listar todos
-    public List<MigracionTarifa> findAll();
+    public List<MigracionTarifaFindContratoDTO> findAll(Long idContrato);
 
     //guardar
     public MigracionTarifa save(MigracionTarifa migracionTarifa);

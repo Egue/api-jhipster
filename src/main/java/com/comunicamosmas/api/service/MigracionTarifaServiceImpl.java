@@ -5,7 +5,8 @@ import com.comunicamosmas.api.repository.IMigracionTarifaDao;
 import com.comunicamosmas.api.service.dto.MigracionTarifaFindContratoDTO;
 import com.comunicamosmas.api.service.dto.MigracionTarifasInfoDTO;
 
-import java.math.BigInteger; 
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
  
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +19,29 @@ public class MigracionTarifaServiceImpl implements IMigracionTarifaService {
 	IMigracionTarifaDao migracionTarifaDao;
 	
 	@Override
-	public List<MigracionTarifa> findAll() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<MigracionTarifaFindContratoDTO> findAll(Long idContrato) {
+		List<Object[]> result = migracionTarifaDao.findAllmigracionByContrato(idContrato);
+		List<MigracionTarifaFindContratoDTO> migracionTarifa = new ArrayList<>();
+		for(Object[] rs : result)
+		{
+			MigracionTarifaFindContratoDTO migracion = new MigracionTarifaFindContratoDTO();
+			migracion.setIdMigracion((Integer) rs[0]);
+			migracion.setIdContrato((Integer) rs[1]);
+			migracion.setIdGeneralAntes((Integer) rs[2]);
+			migracion.setIdPromoAntes((Integer) rs[3]);
+			migracion.setIdGeneralNew((Integer) rs[4]);
+			migracion.setIdPromoNew((Integer) rs[5]);
+			migracion.setIdServicio((Integer) rs[6]);
+			migracion.setIdEmpresa((Integer) rs[7]);
+			migracion.setTarifaAnteriorGeneral((String) rs[8]);
+			migracion.setTarifaAnteriorPromo((String) rs[9]);
+			migracion.setTarifaNewGeneral((String) rs[10]);
+			migracion.setTarifaNewPro((String) rs[11]);
+			migracion.setUsuario((String) rs[12]);
+			migracion.setJustificacion((String) rs[13]);
+			migracionTarifa.add(migracion);
+		}
+		return migracionTarifa;
 	}
 
 	@Override
