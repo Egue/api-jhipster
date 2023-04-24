@@ -1,13 +1,12 @@
 package com.comunicamosmas.api.repository;
-
-import com.comunicamosmas.api.domain.EnumOrdenInstalacion;
-import com.comunicamosmas.api.domain.Orden;
+ 
+import com.comunicamosmas.api.domain.Orden; 
 import com.comunicamosmas.api.service.dto.OrdenForInstalacionFindByIdOrdenDTO;
 import com.comunicamosmas.api.service.dto.OrdenInstalacionDTO; 
-import java.util.List;
-import javax.persistence.Tuple;
+import java.util.List; 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 public interface IOrdenDao extends CrudRepository<Orden, Long> {
     @Query(
@@ -42,16 +41,16 @@ public interface IOrdenDao extends CrudRepository<Orden, Long> {
         "inner join direcciones d on d.id_direccion = o.id_direccion\n" +
         "inner join lista_municipios lm on lm.id_municipio = d.municipio\n" +
         "inner join lista_departamentos ld on ld.id_departamento = d.departamento\n" +
-        "WHERE tt.servicio = 1 AND o.id_orden  = ?",
+        "WHERE tt.servicio = 1 AND o.id_orden  = :id",
         nativeQuery = true
     )
-    public OrdenForInstalacionFindByIdOrdenDTO ordenForInstalacionFindByIdOrden(Long id);
+    public OrdenForInstalacionFindByIdOrdenDTO ordenForInstalacionFindByIdOrden(@Param("id")Long id);
 
     @Query(
-        value = "SELECT u.telefono FROM ordenes o INNER JOIN usuarios u ON u.id_usuario = o.id_usuario_ejecuta WHERE" + " o.id_orden = ?",
+        value = "SELECT u.telefono FROM ordenes o INNER JOIN usuarios u ON u.id_usuario = o.id_usuario_ejecuta WHERE" + " o.id_orden = :idOrden",
         nativeQuery = true
     )
-    public String findTelefonoByIdOrden(Long idOrde);
+    public String findTelefonoByIdOrden(@Param("idOrden")Long idOrde);
 
     @Query(
         value = "SELECT o.id_orden as idOrden, o.id_contrato as idContrato , concat(c.apellido_paterno , ' ', c.nombre_primer , ' ', c.nombre_segundo) as nombreCliente,\n" +
@@ -69,5 +68,78 @@ public interface IOrdenDao extends CrudRepository<Orden, Long> {
         " AND o.fechaf_registra BETWEEN :valor1 AND :valor2",
         nativeQuery = true
     )
-    public List<OrdenInstalacionDTO> getListFindBetwee(String valor1, String valor2);
+    public List<OrdenInstalacionDTO> getListFindBetwee(@Param("valor1")String valor1, @Param("valor2")String valor2);
+    
+    //ordenes buscar por tipo
+    @Query(value="SELECT id_orden, id_contrato FROM ordenes where tipo_orden = :tipoOrden" , nativeQuery = true)
+    public List<Orden> findAllByIdTipo(@Param("tipoOrden") Long tipoOrden);
+    
+    //ordenes por contrato lista
+    @Query(value="select \n"
+    		+ "ord.id_contrato as idContrato,\n"
+    		+ "ord.id_orden as idOrden,\n"
+    		+ "ord.numero_a as numeroA,\n"
+    		+ "ord.numero_b as numeroB,\n"
+    		+ "ores.nombre as tipoOrden,\n"
+    		+ "ord.refiere as origen,\n"
+    		+ "date_format(ord.fechaf_registra , \"%Y-%m-%d\") as registro,\n"
+    		+ "date_format(ord.fechaf_asigna ,\"%Y-%m-%d\" ) as asignacion,\n"
+    		+ "date_format(ord.fechaf_asiste ,\"%Y-%m-%d\" ) as ejecucion,\n"
+    		+ "concat(users.nombre,\" \",users.apellidos) as userAsigna,\n"
+    		+ "concat(user_eje.nombre,\" \",user_eje.apellidos) as userEjecuta\n"
+    		+ "from ordenes ord\n"
+    		+ "inner join ordenes_estados ores on ores.id_estado = ord.tipo_orden\n"
+    		+ "left join usuarios users on users.id_usuario = ord.id_usuario_asigna\n"
+    		+ "left join usuarios user_eje on user_eje.id_usuario = ord.id_usuario_ejecuta\n"
+    		+ "where ord.id_contrato = :idContrato" ,nativeQuery=true)
+    public List<Object[]> listOrdenByIdContrato(@Param("idContrato") Long idContrato);
+    
+    
+    /**BUSCAR RECONEXION ACTIVAS*/
+    @Query(value="select \n"
+    		+ "ord.id_contrato as idContrato,\n"
+    		+ "ord.id_orden as idOrden,  \n"
+    		+ "date_format(ord.fechaf_registra , \"%Y-%m-%d\") as registro,\n"
+    		+ "case 	\n"
+    		+ "	when clientes.tipo_cliente = 'N' then concat(clientes.nombre_primer,' ', clientes.nombre_segundo,' ', clientes.apellido_paterno , ' / ',clientes.documento)\n"
+    		+ "    when clientes.tipo_cliente = 'J' then concat(clientes.razon_social,' /', clientes.documento)\n"
+    		+ "    end as nombreCliente,\n"
+    		+ "estaciones.nombre as nombreEstacion\n"
+    		+ "\n"
+    		+ "from ordenes ord\n"
+    		+ "inner join tipos_tecnologia tt on tt.id_tecnologia = ord.id_tecnologia\n"
+    		+ "inner join clientes on clientes.id_cliente = ord.id_cliente\n"
+    		+ "left join estaciones on ord.id_estacion = estaciones.id_estacion\n"
+    		+ "\n"
+    		+ "where ord.tipo_orden = :tipoOrden and ord.estado IN (0,1,2,3) and ord.abierta = 1 and ord.anulada = 0 and ord.winmax = 0  and tt.servicio = 1 " ,nativeQuery=true)
+    public List<Object[]> listOrdenByTipoOrden(@Param("tipoOrden") Long tipoOrden);
+    
+    /**BUSCAR ORDENES X IDSERVICIO TIPOCLIENTE*/
+    @Query(value="select \n"
+    		+ "ord.id_contrato as idContrato,\n"
+    		+ "ord.id_orden as idOrden,  \n"
+    		+ "date_format(ord.fechaf_registra , \"%Y-%m-%d\") as registro,\n"
+    		+ "case 	\n"
+    		+ "	when clientes.tipo_cliente = 'N' then concat(clientes.nombre_primer,' ', clientes.nombre_segundo,' ', clientes.apellido_paterno , ' / ',clientes.documento)\n"
+    		+ "    when clientes.tipo_cliente = 'J' then concat(clientes.razon_social,' /', clientes.documento)\n"
+    		+ "    end as nombreCliente,\n"
+    		+ "estaciones.nombre as nombreEstacion , \n"
+    		+ "ord.nota  \n"
+    		+ "\n"
+    		+ "from ordenes ord\n"
+    		+ "inner join tipos_tecnologia tt on tt.id_tecnologia = ord.id_tecnologia\n"
+    		+ "inner join clientes on clientes.id_cliente = ord.id_cliente\n"
+    		+ "left join estaciones on ord.id_estacion = estaciones.id_estacion\n"
+    		+ "\n"
+    		+ "where ord.tipo_orden = :tipoOrden and ord.id_servicio = :idServicio and clientes.tipo_cliente = :tipoCliente and ord.estado IN (0,1,2,3) and ord.abierta = 1 and ord.anulada = 0 and ord.winmax = 0  and tt.servicio = 1 " ,nativeQuery=true)
+    public List<Object[]> ordenesByIdServicioAndTipoClienteAndTipoOrden(@Param("tipoOrden")Long tipoOrden , @Param("idServicio") Long idServicio, @Param("tipoCliente") String tipoCliente);
+    
+    /**BUSCAR ULTIMO REGISTRO DE REFIERE A O B*/
+    @Query(value = " select * from ordenes where ordenes.refiere = :refiere AND ordenes.id_servicio = :idServicio order by  ordenes.id_orden desc limit 0,1", nativeQuery = true)
+    public Orden findLastRegisterByRefiere(@Param("refiere") String refiere , @Param("idServicio") Long idServicio);
+    
+    /*BUSCAR POR TIPO Y CONTRATO ACTIVAS**/
+    @Query(value="SELECT * FROM ordenes where ordenes.abierta = 1 and ordenes.anulada = 0 "
+    		+ "and ordenes.estado = 0 and ordenes.tipo_orden = :tipoOrden and ordenes.id_contrato = :idContrato ", nativeQuery = true)
+    public Orden findOrdenActivaByTipo(@Param("tipoOrden")Long tipoOrden , @Param("idContrato")Long idContrato);
 }

@@ -94,7 +94,7 @@ public class Estacion implements Serializable {
 
     private Long estado;
 
-    private String marca;
+    //private String marca;
 
     public Long getId() {
         return id;
@@ -336,11 +336,11 @@ public class Estacion implements Serializable {
         this.estado = estado;
     }
 
-    public String getMarca() {
+   /* public String getMarca() {
         return marca;
     }
 
     public void setMarca(String marca) {
         this.marca = marca;
-    }
+    }*/
 }

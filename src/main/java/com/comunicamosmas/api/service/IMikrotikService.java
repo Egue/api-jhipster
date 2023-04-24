@@ -53,6 +53,10 @@ public interface IMikrotikService {
     public WinmaxPass updatedRemoteAddress(Long id, Long idEstacion, Long idIp) throws MikrotikApiException;
     /**QUEUESIMPLE*/
     public List<MikrotikQueueSimpleDTO> QueueSimpleAll(Long idEstacion) throws MikrotikApiException;
+    //eliminar padre de la rb
+    public void deletePadreRb(Long idEstacion , String namePadre);
+    //actualizar target de padre
+    //public void updatedTargetPadre(Long idEstacion , String namePadre , String target);
     
     /**
      * consulta los profiles del pppOE de cada estacion*/
@@ -69,4 +73,7 @@ public interface IMikrotikService {
     public ValorStringDTO pppeoSecretFindByName(Long idContrato , Long idEstacion) throws MikrotikApiException;
     //change progile
     public List<Map<String, String>> pppoeSecretChangeProfile(Long idContrato , Long idTarifa , String idrb , Long idUser , Long idMigracion)throws MikrotikApiException;
+    
+    //cortar cliente por idOrden
+    public String cortarClienteMoroso(Long idOrden);
 }

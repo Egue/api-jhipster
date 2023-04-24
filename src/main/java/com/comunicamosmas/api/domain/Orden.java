@@ -131,7 +131,7 @@ public class Orden implements Serializable {
     private Long anulada;
 
     @Column(name = "nota_final")
-    private Long notaFinal;
+    private String notaFinal;
 
     private Long winmax;
 
@@ -447,7 +447,7 @@ public class Orden implements Serializable {
     }
 
     public void setF(String f) {
-        f = f;
+        this.f = f;
     }
 
     public String getG() {
@@ -506,11 +506,11 @@ public class Orden implements Serializable {
         this.anulada = anulada;
     }
 
-    public Long getNotaFinal() {
+    public String getNotaFinal() {
         return notaFinal;
     }
 
-    public void setNotaFinal(Long notaFinal) {
+    public void setNotaFinal(String notaFinal) {
         this.notaFinal = notaFinal;
     }
 
@@ -593,4 +593,27 @@ public class Orden implements Serializable {
     public void setLogApi(String logApi) {
         this.logApi = logApi;
     }
+
+	@Override
+	public String toString() {
+		return "Orden [id=" + id + ", tipoOrden=" + tipoOrden + ", refiere=" + refiere + ", causaSolicitud="
+				+ causaSolicitud + ", numeroA=" + numeroA + ", numeroB=" + numeroB + ", idContrato=" + idContrato
+				+ ", idDireccion=" + idDireccion + ", idCliente=" + idCliente + ", idEstacion=" + idEstacion
+				+ ", idZona=" + idZona + ", fechafRegistra=" + fechafRegistra + ", fechafSolicita=" + fechafSolicita
+				+ ", fechafAsigna=" + fechafAsigna + ", fechafAsiste=" + fechafAsiste + ", fechafAnula=" + fechafAnula
+				+ ", fechafDescarga=" + fechafDescarga + ", horaAsisteInicio=" + horaAsisteInicio + ", hotaAsisteFin="
+				+ hotaAsisteFin + ", estado=" + estado + ", nota=" + nota + ", idCiudad=" + idCiudad + ", idEmpresa="
+				+ idEmpresa + ", idServicio=" + idServicio + ", idUsuarioRegistra=" + idUsuarioRegistra
+				+ ", idUsuarioAsigna=" + idUsuarioAsigna + ", idUsuarioEjecuta=" + idUsuarioEjecuta
+				+ ", idUsuarioDescarga=" + idUsuarioDescarga + ", idUsuarioAnula=" + idUsuarioAnula
+				+ ", anulaJustifica=" + anulaJustifica + ", a=" + a + ", b=" + b + ", c=" + c + ", d=" + d + ", e=" + e
+				+ ", f=" + f + ", g=" + g + ", h=" + h + ", i=" + i + ", j=" + j + ", ultimaDow=" + ultimaDow
+				+ ", abierta=" + abierta + ", anulada=" + anulada + ", notaFinal=" + notaFinal + ", winmax=" + winmax
+				+ ", winmaxIdUsuario=" + winmaxIdUsuario + ", winmaxMarca=" + winmaxMarca + ", idTicketSoporte="
+				+ idTicketSoporte + ", pdfDescargaFecha=" + pdfDescargaFecha + ", pdfDescargaUsuario="
+				+ pdfDescargaUsuario + ", idTecnologia=" + idTecnologia + ", tipoReconecta=" + tipoReconecta
+				+ ", apiAutomatica=" + apiAutomatica + ", logApi=" + logApi + "]";
+	}
+    
+    
 }

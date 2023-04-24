@@ -8,6 +8,7 @@ import com.comunicamosmas.api.domain.MikrotikHijoSimpleQueue;
 import com.comunicamosmas.api.domain.MikrotikIp;
 import com.comunicamosmas.api.domain.MikrotikPadreSimpleQueue;
 import com.comunicamosmas.api.domain.MikrotikTarifaReuso;
+import com.comunicamosmas.api.domain.Orden;
 import com.comunicamosmas.api.domain.Tarifa;
 import com.comunicamosmas.api.domain.WinmaxPass;
 import com.comunicamosmas.api.service.dto.ClassErrorDTO;
@@ -64,6 +65,9 @@ public class MikrotikServiceImp implements IMikrotikService {
     
     @Autowired
     IMigracionTarifaService migracionTarifaService;
+    
+    @Autowired
+    IOrdenService ordenService;
     
     ApiConnection apiConnection;
 
@@ -615,8 +619,7 @@ public class MikrotikServiceImp implements IMikrotikService {
         hijo.setIdPadre(idPadre);
         hijo.setLimitAt(limit);
         hijo.setMaxLimit(plan.getSubida() + "/" + plan.getBajada());
-        String name = String(idContrato);
-        hijo.setName(name);
+        hijo.setName(Long.toString(idContrato));
         hijo.setQueue("pcq-upload-default/pcq-download-default");
         hijo.setTarget(ip.getIp());
         mikrotikHijoSimpleQueueService.save(hijo);
@@ -724,6 +727,7 @@ public class MikrotikServiceImp implements IMikrotikService {
 		return pppoeActive;
 	}
 
+	@SuppressWarnings("unused")
 	@Override
 	public ValorStringDTO pppeoSecretFindByName(Long idContrato , Long idEstacion)
 			throws MikrotikApiException {
@@ -733,16 +737,29 @@ public class MikrotikServiceImp implements IMikrotikService {
 		WinmaxPass winmax = winmaxPassService.findByIdContrato(idContrato);
 		//
 		this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(), estacion.getApiPort());
+		
 		String command = "/ppp/secret/print where name="+ winmax.getUsuario();
+		
 		List<Map<String, String>> result =  apiConnection.execute(command);
 		
 		this.logout();
+		
 		ValorStringDTO valor = new  ValorStringDTO();
-		for(Map<String , String > rs : result)
+		
+		if(valor == null)
 		{
-			valor.setValor((String) rs.get(".id"));
+			return null;
+			
+		}else{
+			
+			for(Map<String , String > rs : result)
+			{
+				valor.setValor((String) rs.get(".id"));
+			}
+			
+			return valor;
 		}
-		return valor;
+		
 	}
 
 	@Override
@@ -862,4 +879,135 @@ public class MikrotikServiceImp implements IMikrotikService {
 		}
 		return simple;
 	}
+
+	@Override
+	/**
+	 * 1. buscar el secret en el pppOE*/
+	public java.lang.String cortarClienteMoroso(Long idOrden) {
+		//buscar orden
+		Contrato contrato = contratoService.findById(idOrden);
+		WinmaxPass winmaxpass = winmaxPassService.findByIdContrato(idOrden);
+		//retornar estacion
+		
+		Estacion estacion = estacionService.findById(contrato.getIdEstacion());
+		String respuesta = "vacio";
+		String id = "";
+		try
+		{
+			this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(), estacion.getApiPort());
+			String commando = "/ppp/secret/print where name="+winmaxpass.getUsuario();
+			List<Map<String, String>> result =  apiConnection.execute(commando);
+			
+			 
+			for(Map<String, String> rs : result)
+			{
+				String nameSecret =  rs.get("name");
+				id = rs.get(".id");
+				if(nameSecret.equals(winmaxpass.getUsuario())) {
+					respuesta += "Secret encontrado;";
+				}else{
+					respuesta += "No se ha encontrado el secret;";
+				}
+			}
+			if(!id.isEmpty())
+			{
+				try {
+					
+					commando = "/ppp/secret/set .id="+id+" profile=MOROSOS";
+					apiConnection.execute(commando);
+					
+					respuesta +="Nuevo perfil MOROSOS;";
+					
+					ValorStringDTO idActive =  this.pppoeActiveFindByName(estacion.getId() , idOrden);
+					
+					if(idActive.getValor().isEmpty())
+					{
+						respuesta += "Id en active connections no encontrado";
+					}else {
+						
+						try {
+							
+							commando = "/ppp/active/remove .id="+idActive.getValor();
+							apiConnection.execute(commando);
+							
+						}catch(MikrotikApiException h)
+						{
+							respuesta += h.getMessage();
+						}
+					}
+					
+				}catch(MikrotikApiException j)
+				{
+					respuesta += j.getMessage();
+				}
+				 
+			}
+			this.logout();
+			
+		}catch(MikrotikApiException e)
+		{
+			respuesta += e.getMessage()+";";
+		}
+		return respuesta;
+	}
+
+	/**
+	 * ELIMINAD UNA PADRE DE LA RB CUANDO SE CREA VACIO*/
+	@Override
+	public void deletePadreRb(Long idEstacion, java.lang.String namePadre) {
+		
+		Estacion estacion = estacionService.findById(idEstacion);
+		
+		try {
+			this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(), estacion.getApiPort());
+			String commando = "/queue/simple/print where name="+namePadre;
+			List<Map<String, String>>  result = apiConnection.execute(commando);
+			//extraemos el .id
+			String id = "";
+			for(Map<String , String > rs : result)
+			{
+				id = rs.get(".id");
+			}
+			
+			if(!id.isEmpty())
+			{
+				commando = "/queue/simple/remove .id="+id;
+				apiConnection.execute(commando);
+			}
+			this.logout();
+		}catch(MikrotikApiException e) {
+			System.out.print("aliminando Padre : " + e.getMessage());
+		}
+		
+	}
+	/*
+	 * ACTUALIZAR EL NUEVO TARGET AL PADRE
+	 * **/
+
+	/*@Override
+	public void updatedTargetPadre(Long idEstacion, java.lang.String namePadre, java.lang.String target) {
+		// TODO Auto-generated method stub
+		Estacion estacion = estacionService.findById(idEstacion);
+		try {
+			this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(), estacion.getApiPort());
+			String commando = "/queue/simple/print where name="+namePadre;
+			List<Map<String, String>>  result = apiConnection.execute(commando);
+			//extraemos el .id
+			String id = "";
+			for(Map<String , String > rs : result)
+			{
+				id = rs.get(".id");
+			}
+			
+			if(!id.isEmpty())
+			{ 
+				commando = "/queue/simple/set .id="+id+" target="+target;
+				apiConnection.execute(commando);
+			}
+			this.logout();
+		}catch(MikrotikApiException e)
+		{
+			System.out.print("actualizando target +" + e.getMessage());
+		}
+	}*/
 }

@@ -8,11 +8,13 @@ public interface IOrdenEstadoService {
     public List<OrdenEstado> findAll();
 
     //guardar
-    public OrdenEstado save(OrdenEstado ordenEstado);
+    public void save(OrdenEstado ordenEstado);
 
     //eliminar
-    public Long deleteById(Long id);
+    public void deleteById(Long id);
 
     //buscar por id
     public OrdenEstado findById(Long id);
+    
+    public List<OrdenEstado>findAllByEstadoAndCliente(String rol);
 }

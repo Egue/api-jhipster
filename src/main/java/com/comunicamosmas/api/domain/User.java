@@ -31,6 +31,7 @@ public class User extends AbstractAuditingEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_usuario")
     private Long id;
+     
 
     @NotNull
     @Pattern(regexp = Constants.LOGIN_REGEX)
@@ -238,4 +239,6 @@ public class User extends AbstractAuditingEntity implements Serializable {
             ", activationKey='" + activationKey + '\'' +
             "}";
     }
+
+	 
 }

@@ -1,12 +1,16 @@
 package com.comunicamosmas.api.service;
 
+import com.comunicamosmas.api.domain.MikrotikHijoSimpleQueue;
+import com.comunicamosmas.api.domain.MikrotikIp;
 import com.comunicamosmas.api.domain.MikrotikPadreSimpleQueue;
 import com.comunicamosmas.api.domain.MikrotikSegmentoIp;
 import com.comunicamosmas.api.repository.IMikrotikPadreSimpleQueueDao;
 import com.comunicamosmas.api.repository.IMikrotikSegmentoIpDao;
+import com.comunicamosmas.api.service.dto.PadreSimpleQueeHijosDTO;
 import com.comunicamosmas.api.service.dto.SimpleQueueFindReusoDTO;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +20,15 @@ public class MikrotikPadreSimpleQueueServiceImp implements IMikrotikPadreSimpleQ
 
     @Autowired
     IMikrotikPadreSimpleQueueDao mikrotikPadreSimpleDao;
+    
+    @Autowired
+    IMikrotikHijoSimpleQueueService hijoSimple;
+    
+    @Autowired
+    IMikrotikIpService ipService;
 
+    @Autowired
+    IMikrotikService mikrotikService;
     @Override
     public void save(MikrotikPadreSimpleQueue mikrotikPadreSimpleQueue) {
         mikrotikPadreSimpleDao.save(mikrotikPadreSimpleQueue);
@@ -86,12 +98,73 @@ public class MikrotikPadreSimpleQueueServiceImp implements IMikrotikPadreSimpleQ
 		return simpleQueue;
 	}
 
+	@SuppressWarnings("null")
 	@Override
-	public void eliminarTarget(Long idPadre, String ip) {
+	public void eliminarTarget(Long idPadre, Long Idip) {
 		MikrotikPadreSimpleQueue result = mikrotikPadreSimpleDao.findById(idPadre).orElse(null);
-		Long reduccion = result.getReuso() - 1;
-		result.setReuso(reduccion);
+		MikrotikIp ip = ipService.findById(Idip);
+		/*Long reduccion = result.getReuso() - 1;
+		result.setReuso(reduccion);*/
 		//pendiente eliminar de una target
+		if(result.getReuso().equals(1L))
+		{
+			//eliminarPadreRb
+			mikrotikService.deletePadreRb(result.getIdEstacion(), result.getName());
+			//eliminarPadreBasededatos
+			mikrotikPadreSimpleDao.deleteById(idPadre);
+		}else {
+			Long reuso = result.getReuso() - 1;
+			result.setReuso(reuso);
+			String [] target = result.getTarget().split(",\\s");
+			String[] newTarget = null;
+			int conteo = 0;
+			for(int i = 0; i < target.length; i ++)
+			{
+				if(!target[i].equals(ip.getIp()))
+				{
+					newTarget[conteo] = target[i];
+					
+				}
+			}
+			String targetComoString = Arrays.toString(newTarget);
+			
+			targetComoString = targetComoString.substring(1, targetComoString.length() - 1);
+			
+			result.setTarget(targetComoString);
+			//agregar nuevo target a la rb
+			try {
+				 
+				mikrotikPadreSimpleDao.save(result);
+				MikrotikPadreSimpleQueue padre = mikrotikService.updatedTargetPadreInRB(result.getIdEstacion(), result.getId());
+			}catch(Exception e)
+			{
+				System.out.print(e.getMessage());
+			}
+			
+		}
 		
+	}
+
+	@Override
+	public List<PadreSimpleQueeHijosDTO> listPadreWithHijos(Long idEstacion) {
+		//consultar padre
+		List<Object[]> result = mikrotikPadreSimpleDao.listPadreByEstacion(idEstacion);
+		List<PadreSimpleQueeHijosDTO> padre  = new ArrayList<>();
+		for(Object[] rs : result)
+		{
+			PadreSimpleQueeHijosDTO obj = new PadreSimpleQueeHijosDTO();
+			obj.setId((Integer) rs[0]);
+			obj.setName((String) rs[1]);
+			obj.setTarget((String) rs[2]);
+			obj.setComment((String) rs[3]);
+			obj.setLimitAt((String) rs[4]);
+			obj.setMaxLimit((String) rs[5]);
+			obj.setReuso((Integer) rs[6]);
+			List<MikrotikHijoSimpleQueue> hijos = hijoSimple.findAllByidPadre((Integer) rs[0]);
+			obj.setHijos(hijos);
+			padre.add(obj);
+			
+		}
+		return padre;
 	}
 }

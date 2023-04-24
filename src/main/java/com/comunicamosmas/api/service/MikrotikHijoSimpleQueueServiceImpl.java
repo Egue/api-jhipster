@@ -53,4 +53,10 @@ public class MikrotikHijoSimpleQueueServiceImpl implements IMikrotikHijoSimpleQu
     public MikrotikHijoSimpleQueue findByIdContrato(Long idContrato) {
         return mikrotikHijoSimpleQueueDao.findByIdContrato(idContrato);
     }
+
+	@Override
+	public List<MikrotikHijoSimpleQueue> findAllByidPadre(Integer idPadre) {
+		
+		return (List<MikrotikHijoSimpleQueue>)mikrotikHijoSimpleQueueDao.findAllByPadre(idPadre);
+	}
 }

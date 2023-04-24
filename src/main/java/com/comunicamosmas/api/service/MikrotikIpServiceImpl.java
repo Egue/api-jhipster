@@ -86,8 +86,9 @@ public class MikrotikIpServiceImpl implements IMikrotikIpService {
         }
         //separa 10.250.0.0
         String[] ipSplit = ip.split("\\.");
+        int tercerOcteto = Integer.parseInt(ipSplit[2]);
         //
-        for (int j = 0; j < octeto; j++) {
+        for (int j = tercerOcteto ; j < (octeto + tercerOcteto); j++) {
             for (int i = 2; i < limit; i++) {
                 String newIp = ipSplit[0] + "." + ipSplit[1] + "." + j + "." + i;
                 MikrotikIp mikrotikIp = new MikrotikIp();

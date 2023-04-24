@@ -1,6 +1,8 @@
 package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.Deuda;
+import com.comunicamosmas.api.service.dto.EstadoCuentaDeudasDTO;
+
 import java.util.List;
 
 public interface IDeudaService {
@@ -15,4 +17,7 @@ public interface IDeudaService {
 
     //buscar por id
     public Deuda findById(Long id);
+    
+    //buscar por contrado
+    public List<EstadoCuentaDeudasDTO> findByIdContrato(Long contrato);
 }

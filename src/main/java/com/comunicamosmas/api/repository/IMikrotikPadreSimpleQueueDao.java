@@ -41,4 +41,19 @@ public interface IMikrotikPadreSimpleQueueDao extends CrudRepository<MikrotikPad
     		+ "inner join winmax_pass wx on wx.id_contrato = co.id_contrato\n"
     		+ "where co.id_contrato = :idContrato limit 0,1" , nativeQuery = true)
     public List<Object[]> simpleQueueInfoComponent(@Param("idContrato") Long idContrato);
+    
+    /**
+     * listar padres por estacion*/
+    @Query(value="SELECT \n"
+    		+ "padre.id_padre as id,\n"
+    		+ "padre.name,\n"
+    		+ "padre.target,\n"
+    		+ "padre.comment,\n"
+    		+ "padre.limit_at as limitAt,\n"
+    		+ "padre.max_limit as maxLimit,\n"
+    		+ "padre.reuso \n"
+    		+ "FROM  mikrotik_padre_simple_queue padre \n"
+    		+ "where padre.id_estacion = :idEstacion", nativeQuery =true)
+    public List<Object[]> listPadreByEstacion(@Param("idEstacion") Long idEstacion);
+    
 }

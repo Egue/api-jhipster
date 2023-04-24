@@ -38,4 +38,22 @@ public class ServiciosController {
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
         }
     }
+    
+    @GetMapping("/servicios/all")
+    public ResponseEntity<?> all()
+    {
+    	 Map<String, Object> response = new HashMap<>();
+
+    	 try {
+             List<Servicio> result = servicioService.findAll();
+
+             response.put("response", result);
+
+             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
+         } catch (Exception e) {
+             response.put("response", e.getMessage());
+
+             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+         }
+    }
 }

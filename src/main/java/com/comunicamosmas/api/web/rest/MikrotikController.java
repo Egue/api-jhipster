@@ -21,6 +21,7 @@ import com.comunicamosmas.api.domain.MikrotikPadreSimpleQueue;
 import com.comunicamosmas.api.domain.Tarifa;
 import com.comunicamosmas.api.domain.WinmaxPass;
 import com.comunicamosmas.api.service.IContratoService;
+import com.comunicamosmas.api.service.IMikrotikPadreSimpleQueueService;
 import com.comunicamosmas.api.service.IMikrotikService;
 import com.comunicamosmas.api.service.ITarifaService;
 import com.comunicamosmas.api.service.dto.MikrotikPPPActiveDTO;
@@ -44,6 +45,9 @@ public class MikrotikController {
 	
 	@Autowired
 	ITarifaService tarifaService;
+	
+	@Autowired
+	IMikrotikPadreSimpleQueueService padreSimpleQueueService;
 
 	@GetMapping("/mikrotik/test/{id}")
 	public ResponseEntity<?> test(@PathVariable long id) {
@@ -121,13 +125,35 @@ public class MikrotikController {
 	/*
 	 * endpoint buscar contratos en pppOE secret
 	 **/
+	@SuppressWarnings("unused")
 	@PostMapping("/mikrotik/pppoe/secret/findByName")
 	public ResponseEntity<?> pppoeSecretFindByName(@RequestParam Long idContrato) {
 		Map<String, Object> response = new HashMap<>();
 
 		try {
 			Contrato contrato =  contratoService.findById(idContrato);
+			
+			if(contrato.getIdEstacion().equals(0L))
+			{
+				response.put("response", "Contrato no asociado a una estación");
+
+				return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+			}
+			
+			if(contrato == null)
+			{
+				response.put("response", "No se ha encontrato el contrato");
+
+				return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+			}
 			ValorStringDTO result = mikrotikService.pppeoSecretFindByName(idContrato, contrato.getIdEstacion());
+			
+			if(result == null)
+			{
+				response.put("response", "No se ha encontrato el perfil");
+
+				return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+			}
 			response.put("response", result);
 
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
@@ -308,6 +334,8 @@ public class MikrotikController {
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 		}catch(Exception e)
 		{
+			//ir a base de datos y quitar el padre
+			padreSimpleQueueService.eliminarTarget(idPadre, idIp);
 			response.put("response", e.getMessage());
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
 		}

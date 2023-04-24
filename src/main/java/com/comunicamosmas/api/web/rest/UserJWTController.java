@@ -7,8 +7,11 @@ import com.comunicamosmas.api.security.jwt.TokenProvider;
 import com.comunicamosmas.api.service.ISidebarRelationsService;
 import com.comunicamosmas.api.service.IUsuarioService;
 import com.comunicamosmas.api.service.UserService;
+import com.comunicamosmas.api.service.dto.userLoginDTO;
 import com.comunicamosmas.api.web.rest.vm.LoginVM;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,14 +69,24 @@ public class UserJWTController {
 
         //informacion del user;
         Optional<User> user = userService.getUserWithAuthoritiesByLogin(loginVM.getUsername());
-        //traer el rol
-        System.out.print(loginVM.getUsername());
-
+        userLoginDTO loginDto =  new userLoginDTO();
+        
+        loginDto.setId((Long) user.get().getId());
+        loginDto.setLogin((String) user.get().getLogin());
+        loginDto.setFirtsName((String) user.get().getFirstName());
+        loginDto.setLastName((String) user.get().getLastName());
+        loginDto.setEmail((String) user.get().getEmail());
+        loginDto.setActivated((Boolean) user.get().isActivated());
+        loginDto.setLangKey((String) user.get().getLangKey());
+        loginDto.setImageUrl((String) user.get().getImageUrl());
+        loginDto.setResetDate((Instant) user.get().getResetDate());
+      
         String rol = usuarioService.findRolByUser(loginVM.getUsername());
+        loginDto.setRol((String) rol);
 
         List<SidebarRelations> menu = sidebarRelationsService.findByIdRole(rol);
 
-        return new ResponseEntity<>(new JWTToken(jwt, user, menu), httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(new JWTToken(jwt, loginDto, menu), httpHeaders, HttpStatus.OK);
     }
 
     /**
@@ -86,11 +99,23 @@ public class UserJWTController {
             Authentication authentication = tokenProvider.getAuthentication(token);
             Optional<User> user = userService.getUserWithAuthoritiesByLogin(authentication.getName());
             String rol = usuarioService.findRolByUser(authentication.getName());
-
+            
+            userLoginDTO loginDto =  new userLoginDTO();
+            
+            loginDto.setId((Long) user.get().getId());
+            loginDto.setLogin((String) user.get().getLogin());
+            loginDto.setFirtsName((String) user.get().getFirstName());
+            loginDto.setLastName((String) user.get().getLastName());
+            loginDto.setEmail((String) user.get().getEmail());
+            loginDto.setActivated((Boolean) user.get().isActivated());
+            loginDto.setLangKey((String) user.get().getLangKey());
+            loginDto.setImageUrl((String) user.get().getImageUrl());
+            loginDto.setResetDate((Instant) user.get().getResetDate());
+            loginDto.setRol((String) rol);
             List<SidebarRelations> menu = sidebarRelationsService.findByIdRole(rol);
             //response.put("id_token","ok");
 
-            return new ResponseEntity<>(new JWTToken(token, user, menu), HttpStatus.OK);
+            return new ResponseEntity<>(new JWTToken(token, loginDto, menu), HttpStatus.OK);
         } catch (Exception e) {
             response.put("response", e.getMessage());
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
@@ -104,11 +129,11 @@ public class UserJWTController {
 
         private String idToken;
 
-        private Optional<User> user;
+        private userLoginDTO user;
 
         private List<SidebarRelations> menu;
 
-        JWTToken(String idToken, Optional<User> user, List<SidebarRelations> menu) {
+        JWTToken(String idToken, userLoginDTO user, List<SidebarRelations> menu) {
             this.idToken = idToken;
             this.user = user;
             this.menu = menu;
@@ -120,7 +145,7 @@ public class UserJWTController {
         }
 
         @JsonProperty("usuario")
-        Optional<User> getUser() {
+        userLoginDTO getUser() {
             return user;
         }
 

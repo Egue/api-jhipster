@@ -16,8 +16,8 @@ public class ServicioServiceImpl implements IServicioService {
 
     @Override
     public List<Servicio> findAll() {
-        // TODO Auto-generated method stub
-        return null;
+        
+        return (List<Servicio>)servicioDao.findAll();
     }
 
     @Override

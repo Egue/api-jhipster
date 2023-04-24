@@ -80,7 +80,7 @@ public class Contrato implements Serializable {
     @Column(name = "id_direccion_factura")
     private Long idDireccionFactura;
 
-    private String marca;
+    //private String marca;
 
     @Column(name = "otr_imp")
     private Long otrImp;
@@ -117,8 +117,8 @@ public class Contrato implements Serializable {
     @Column(name = "ip_publica")
     private Long ipPublica;
 
-    @Column(name = "ultimo_pago")
-    private String ultimoPago;
+    /*@Column(name = "ultimo_pago")
+    private String ultimoPago;*/
 
     @Column(name = "ultimo_estado")
     private String ultimoEstado;
@@ -325,13 +325,13 @@ public class Contrato implements Serializable {
         this.idDireccionFactura = idDireccionFactura;
     }
 
-    public String getMarca() {
+    /*public String getMarca() {
         return marca;
     }
 
     public void setMarca(String marca) {
         this.marca = marca;
-    }
+    }*/
 
     public Long getOtrImp() {
         return otrImp;
@@ -437,13 +437,13 @@ public class Contrato implements Serializable {
         this.ipPublica = ipPublica;
     }
 
-    public String getUltimoPago() {
+    /*public String getUltimoPago() {
         return ultimoPago;
     }
 
     public void setUltimoPago(String ultimoPago) {
         this.ultimoPago = ultimoPago;
-    }
+    }*/
 
     public String getUltimoEstado() {
         return ultimoEstado;

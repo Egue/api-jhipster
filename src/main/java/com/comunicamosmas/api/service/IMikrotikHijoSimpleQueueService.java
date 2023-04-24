@@ -9,6 +9,8 @@ public interface IMikrotikHijoSimpleQueueService {
     public List<MikrotikHijoSimpleQueue> findAll();
 
     public MikrotikHijoSimpleQueue findById(Long id);
+    
+    public List<MikrotikHijoSimpleQueue> findAllByidPadre(Integer idPadre);
 
     public MikrotikHijoSimpleQueue findByIdContrato(Long idContrato);
 

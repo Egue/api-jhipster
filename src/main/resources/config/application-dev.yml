@@ -31,10 +31,14 @@ spring:
     serialization:
       indent-output: true
   datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    url: jdbc:mysql://192.168.0.115:33307/controlmas?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+    #type: com.zaxxer.hikari.HikariDataSource
+    url: jdbc:mysql://192.168.10.21:33306/controlmas?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+    #url: jdbc:mysql://10.111.39.3:3306/controlmas?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+    #username: LNWW(345
+    #password: 9C9UAaqKecHRZA79
     username: root
     password: mysql
+    driver-class-name: com.mysql.jdbc.Driver
     hikari:
       poolName: Hikari
       auto-commit: false
@@ -47,6 +51,7 @@ spring:
   liquibase:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
     contexts: dev, faker
+    enabled: false
   mail:
     host: localhost
     port: 25

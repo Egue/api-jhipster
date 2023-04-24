@@ -61,7 +61,7 @@ public interface IContratoDao extends CrudRepository<Contrato, Long> {
     		+ "es.longitud as longEstacion,\n"
     		+ "concat(dir.tipo,' / ',dir.a_tipo,' ',dir.a_numero,' ',dir.a_letra,' ',dir.b_tipo,' ',dir.b_numero,' ',dir.b_letra,' ',dir.numero,' / ',dir.nota,' / ',dir.barrio) as direccionServicio\n"
     		+ "\n"
-    		+ "FROM controlmas.contratos co\n"
+    		+ "FROM contratos co\n"
     		+ "\n"
     		+ "left join clientes cl on cl.id_cliente = co.id_cliente\n"
     		+ "left join tarifas ta on ta.id_tarifa = co.id_tarifa_promo\n"

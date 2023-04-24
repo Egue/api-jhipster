@@ -1,6 +1,8 @@
 package com.comunicamosmas.api.domain;
 
 import java.io.Serializable;
+import java.time.Instant;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -84,7 +86,7 @@ public class Cliente implements Serializable {
 
     private String observaciones;
 
-    private String marca;
+   // private Instant marca;
 
     private String sha;
 
@@ -293,13 +295,13 @@ public class Cliente implements Serializable {
         this.observaciones = observaciones;
     }
 
-    public String getMarca() {
+    /*public Instant getMarca() {
         return marca;
-    }
+    }*/
 
-    public void setMarca(String marca) {
+    /*public void setMarca(Instant marca) {
         this.marca = marca;
-    }
+    }*/
 
     public String getSha() {
         return sha;

@@ -28,7 +28,7 @@ public class LiquibaseConfiguration {
         this.env = env;
     }
 
-    @Bean
+    /*@Bean
     public SpringLiquibase liquibase(
         @Qualifier("taskExecutor") Executor executor,
         @LiquibaseDataSource ObjectProvider<DataSource> liquibaseDataSource,
@@ -65,5 +65,5 @@ public class LiquibaseConfiguration {
             log.debug("Configuring Liquibase");
         }
         return liquibase;
-    }
+    }*/
 }

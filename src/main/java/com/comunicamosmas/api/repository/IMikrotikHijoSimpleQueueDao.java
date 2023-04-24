@@ -1,6 +1,9 @@
 package com.comunicamosmas.api.repository;
 
 import com.comunicamosmas.api.domain.MikrotikHijoSimpleQueue;
+
+import java.util.List;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -8,4 +11,7 @@ import org.springframework.data.repository.query.Param;
 public interface IMikrotikHijoSimpleQueueDao extends CrudRepository<MikrotikHijoSimpleQueue, Long> {
     @Query(value = "SELECT * FROM mikrotik_hijo_simple_queue mh WHERE mh.id_contrato = :idContrato", nativeQuery = true)
     public MikrotikHijoSimpleQueue findByIdContrato(@Param("idContrato")Long idContrato);
+    
+    @Query(value="SELECT * FROM mikrotik_hijo_simple_queue WHERE mikrotik_hijo_simple_queue.id_padre = :idPadre", nativeQuery = true)
+    public List<MikrotikHijoSimpleQueue> findAllByPadre(@Param("idPadre") Integer idPadre);
 }
