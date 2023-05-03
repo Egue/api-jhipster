@@ -40,6 +40,8 @@
     "clientTheme": "none",
     "clientThemeVariant": "",
     "withAdminUi": true,
-    "languages": ["en", "fr"]
+    "languages": ["en", "fr"],
+    "lastLiquibaseTimestamp": 1682367736000,
+    "entities": ["EmailCampaignApi"]
   }
 }

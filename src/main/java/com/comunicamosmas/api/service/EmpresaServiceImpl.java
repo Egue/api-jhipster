@@ -41,4 +41,10 @@ public class EmpresaServiceImpl implements IEmpresaService {
         // TODO Auto-generated method stub
         return (List<Empresa>) empresaDao.findByLikeNombreComercial(empresa);
     }
+
+	@Override
+	public Empresa findByIdContrato(Long idContrato) {
+		// TODO Auto-generated method stub
+		return empresaDao.findEmpresaByContrato(idContrato);
+	}
 }

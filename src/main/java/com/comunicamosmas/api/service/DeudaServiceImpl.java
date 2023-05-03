@@ -78,5 +78,11 @@ public class DeudaServiceImpl implements IDeudaService {
 		return listDeudas;
 	}
 
+	@Override
+	public String findDeudaByIdContrato(Long idContrato) {
+		// TODO Auto-generated method stub
+		return deudaDao.findDeudaByIdContrato(idContrato);
+	}
+
      
 }

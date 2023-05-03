@@ -24,4 +24,8 @@ public interface IDeudaDao extends CrudRepository<Deuda, Long> {
 			+ "\n"
 			+ "FROM deudas deu where deu.id_contrato = :contrato" , nativeQuery = true)
 	public List<Object[]> findByIdContrato(@Param("contrato") Long contrato);
+	
+	@Query(value="SELECT concat('$ ' , FORMAT(sum(deudas.valor_total - (deudas.valor_parcial)) , 2))  "
+			+ "as parcial FROM deudas where deudas.id_contrato = :idContrato and deudas.estado in (1,3)" , nativeQuery=true)
+	public String findDeudaByIdContrato(@Param("idContrato")Long idContrato);
 }

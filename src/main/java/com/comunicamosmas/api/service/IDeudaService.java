@@ -20,4 +20,6 @@ public interface IDeudaService {
     
     //buscar por contrado
     public List<EstadoCuentaDeudasDTO> findByIdContrato(Long contrato);
+    
+    public String findDeudaByIdContrato(Long idContrato);
 }

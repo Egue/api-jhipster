@@ -13,6 +13,8 @@ public interface IEmailCampaignDetalleService {
 	
 	public List<EmailCampaignDetalleDTO> findByIdEmailCampaing(Long id);
 	
+	public EmailCampaignDetalle findById(Integer id);
+	
 	public void sendMail(Integer id);
 	
 	

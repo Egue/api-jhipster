@@ -17,4 +17,6 @@ public interface IEmpresaService {
     public Empresa findById(Long id);
 
     public List<Empresa> findByLikeNombreComercial(String empresa);
+    
+    public Empresa findByIdContrato(Long idContrato);
 }
