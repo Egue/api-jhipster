@@ -20,7 +20,7 @@ public class Deuda implements Serializable {
     private Long id;
 
     @Column(name = "id_cliente")
-    private String idCliente;
+    private Long idCliente;
 
     private String refiere;
 
@@ -138,11 +138,11 @@ public class Deuda implements Serializable {
         this.id = id;
     }
 
-    public String getIdCliente() {
+    public Long getIdCliente() {
         return idCliente;
     }
 
-    public void setIdCliente(String idCliente) {
+    public void setIdCliente(Long idCliente) {
         this.idCliente = idCliente;
     }
 

@@ -17,81 +17,87 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.comunicamosmas.api.domain.EmailCampaign;
+import com.comunicamosmas.api.domain.EmailCampaignDetalle;
 import com.comunicamosmas.api.service.IEmailCampaignDetalleService;
-import com.comunicamosmas.api.service.dto.EmailCampaignDetalleDTO;  
- 
+import com.comunicamosmas.api.service.dto.EmailCampaignDetalleDTO;
+import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/controlmas")
 public class EmailCampaignDetalleController {
-	
+
 	@Autowired
 	IEmailCampaignDetalleService emailCampaignDetalleService;
-	
+
 	@GetMapping("/emailCampaignDetalle/generate/{idEmailCampaign}")
-	public ResponseEntity<?> generate( @PathVariable Integer idEmailCampaign)
-	{
+	public ResponseEntity<?> generate(@PathVariable Integer idEmailCampaign) {
 		Map<String, Object> response = new HashMap<>();
-		
-		try
-		{
+
+		try {
 			emailCampaignDetalleService.findEmailBySend(idEmailCampaign);
-			
+
 			response.put("response", "Generado");
-			
+
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
-		}catch(Exception e)
-		{
+		} catch (Exception e) {
 			response.put("response", e.getMessage());
-			
+
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
-	
-	/**GET BUSCAR POR IDEMAILCAMPAIGN*/
+
+	/** GET BUSCAR POR IDEMAILCAMPAIGN */
 	@GetMapping("/emailCampaignDetalle/emailCampaign/{id}")
-	public ResponseEntity<?> findByEmailCampaign(@PathVariable Long id){
-		Map<String , Object> response = new HashMap<>();
-		
+	public ResponseEntity<?> findByEmailCampaign(@PathVariable Long id) {
+		Map<String, Object> response = new HashMap<>();
+
 		try {
-			
+
 			List<EmailCampaignDetalleDTO> result = emailCampaignDetalleService.findByIdEmailCampaing(id);
-			
+
 			response.put("response", result);
-			
+
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
-			
-		}catch(Exception e)
-		{
+
+		} catch (Exception e) {
 			response.put("response", e.getMessage());
-			
+
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
+
 	
-	/**GET ENDPOINT 
-	 * enviando correo electronico a un contrato de los cargado en emailCampaignDetalle*/
-	@GetMapping("emailCampaign/send/{id}")//id_email_campaign
-	public ResponseEntity<?> sendMail(@PathVariable Integer id)
-	{
+
+	/**
+	 * GET
+	 * 
+	 * @param id informacion del contratounitario
+	 */
+	@PostMapping("/emailCampaingDetalle/sendMail")
+	public ResponseEntity<?> sendMailUnitario(@RequestBody EmailCampaignDetalleDTO detalle) {
 		Map<String, Object> response = new HashMap<>();
-		
+
 		try {
+ 
+			String result = emailCampaignDetalleService.sendMailUnitario(detalle);
+
+			response.put("response", result);
+
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
+
+		}catch(ExceptionNullSql ex){
+
+				response.put("response", ex.getDetails());
+
+				return new ResponseEntity<Map<String, Object>>(response , HttpStatus.BAD_REQUEST);
+
+		}catch (Exception e) {
 			
-			emailCampaignDetalleService.sendMail(id);
-			
-			response.put("response", "enviado");
-			
-			return new ResponseEntity<Map<String, Object>>(response , HttpStatus.OK);
-		}catch(Exception e)
-		{
 			response.put("response", e.getMessage());
-			
-			return new ResponseEntity<Map<String, Object>>(response , HttpStatus.BAD_REQUEST);
+
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
-	
-	 
 
 }

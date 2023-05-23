@@ -69,4 +69,25 @@ public interface IContratoDao extends CrudRepository<Contrato, Long> {
     		+ "left join estaciones es on es.id_estacion = co.id_estacion\n"
     		+ "where co.id_contrato = :idContrato" , nativeQuery=true)
     public List<Object[]> datosClienteByIdContrato(@Param(value="idContrato") Long idContrato);
+    
+    /**
+     * utilizado para informacion de factura encabezado*/
+    @Query(value="SELECT  \n"
+    		+ "cl.id_cliente as idCliente,\n"
+    		+ "concat(cl.documento,'-',cl.dv) documento,\n"
+    		+ "concat(cl.celular_a,'/',cl.celular_b) celular,\n"
+    		+ "case\n"
+    		+ "when cl.tipo_cliente = 'J' then cl.razon_social\n"
+    		+ "when cl.tipo_cliente = 'N' then CONCAT(cl.apellido_paterno , ' ',cl.apellido_materno , ' ',cl.nombre_primer , ' ',cl.nombre_segundo)\n"
+    		+ "end  as nombreCliente,\n"
+    		+ "concat(dir.tipo,' / ',dir.a_tipo,' ',dir.a_numero,' ',dir.a_letra,' ',dir.b_tipo,' ',dir.b_numero,' ',dir.b_letra,' ',dir.numero,' / ',dir.nota,' / ',dir.barrio,' / ',mun.municipio , ' / ',dep.departamento) as direccion\n"
+    		+ " \n"
+    		+ "FROM clientes cl\n"
+    		+ "\n"
+    		+ "inner join contratos co on co.id_cliente = cl.id_cliente\n"
+    		+ "inner join direcciones dir on dir.id_direccion = co.id_direccion_factura\n"
+    		+ "inner join lista_municipios mun on mun.id_municipio = dir.municipio\n"
+    		+ "inner join lista_departamentos dep on dir.departamento = dep.id_departamento\n"
+    		+ "where co.id_contrato = :idContrato", nativeQuery = true)
+    public List<Object[]> infoByFactura(@Param("idContrato") Long idContrato);
 }

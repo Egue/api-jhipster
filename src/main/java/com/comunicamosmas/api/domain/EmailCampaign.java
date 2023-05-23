@@ -28,10 +28,24 @@ public class EmailCampaign implements Serializable{
 	
 	@Column(name="fecha_limite_pago")
 	private String fechaLimitePago;
+
+	@Column(name="fecha_de_corte")
+	private String fechaCorte;
 	
-	private Long mes;
+	private String mes;
 	
-	private Long anno;
+	private String anno;
+
+	private String estado;
+	
+
+	public String getEstado() {
+		return estado;
+	}
+
+	public void setEstado(String estado) {
+		this.estado = estado;
+	}
 
 	public Integer getId() {
 		return id;
@@ -73,20 +87,36 @@ public class EmailCampaign implements Serializable{
 		this.fechaLimitePago = fechaLimitePago;
 	}
 
-	public Long getMes() {
+	public String getMes() {
 		return mes;
 	}
 
-	public void setMes(Long mes) {
+	public void setMes(String mes) {
 		this.mes = mes;
 	}
 
-	public Long getAnno() {
+	public String getAnno() {
 		return anno;
 	}
 
-	public void setAnno(Long anno) {
+	public void setAnno(String anno) {
 		this.anno = anno;
 	}
+
+	public String getFechaCorte() {
+		return fechaCorte;
+	}
+
+	public void setFechaCorte(String fechaCorte) {
+		this.fechaCorte = fechaCorte;
+	}
+
+	@Override
+	public String toString() {
+		return "EmailCampaign [id=" + id + ", nombre=" + nombre + ", fecha=" + fecha + ", idEmpresa=" + idEmpresa
+				+ ", fechaLimitePago=" + fechaLimitePago + ", mes=" + mes + ", anno=" + anno + "]";
+	}
+ 
+	
 
 }

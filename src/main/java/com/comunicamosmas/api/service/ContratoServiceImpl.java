@@ -2,6 +2,7 @@ package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.Contrato;
 import com.comunicamosmas.api.repository.IContratoDao;
+import com.comunicamosmas.api.service.dto.ContratoInfoFacturaDTO;
 import com.comunicamosmas.api.service.dto.DatosClienteDTO;
 import com.comunicamosmas.api.service.dto.ListContratoDTO;
 
@@ -101,5 +102,25 @@ public class ContratoServiceImpl implements IContratoService {
 		}else {
 			return null;
 		}
+	}
+
+	@Override
+	public ContratoInfoFacturaDTO contratoFindFactura(Long idContrato) {
+		
+		List<Object[]> result = contratoDao.infoByFactura(idContrato);
+		
+		ContratoInfoFacturaDTO info = new ContratoInfoFacturaDTO();
+		
+		for(Object[] rs : result)
+		{
+			info.setIdCliente((Integer)rs[0]);
+			info.setDocumento((String) rs[1]);
+			info.setCelular((String) rs[2]);
+			info.setNombreCliente((String) rs[3]);
+			info.setDireccion((String) rs[4]);
+		}
+		
+		return info;
+		
 	}
 }

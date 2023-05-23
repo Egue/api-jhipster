@@ -2,6 +2,9 @@ package com.comunicamosmas.api.config;
 
 import com.comunicamosmas.api.security.*;
 import com.comunicamosmas.api.security.jwt.*;
+
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
@@ -15,6 +18,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 import org.zalando.problem.spring.web.advice.security.SecurityProblemSupport;
 import tech.jhipster.config.JHipsterProperties;
@@ -91,11 +97,24 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/management/prometheus").permitAll()
             .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
         .and()
-            .httpBasic()
+            .httpBasic() 
         .and()
             .apply(securityConfigurerAdapter());
         // @formatter:on
     }
+    
+    /*@Bean
+    public CorsConfigurationSource corsConfigurationSource()
+    {
+    	CorsConfiguration conf = new CorsConfiguration();
+    	conf.setAllowedOrigins(Arrays.asList("*"));
+    	conf.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE" , "OPTIONS"));
+    	conf.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));    	
+    	UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    	source.registerCorsConfiguration("/**", conf);
+        return source;
+    }*/
+    
 
     private JWTConfigurer securityConfigurerAdapter() {
         return new JWTConfigurer(tokenProvider);

@@ -1,7 +1,6 @@
 package com.comunicamosmas.api.domain;
 
-import java.io.Serializable;
-import java.time.Instant;
+import java.io.Serializable; 
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

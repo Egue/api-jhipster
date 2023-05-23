@@ -474,4 +474,26 @@ public class Empresa implements Serializable {
     public void setMuestra_fisicos(Long muestra_fisicos) {
         this.muestra_fisicos = muestra_fisicos;
     }
+
+	@Override
+	public String toString() {
+		return "Empresa [id=" + id + ", nombreComercial=" + nombreComercial + ", razonSocial=" + razonSocial
+				+ ", idCiudad=" + idCiudad + ", estado=" + estado + ", telefonos=" + telefonos + ", nit=" + nit
+				+ ", dv=" + dv + ", logo=" + logo + ", direccion=" + direccion + ", ciudad=" + ciudad
+				+ ", facturaANumeroInicio=" + facturaANumeroInicio + ", facturaANumeroFinal=" + facturaANumeroFinal
+				+ ", facturaAResolucion=" + facturaAResolucion + ", facturaAFechaInicio=" + facturaAFechaInicio
+				+ ", facturaAFechaVence=" + facturaAFechaVence + ", facturaAPrefijo=" + facturaAPrefijo
+				+ ", facturaBNumeroInicio=" + facturaBNumeroInicio + ", facturaBNumeroFinal=" + facturaBNumeroFinal
+				+ ", facturaBResolucion=" + facturaBResolucion + ", facturaBFechaInicio=" + facturaBFechaInicio
+				+ ", facturaBFechaVence=" + facturaBFechaVence + ", facturaBPrefijo=" + facturaBPrefijo + ", marca="
+				+ marca + ", estadoCuenta=" + estadoCuenta + ", idServicioServicio=" + idServicioServicio
+				+ ", idServicioInstalacion=" + idServicioInstalacion + ", idServicioReconexion=" + idServicioReconexion
+				+ ", regimen=" + regimen + ", anexoFactura=" + anexoFactura + ", pdfa=" + pdfa + ", pdfb=" + pdfb
+				+ ", pdfc=" + pdfc + ", pdfd=" + pdfd + ", facturaSms=" + facturaSms + ", facturaElectronica="
+				+ facturaElectronica + ", idResolucionActiva=" + idResolucionActiva + ", logoPublico=" + logoPublico
+				+ ", web=" + web + ", fondoFactura=" + fondoFactura + ", fondoFacturaB=" + fondoFacturaB + ", tcApi="
+				+ tcApi + ", muestra_fisicos=" + muestra_fisicos + "]";
+	}
+    
+    
 }

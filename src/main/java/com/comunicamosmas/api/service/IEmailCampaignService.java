@@ -18,5 +18,7 @@ public interface IEmailCampaignService {
 	public void deleteById(Integer id);
 	
 	public List<EmailCampanignDTO> findAllEmailCampaign();
+
+	public EmailCampaign findEmailCampaignLimitOne();
 	 
 }

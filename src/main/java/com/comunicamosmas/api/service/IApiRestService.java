@@ -1,9 +1,12 @@
 package com.comunicamosmas.api.service;
+ 
 
-import java.util.List;
+import com.comunicamosmas.api.service.dto.FacturaElectronicaResponseDTO;
 
 public interface IApiRestService {
 	
 	public void pagosSupergiros();
+
+	public FacturaElectronicaResponseDTO unSerializablePHP(String factura , Integer mesServicio , Long idEmpresa);
 
 }

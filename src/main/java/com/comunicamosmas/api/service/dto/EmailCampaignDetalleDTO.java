@@ -4,7 +4,7 @@ public class EmailCampaignDetalleDTO {
 
 	private Integer id;
 	
-	private Integer idContrato;
+	private String factura;
 	
 	private Integer idCliente;
 	
@@ -20,84 +20,118 @@ public class EmailCampaignDetalleDTO {
 	
 	private String nombreCliente;
 	
+	private Integer idCampaign;
 	
 
 	public EmailCampaignDetalleDTO() {
 		 
 	}
+ 
 
 	public Integer getId() {
 		return id;
 	}
 
+
 	public void setId(Integer id) {
 		this.id = id;
 	}
 
-	public Integer getIdContrato() {
-		return idContrato;
+
+	public String getFactura() {
+		return factura;
 	}
 
-	public void setIdContrato(Integer idContrato) {
-		this.idContrato = idContrato;
+
+	public void setFactura(String factura) {
+		this.factura = factura;
 	}
+
 
 	public Integer getIdCliente() {
 		return idCliente;
 	}
 
+
 	public void setIdCliente(Integer idCliente) {
 		this.idCliente = idCliente;
 	}
+
 
 	public String getEmail() {
 		return email;
 	}
 
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
+
 
 	public String getResponse() {
 		return response;
 	}
 
+
 	public void setResponse(String response) {
 		this.response = response;
 	}
+
 
 	public String getProcesado() {
 		return procesado;
 	}
 
+
 	public void setProcesado(String procesado) {
 		this.procesado = procesado;
 	}
+
 
 	public String getNombreServicio() {
 		return nombreServicio;
 	}
 
+
 	public void setNombreServicio(String nombreServicio) {
 		this.nombreServicio = nombreServicio;
 	}
+
 
 	public String getTipoCliente() {
 		return tipoCliente;
 	}
 
+
 	public void setTipoCliente(String tipoCliente) {
 		this.tipoCliente = tipoCliente;
 	}
+
 
 	public String getNombreCliente() {
 		return nombreCliente;
 	}
 
+
 	public void setNombreCliente(String nombreCliente) {
 		this.nombreCliente = nombreCliente;
 	}
+
+
+	public Integer getIdCampaign() {
+		return idCampaign;
+	}
+
+
+	public void setIdCampaign(Integer idCampaign) {
+		this.idCampaign = idCampaign;
+	}
 	
+	
+	
+	
+	
+ 
 	
 	
 }

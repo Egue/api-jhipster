@@ -1,6 +1,7 @@
 package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.Contrato;
+import com.comunicamosmas.api.service.dto.ContratoInfoFacturaDTO;
 import com.comunicamosmas.api.service.dto.DatosClienteDTO;
 import com.comunicamosmas.api.service.dto.ListContratoDTO; 
 import java.util.List;
@@ -22,4 +23,7 @@ public interface IContratoService {
     public List<ListContratoDTO> findByIdCliente(Long idCliente);
     
     public DatosClienteDTO datosContactoByIdContrato(Long idContrato);
+    
+    //buscar informacion de contrato para factura
+    public ContratoInfoFacturaDTO contratoFindFactura(Long idContrato);
 }

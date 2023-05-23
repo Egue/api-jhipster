@@ -22,8 +22,8 @@ public class EmailCampaignDetalle implements Serializable{
 	@Column(name="id_email_campaing")
 	private Integer idEmailCampaign;
 	
-	@Column(name="id_contrato")
-	private Integer idContrato;
+	@Column(name="factura")
+	private String factura;
 	
 	@Column(name="id_cliente")
 	private Integer idCliente;
@@ -54,12 +54,12 @@ public class EmailCampaignDetalle implements Serializable{
 		this.idEmailCampaign = idEmailCampaign;
 	}
 
-	public Integer getIdContrato() {
-		return idContrato;
+	public String getFactura() {
+		return factura;
 	}
 
-	public void setIdContrato(Integer idContrato) {
-		this.idContrato = idContrato;
+	public void setFactura(String factura) {
+		this.factura = factura;
 	}
 
 	public Integer getIdCliente() {

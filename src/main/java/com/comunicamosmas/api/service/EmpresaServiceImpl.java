@@ -33,7 +33,7 @@ public class EmpresaServiceImpl implements IEmpresaService {
     @Override
     public Empresa findById(Long id) {
         // TODO Auto-generated method stub
-        return null;
+        return empresaDao.findById(id).orElse(null);
     }
 
     @Override

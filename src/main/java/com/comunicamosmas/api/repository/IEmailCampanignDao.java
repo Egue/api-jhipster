@@ -17,7 +17,9 @@ public interface IEmailCampanignDao extends CrudRepository< EmailCampaign, Integ
 			+ "camp.fecha_limite_pago as fechaLimitePago,\n"
 			+ "camp.mes,\n"
 			+ "camp.nombre,\n"
-			+ "empresas.nombre_comercial as nombreComercial\n"
+			+ "empresas.nombre_comercial as nombreComercial,\n"
+			+ "camp.fecha_de_corte,\n"
+			+ "camp.estado\n"
 			+ " FROM email_campaign as camp INNER JOIN empresas on empresas.id_empresa = camp.id_empresa" , nativeQuery = true)
 	public List<Object[]> findAllEmailCampaign();
 	
@@ -28,8 +30,17 @@ public interface IEmailCampanignDao extends CrudRepository< EmailCampaign, Integ
 			+ "	camp.fecha_limite_pago as fechaLimitePago, \n"
 			+ "	camp.mes, \n"
 			+ "	camp.nombre, \n"
-			+ "	empresas.nombre_comercial as nombreComercial \n"
+			+ "	empresas.nombre_comercial as nombreComercial, \n"
+			+ "camp.fecha_de_corte,\n"
+			+ "camp.estado\n"
 			+ "	FROM email_campaign as camp INNER JOIN empresas on empresas.id_empresa = camp.id_empresa "
 			+ " WHERE camp.id = :id", nativeQuery=true)
 	public List<Object[]> findByIdDTO(@Param("id") Integer id);
+
+	/** 
+	 * campaña con estado Abierto limit 1
+	*/
+	@Query(value="SELECT * FROM email_campaign WHERE email_campaign.estado = 'Abierto' LIMIT 0,1" ,  nativeQuery = true)
+	public EmailCampaign findCampaignLimitOne();
+
 }

@@ -15,8 +15,12 @@ public interface IEmailCampaignDetalleService {
 	
 	public EmailCampaignDetalle findById(Integer id);
 	
-	public void sendMail(Integer id);
+	//public void sendMail(Integer id);
 	
+	public String sendMailUnitario(EmailCampaignDetalleDTO detalle);
+
+	//buscar emaildetalle procesado 0
+	public List<EmailCampaignDetalleDTO> findEmailCampaignDetalleSinProcesar(Integer idEmailCampaign);
 	
 
 }

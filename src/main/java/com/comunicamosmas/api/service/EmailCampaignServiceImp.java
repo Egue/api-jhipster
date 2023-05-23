@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.comunicamosmas.api.domain.EmailCampaign;
 import com.comunicamosmas.api.repository.IEmailCampanignDao;
 import com.comunicamosmas.api.service.dto.EmailCampanignDTO;
+import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 
 @Service
 public class EmailCampaignServiceImp implements IEmailCampaignService{
@@ -36,13 +37,14 @@ public class EmailCampaignServiceImp implements IEmailCampaignService{
 			
 			
 			obj.setId((Integer) rs[0]);
-			obj.setAnno((Integer) rs[1]);
+			obj.setAnno((String) rs[1]);
 			obj.setFecha((Date) rs[2]);
 			obj.setFechaLimitePago((String) rs[3]);
-			obj.setMes((Integer) rs[4]);
+			obj.setMes((String) rs[4]);
 			obj.setNombre((String) rs[5]);
 			obj.setNombreComercial((String) rs[6]);
-			
+			obj.setFechaCorte((String)rs[7]);
+			obj.setEstado((String) rs[8]);
 			 
 		}
 		
@@ -66,18 +68,24 @@ public class EmailCampaignServiceImp implements IEmailCampaignService{
 		// TODO Auto-generated method stub
 		List<Object[]> result = emailCampaignDao.findAllEmailCampaign();
 		List<EmailCampanignDTO> email = new ArrayList<EmailCampanignDTO>();
-		for(Object[] rs: result)
+		try{
+			for(Object[] rs: result)
 		{
 			EmailCampanignDTO obj = new EmailCampanignDTO();
 			obj.setId((Integer) rs[0]);
-			obj.setAnno((Integer) rs[1]);
+			obj.setAnno((String) rs[1]);
 			obj.setFecha((Date) rs[2]);
 			obj.setFechaLimitePago((String) rs[3]);
-			obj.setMes((Integer) rs[4]);
+			obj.setMes((String) rs[4]);
 			obj.setNombre((String) rs[5]);
 			obj.setNombreComercial((String) rs[6]);
-			
+			obj.setFechaCorte((String) rs[7]);
+			obj.setEstado((String) rs[8]);
 			email.add(obj);
+		}
+		}catch(Exception e)
+		{
+			throw new ExceptionNullSql(new Date(), "Email Campaign", "Sin resultados");
 		}
 		
 		return email;
@@ -87,6 +95,12 @@ public class EmailCampaignServiceImp implements IEmailCampaignService{
 	public EmailCampaign findById(Integer id) {
 		// TODO Auto-generated method stub
 		return emailCampaignDao.findById(id).orElse(null);
+	}
+
+	@Override
+	public EmailCampaign findEmailCampaignLimitOne() {
+		
+		return emailCampaignDao.findCampaignLimitOne();
 	}
 
 }
