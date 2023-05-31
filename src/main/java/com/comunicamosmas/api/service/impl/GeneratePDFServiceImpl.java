@@ -267,7 +267,7 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 						parcial += (float) rs[1];
 						total 	+= (double) rs[2];
 				} 
-			saldoAnterior = parcial - total;
+			saldoAnterior = total - parcial;
 			
 		}
 
