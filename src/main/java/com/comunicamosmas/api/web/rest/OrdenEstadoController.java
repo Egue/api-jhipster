@@ -48,4 +48,25 @@ public class OrdenEstadoController {
 		}
 	}
 
+	@GetMapping("/ordenestado/all")
+	public ResponseEntity<?> findAll()
+	{
+		Map<String, Object> response = new HashMap<>();
+		
+		try {
+			
+			List<OrdenEstado>  result = ordenEstadoService.findAll();
+			
+			response.put("response", result);
+			
+			return new ResponseEntity<Map<String, Object>>(response , HttpStatus.OK);
+			
+		}catch(Exception e)
+		{
+			response.put("response", e.getMessage());
+			
+			return new ResponseEntity<Map<String, Object>>(response , HttpStatus.BAD_REQUEST);
+		}
+	}
+
 }

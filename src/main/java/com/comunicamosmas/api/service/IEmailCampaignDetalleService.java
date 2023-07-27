@@ -2,6 +2,7 @@ package com.comunicamosmas.api.service;
 
 import java.util.List;
 
+import com.comunicamosmas.api.domain.EmailCampaignApi;
 import com.comunicamosmas.api.domain.EmailCampaignDetalle;
 import com.comunicamosmas.api.service.dto.EmailCampaignDetalleDTO;
 
@@ -21,6 +22,8 @@ public interface IEmailCampaignDetalleService {
 
 	//buscar emaildetalle procesado 0
 	public List<EmailCampaignDetalleDTO> findEmailCampaignDetalleSinProcesar(Integer idEmailCampaign);
+
+	
 	
 
 }

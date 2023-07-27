@@ -1,18 +1,21 @@
 package com.comunicamosmas.api.service.impl;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.comunicamosmas.api.domain.EmailCampaignApi;
 import com.comunicamosmas.api.repository.EmailCampaignApiRepository;
 import com.comunicamosmas.api.service.EmailCampaignApiService;
 import com.comunicamosmas.api.service.dto.EmailCampaignApiDTO;
 import com.comunicamosmas.api.service.mapper.EmailCampaignApiMapper;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service Implementation for managing {@link EmailCampaignApi}.
@@ -80,5 +83,30 @@ public class EmailCampaignApiServiceImpl implements EmailCampaignApiService {
     public void delete(Long id) {
         log.debug("Request to delete EmailCampaignApi : {}", id);
         emailCampaignApiRepository.deleteById(id);
+    }
+
+    @Override
+    public EmailCampaignApi findApiMailRelay(Integer idServicio) {
+         
+        List<EmailCampaignApiDTO> result =   this.findAll();
+
+        EmailCampaignApi obj = new EmailCampaignApi();
+
+        for(EmailCampaignApiDTO api:result)
+        {
+            String[] servicios = api.getServicio().split(",");
+            if (Arrays.asList(servicios).contains(String.valueOf(idServicio)))
+            {
+                
+                obj.setId(api.getId());
+                obj.setMail_envio(api.getMail_envio());
+                obj.setNombre_envio(api.getNombre_envio());
+                obj.setToken(api.getToken());
+                obj.setUrl(api.getUrl());
+                break;
+            }
+        }
+        //obj=this.findOneByServiceIdAndStatusActive(idServicio,true
+        return obj;
     }
 }

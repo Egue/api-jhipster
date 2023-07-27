@@ -1,5 +1,6 @@
 package com.comunicamosmas.api.service;
 
+import com.comunicamosmas.api.domain.EmailCampaignApi;
 import com.comunicamosmas.api.service.dto.EmailCampaignApiDTO;
 import java.util.List;
 import java.util.Optional;
@@ -45,4 +46,7 @@ public interface EmailCampaignApiService {
      * @param id the id of the entity.
      */
     void delete(Long id);
+
+    //buscar datos por id servicio
+	public EmailCampaignApi findApiMailRelay(Integer idServicio);
 }

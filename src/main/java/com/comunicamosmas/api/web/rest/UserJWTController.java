@@ -1,12 +1,15 @@
 package com.comunicamosmas.api.web.rest;
 
+import com.comunicamosmas.api.domain.Menu;
 import com.comunicamosmas.api.domain.SidebarRelations;
 import com.comunicamosmas.api.domain.User;
 import com.comunicamosmas.api.security.jwt.JWTFilter;
 import com.comunicamosmas.api.security.jwt.TokenProvider;
+import com.comunicamosmas.api.service.IMenuService;
 import com.comunicamosmas.api.service.ISidebarRelationsService;
 import com.comunicamosmas.api.service.IUsuarioService;
 import com.comunicamosmas.api.service.UserService;
+import com.comunicamosmas.api.service.dto.MenuDTOJson;
 import com.comunicamosmas.api.service.dto.userLoginDTO;
 import com.comunicamosmas.api.web.rest.vm.LoginVM;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -44,9 +47,11 @@ public class UserJWTController {
 
     @Autowired
     IUsuarioService usuarioService;
+ 
+
 
     @Autowired
-    ISidebarRelationsService sidebarRelationsService;
+    IMenuService menuService;
 
     public UserJWTController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder) {
         this.tokenProvider = tokenProvider;
@@ -83,10 +88,11 @@ public class UserJWTController {
       
         String rol = usuarioService.findRolByUser(loginVM.getUsername());
         loginDto.setRol((String) rol);
+        List<MenuDTOJson.Menu> menu = menuService.menu(rol);
+        //List<SidebarRelations> menu = sidebarRelationsService.findByIdRole(rol);
+        //List<Menu> menu = menuService.findMenu();
 
-        List<SidebarRelations> menu = sidebarRelationsService.findByIdRole(rol);
-
-        return new ResponseEntity<>(new JWTToken(jwt, loginDto, menu), httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(new JWTToken(jwt, loginDto , menu ), httpHeaders, HttpStatus.OK);
     }
 
     /**
@@ -112,10 +118,12 @@ public class UserJWTController {
             loginDto.setImageUrl((String) user.get().getImageUrl());
             loginDto.setResetDate((Instant) user.get().getResetDate());
             loginDto.setRol((String) rol);
-            List<SidebarRelations> menu = sidebarRelationsService.findByIdRole(rol);
+           // List<SidebarRelations> menu = sidebarRelationsService.findByIdRole(rol);
             //response.put("id_token","ok");
+            List<MenuDTOJson.Menu> menu = menuService.menu(rol);
+            //List<Menu> menu = menuService.findMenu();
 
-            return new ResponseEntity<>(new JWTToken(token, loginDto, menu), HttpStatus.OK);
+            return new ResponseEntity<>(new JWTToken(token, loginDto , menu), HttpStatus.OK);
         } catch (Exception e) {
             response.put("response", e.getMessage());
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
@@ -131,12 +139,12 @@ public class UserJWTController {
 
         private userLoginDTO user;
 
-        private List<SidebarRelations> menu;
+        private List<MenuDTOJson.Menu> menu;
 
-        JWTToken(String idToken, userLoginDTO user, List<SidebarRelations> menu) {
-            this.idToken = idToken;
+        JWTToken(String idToken, userLoginDTO user  , List<MenuDTOJson.Menu> menu) {
+           this.idToken = idToken;
             this.user = user;
-            this.menu = menu;
+           this.menu = menu;
         }
 
         @JsonProperty("id_token")
@@ -150,7 +158,7 @@ public class UserJWTController {
         }
 
         @JsonProperty("menu")
-        List<SidebarRelations> getMenu() {
+        List<MenuDTOJson.Menu>  getMenu() {
             return menu;
         }
 

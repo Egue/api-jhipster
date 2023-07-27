@@ -103,4 +103,32 @@ public class EmailCampaignServiceImp implements IEmailCampaignService{
 		return emailCampaignDao.findCampaignLimitOne();
 	}
 
+	@Override
+	public List<EmailCampanignDTO> filterEmailCampaign(Long idEmpresa, String fecha) {
+		// TODO Auto-generated method stub
+		 List<Object[]> result = emailCampaignDao.filterEmailCampaign(idEmpresa , fecha);
+		 List<EmailCampanignDTO> email = new ArrayList<EmailCampanignDTO>();
+		 try{
+			 for(Object[] rs: result)
+		 {
+			 EmailCampanignDTO obj = new EmailCampanignDTO();
+			 obj.setId((Integer) rs[0]);
+			 obj.setAnno((String) rs[1]);
+			 obj.setFecha((Date) rs[2]);
+			 obj.setFechaLimitePago((String) rs[3]);
+			 obj.setMes((String) rs[4]);
+			 obj.setNombre((String) rs[5]);
+			 obj.setNombreComercial((String) rs[6]);
+			 obj.setFechaCorte((String) rs[7]);
+			 obj.setEstado((String) rs[8]);
+			 email.add(obj);
+		 }
+		 }catch(Exception e)
+		 {
+			 throw new ExceptionNullSql(new Date(), "Email Campaign", "Sin resultados");
+		 }
+		 
+		 return email;
+	}
+
 }

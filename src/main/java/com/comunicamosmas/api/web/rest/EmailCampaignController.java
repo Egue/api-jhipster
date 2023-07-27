@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.comunicamosmas.api.domain.EmailCampaign;
@@ -79,6 +80,28 @@ public class EmailCampaignController {
 			EmailCampanignDTO result = emailCampaignService.findByIdDTO(id);
 			
 			response.put("response", result);
+			
+			return new ResponseEntity<Map<String, Object>>(response , HttpStatus.OK);
+			
+		}catch(Exception e)
+		{
+			response.put("response", e.getMessage());
+			
+			return new ResponseEntity<Map<String, Object>>(response , HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@PostMapping("/emailCampaign/search")
+	public ResponseEntity<?> search(@RequestParam Long idEmpresa , @RequestParam String fecha)
+	{
+		Map<String, Object> response = new HashMap<>();
+		
+		try {
+			
+			List<EmailCampanignDTO> result = emailCampaignService.filterEmailCampaign(idEmpresa, fecha);
+
+			response.put("response", result);
+			 
 			
 			return new ResponseEntity<Map<String, Object>>(response , HttpStatus.OK);
 			

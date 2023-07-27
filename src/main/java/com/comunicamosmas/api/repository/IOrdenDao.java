@@ -3,7 +3,9 @@ package com.comunicamosmas.api.repository;
 import com.comunicamosmas.api.domain.Orden; 
 import com.comunicamosmas.api.service.dto.OrdenForInstalacionFindByIdOrdenDTO;
 import com.comunicamosmas.api.service.dto.OrdenInstalacionDTO; 
-import java.util.List; 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -142,4 +144,54 @@ public interface IOrdenDao extends CrudRepository<Orden, Long> {
     @Query(value="SELECT * FROM ordenes where ordenes.abierta = 1 and ordenes.anulada = 0 "
     		+ "and ordenes.estado = 0 and ordenes.tipo_orden = :tipoOrden and ordenes.id_contrato = :idContrato ", nativeQuery = true)
     public Orden findOrdenActivaByTipo(@Param("tipoOrden")Long tipoOrden , @Param("idContrato")Long idContrato);
+
+    //reporte de ordenes por tipo y observaciones de visitas usando
+    //between de fecha a fecha 
+    /*
+     * @Param("idServicio")
+     * @Param("fechaInicio")
+     * @Param("fechaFinal")
+     * @Param("tipoOrden")
+     */
+    @Query(value="SELECT \n" + //
+            "ord.id_orden, \n" + //
+            "es.nombre,\n" + //
+            "ord.causa_solicitud ,\n" + //
+            "ord.id_contrato , \n" + //
+            "ord.fechaf_registra,\n" + //
+            "ord.refiere , \n" + //
+            "cli.tipo_cliente,\n" + //
+            "case \n" + //
+            "\tWHEN cli.tipo_cliente = 'J' THEN CONCAT(cli.razon_social)\n" + //
+            "    WHEN cli.tipo_cliente = 'N' THEN CONCAT(cli.nombre_primer, cli.nombre_segundo , ' / ' , cli.apellido_paterno, cli.apellido_materno)\n" + //
+            "END as cliente,\n" + //
+            "cli.documento,\n" + //
+            "ord.nota,\n" + //
+            "case when ord.estado = 0 THEN 'Sin asignar'\n" + //
+            "\twhen ord.estado = 1 THEN 'Asignada'\n" + //
+            "    when ord.estado = 2 THEN 'En proceso'\n" + //
+            "    when ord.estado = 3 THEN 'Ejecutada'\n" + //
+            "    when ord.estado = 4 THEN 'Anulada'\n" + //
+            "end as estado,\n" + //
+            "ord.nota_final,\n" + //
+            "group_concat(ov.detalle separator ',') visitaFallida \n" + //
+            "FROM ordenes ord \n" + //
+            "inner join clientes cli on cli.id_cliente = ord.id_cliente\n" + //
+            "inner join ordenes_estados es on es.id_estado = ord.tipo_orden\n" + //
+            "left join ordenes_visitas ov on ov.id_orden = ord.id_orden\n" + //
+            "where ord.fechaf_registra between :fechaInicio and :fechaFinal \n" + //
+            "and ord.tipo_orden = :idTipo\n" + //
+            "and ord.id_servicio = :idServicio\n" + //
+            "group by ord.id_orden" , nativeQuery = true)
+    public Optional<List<Object[]>> findTipoAndIdServicioAndFechaCreadaWithVisitaFallida(@Param("idServicio") Long idServicio , @Param("idTipo") Long idTipo ,
+    @Param("fechaInicio") Long fechaInicio, @Param("fechaFinal") Long fechaFinal);
+
+    @Query(value="SELECT MONTH(winmax_marca) mes,count(*)  as cantidad from ordenes \n" + //
+            "WHERE winmax = 1 AND YEAR(winmax_marca) = :ano AND tipo_orden = :tipo and id_servicio IN  (:servicios) group by mes\n" + //
+            "ORDER BY mes ASC" , nativeQuery = true)
+    public Optional<List<Object[]>> chatLineCortado(@Param("servicios") List<Integer> servicios , @Param("ano") Integer ano , @Param("tipo")Integer tipo);
+    
+
+
+    
 }

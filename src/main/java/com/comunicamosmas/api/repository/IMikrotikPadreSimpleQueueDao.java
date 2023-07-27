@@ -3,6 +3,7 @@ package com.comunicamosmas.api.repository;
 import com.comunicamosmas.api.domain.MikrotikPadreSimpleQueue;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

@@ -11,7 +11,7 @@ public class MailRelaySendMail {
 
 	//private static final long serialVersionUID = 1L;
 
-	public class Send {
+	public class Send { 
 
 		private From from;
 

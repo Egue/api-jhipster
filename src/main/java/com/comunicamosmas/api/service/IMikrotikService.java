@@ -35,16 +35,15 @@ public interface IMikrotikService {
     public void test(Long idEstacion, String ip, Long idContrato) throws MikrotikApiException;
 
     //nuevas instancias
-    //crea solo el padre
-    public MikrotikPadreSimpleQueue padreQueuesimple(Long idPlan, Long idEstacion, Long idIp) throws MikrotikApiException;
+    //crea solo el padre o busca uno nuevo
+    public MikrotikPadreSimpleQueue padreQueuesimple(Long idPlan, Long idEstacion, Long idIp);
 
     //crea el secrect en el ppoe
     public WinmaxPass pppSecrect(Long idContrato, Long idEstacion, String profile, String nameSecrect, String pass)
         throws MikrotikApiException;
 
     //crea el hijo
-    public MikrotikHijoSimpleQueue hijoQueueSimple(Long idPlan, Long idIp, Long idPadre, Long idContrato, Long idEstacion)
-        throws MikrotikApiException;
+    public MikrotikHijoSimpleQueue hijoQueueSimple(Long idPlan, Long idIp, Long idPadre, Long idContrato, Long idEstacion);
 
     //actualiza el target del hijo creado
     public MikrotikPadreSimpleQueue updatedTargetPadreInRB(Long idEstacion, Long idPadre) throws MikrotikApiException;

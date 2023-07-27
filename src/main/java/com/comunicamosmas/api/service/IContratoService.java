@@ -1,6 +1,7 @@
 package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.Contrato;
+import com.comunicamosmas.api.service.dto.CarteraDTO;
 import com.comunicamosmas.api.service.dto.ContratoInfoFacturaDTO;
 import com.comunicamosmas.api.service.dto.DatosClienteDTO;
 import com.comunicamosmas.api.service.dto.ListContratoDTO; 
@@ -26,4 +27,10 @@ public interface IContratoService {
     
     //buscar informacion de contrato para factura
     public ContratoInfoFacturaDTO contratoFindFactura(Long idContrato);
+
+     
+
+    //
+    public List<CarteraDTO> carteraByServicio(List<Integer> servicios);
+ 
 }

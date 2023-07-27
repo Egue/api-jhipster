@@ -2,10 +2,13 @@ package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.Contrato;
 import com.comunicamosmas.api.domain.Orden;
+import com.comunicamosmas.api.service.dto.ChartDataLineDTO;
 import com.comunicamosmas.api.service.dto.OrdenByContratoDTO;
 import com.comunicamosmas.api.service.dto.OrdenByTipoOrdenDTO;
 import com.comunicamosmas.api.service.dto.OrdenForInstalacionFindByIdOrdenDTO;
-import com.comunicamosmas.api.service.dto.OrdenInstalacionDTO; 
+import com.comunicamosmas.api.service.dto.OrdenInstalacionDTO;
+import com.comunicamosmas.api.service.dto.ReporteOrdenConVisitaFallidaDTO;
+
 import java.util.List;
 
 public interface IOrdenService {
@@ -53,5 +56,11 @@ public interface IOrdenService {
     
     //anular una orden
     public void anularOrden(Orden orden ,  String comentario);
+
+    //reporte de ordenes de servicio por tipo fecha y visita fallidas
+    public List<ReporteOrdenConVisitaFallidaDTO> reporteConVisitaFallida(Long idServicio, Long tipo , String iniciof, String finalf);
+
+    //
+    public ChartDataLineDTO chartLineOrdenesCortados(Integer ano , List<Integer> servicios);
     	
 }

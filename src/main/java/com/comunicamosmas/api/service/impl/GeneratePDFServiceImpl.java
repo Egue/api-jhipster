@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -20,7 +21,17 @@ import java.util.Locale;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.web.client.RequestCallback;
+import org.springframework.web.client.ResponseExtractor;
+import org.springframework.web.client.RestTemplate;
 
 import com.comunicamosmas.api.domain.Contrato;
 import com.comunicamosmas.api.domain.Empresa;
@@ -57,6 +68,7 @@ import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
+ 
 
 @Service
 public class GeneratePDFServiceImpl implements IGeneratePDFService {
@@ -291,7 +303,7 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 				imagenQr = facturaDIAN.getUrl_qr();
 
 				//descagar XML
-				String pathXML = this.downloadFileXML(facturaDIAN.getRespuesta_final_dian() , empresa.getNit().toString() , detalle.getFactura());
+				String pathXML = this.downloadFileXML(facturaDIAN.getUrl_xml_AttachedDocument() , empresa.getNit().toString() , detalle.getFactura());
 				//imagenQr = "QR.png";
 				responseFactura.setPathXML(pathXML);
 
@@ -717,27 +729,24 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 		SystemConfig system = systemService.findByOrigen("facturas");
 		//String savePath = "/home/programador/Documentos/"+armandoName;
 		String savePath = system.getComando()+armandoName;
-		try {
-            URL link = new URL(url);
-            Path path = Path.of(savePath);
+		try { 
+			RestTemplate restTemplate = new RestTemplate();
 
-            // Descargar el archivo utilizando un buffer para mejorar el rendimiento
-            try (BufferedInputStream in = new BufferedInputStream(link.openStream());
-                 FileOutputStream fileOutputStream = new FileOutputStream(path.toFile())) {
+        	ResponseEntity<Resource> response = restTemplate.exchange(url, HttpMethod.GET, null, Resource.class);
+        
+			Resource resource = response.getBody();
+			
+			File file = new File(savePath);
+			
+			FileOutputStream outputStream = new FileOutputStream(file);
 
-                byte[] dataBuffer = new byte[1024];
-                int bytesRead;
-                while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-                    fileOutputStream.write(dataBuffer, 0, bytesRead);
-                }
-            }
+			FileCopyUtils.copy(resource.getInputStream(), outputStream);
 
-            
 			return savePath;
 
-        } catch (IOException e) {
+        } catch (IOException e) { 
 
-            throw new ExceptionNullSql(new Date(), "Error descargando archivo", e.getMessage());
+            throw new ExceptionNullSql(new Date(), "Error descargando archivo : "+e.getMessage(), e.getMessage());
         }
 
 	}

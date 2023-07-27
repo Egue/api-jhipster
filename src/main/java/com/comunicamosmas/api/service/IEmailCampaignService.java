@@ -20,5 +20,7 @@ public interface IEmailCampaignService {
 	public List<EmailCampanignDTO> findAllEmailCampaign();
 
 	public EmailCampaign findEmailCampaignLimitOne();
+
+	public List<EmailCampanignDTO> filterEmailCampaign(Long idEmpresa , String fecha);
 	 
 }

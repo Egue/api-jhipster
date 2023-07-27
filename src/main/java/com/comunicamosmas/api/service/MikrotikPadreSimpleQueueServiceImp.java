@@ -78,6 +78,7 @@ public class MikrotikPadreSimpleQueueServiceImp implements IMikrotikPadreSimpleQ
 
     @Override
     public MikrotikPadreSimpleQueue findByIdPlanAndReuso(Long idPlan, Long reuso, Long idEstacion) {
+		
         return mikrotikPadreSimpleDao.findByIdPlanAndReuso(idPlan, reuso, idEstacion);
     }
 

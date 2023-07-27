@@ -399,6 +399,9 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 		}
 		return email;
 	}
+
+	 
+	
  
 	 
 }

@@ -100,131 +100,116 @@ public interface IContratoDao extends CrudRepository<Contrato, Long> {
 	+ "#co.limite_promo AS ff_limitepromotarifa,\n"
 	+ "co.id_zona AS ff_idzonacontra,\n"
 	+ "#co.id_direccion_servicio AS ff_iddireccion,\n"
-	+ "co.marca AS ff_marcacontrato,
-	+ "co.inicio AS ff_iniciocontrato,
-	+ "co.grupo AS ff_grupocontra, 
-	+ "CASE 
-	+ "	WHEN co.estado = 0 THEN 'Por Aprobar'
-	+ "	WHEN co.estado = 1 THEN 'Activo'
-	+ "	WHEN co.estado = 2 THEN 'Cortado'
-	+ "	WHEN co.estado = 3 THEN 'Anulado'
-	+ "	WHEN co.estado = 4 THEN 'Retirado'
-	+ "	WHEN co.estado = 5 THEN 'Suspensión temporal'
-	+ "END ff_estadocontrato,
-	+ "co.ultimo_pago AS ultimo_pago,
-	+ "co.ultimo_estado AS fecha_ultimo_estado,
-	+ "co.estrato AS estrato_contrato,
-	+ "co.venta as modalidad,
-	+ "
-	+ "/* TARIFAS */ 
-	+ "ta.valor AS 'tarifa_general_valor',
-	+ "ta.numero_canales AS 'numero_canales',
-	+ "ta.velocidad AS 'velocidad',
-	+ "tb.nombre AS 'tarifa_nombre',
-	+ "tb.valor AS 'tarifa_promo_valor',
-	+ "CASE
-	+ "	WHEN tb.tipo_banda = 0
-	+ "	THEN 'No Aplica'
-	+ "	WHEN tb.tipo_banda = 1
-	+ "	THEN 'Banda Ancha'
-	+ "	WHEN tb.tipo_banda = 2
-	+ "	THEN 'Dedicado'
-	+ "END as t_tipo_banda,
-	+ "
-	+ "/*	CLIENTES */
-	+ "concat(clientes.telefono,'/', clientes.celular_a,'/', clientes.celular_b ) as contacto,
-	+ "clientes.documento AS cliente_documento,
-	+ "clientes.dv ,
-	+ "clientes.tipo_cliente AS cliente_tipo_cliente,
-	+ "case 
-	+ "	WHEN clientes.tipo_cliente = 'J' THEN clientes.razon_social 
-	+ "	WHEN clientes.tipo_cliente = 'N' THEN concat(clientes.apellido_paterno,' ',clientes.apellido_materno,' ',clientes.nombre_primer,' ',clientes.nombre_segundo)
-	+ "END nombre_cliente,
-	+ "clientes.mail,
-	+ "/*	ZONAS */
-	+ "zonas.nombre AS zona_nombre,
-	+ "/*	SERVICIOS */
-	+ "servicios.nombre AS servicios_nombre,
-	+ "/* PAGOS */
-	+ "SUM(if(deudasb.instalacion = '0' && deudasb.reconexion = '0' && deudasb.materiales = '0' && deudasb.traslado = '0' && deudasb.otros = '0' && (deudasb.estado = '1' || deudasb.estado = '3') , 1, 0)) AS mesesdebe,
-	+ "SUM(if(deudasb.estado = '1' || deudasb.estado = '3', deudasb.valor_total, 0)) AS total_debe,
-	+ "SUM(if(deudasb.estado = '1' || deudasb.estado = '3', deudasb.valor_parcial, 0)) AS total_abonos,
-	+ "/*SUM(if(deudasb.estado = '1' || deudasb.estado = '3', 1, 0)) AS mesesdebe,*/
-	+ "
-	+ "/* DIRECCIONES */
-	+ "concat(direcciones.a_tipo , ' ',direcciones.a_numero,' ',direcciones.a_letra,' ',direcciones.b_tipo , ' ',direcciones.b_numero,' ',direcciones.b_letra,' ',direcciones.numero , ' ',direcciones.nota) as direccion ,
-	+ "direcciones.barrio AS dirr_barrio,
-	+ "direcciones.tipo as dirr_tipo, 
-	+ "lista_municipios.municipio,
-	+ "lista_departamentos.departamento ,
-	+ " 
-	+ "CASE 
-	+ "	WHEN co.id_tecnologia =  1
-		+ "THEN 'Fibra'
-		+ "WHEN co.id_tecnologia =  2
-		+ "THEN 'Inalámbrico'
-		+ "WHEN co.id_tecnologia =  3
-		+ "THEN 'EOC'
-		+ "WHEN co.id_tecnologia =  4
-		+ "THEN 'FTTH'
-		+ "WHEN co.id_tecnologia =  5
-		+ "THEN 'Analoga Coaxial'
-		+ "WHEN co.id_tecnologia =  6
-		+ "THEN 'Digital Cerrada'
-		+ "WHEN co.id_tecnologia =  7
-		+ "THEN 'Digital Abierta'
-		+ "WHEN co.id_tecnologia =  8
-		+ "THEN 'FTTH ONU'
-		+ "WHEN co.id_tecnologia =  9
-		+ "THEN '3G'
-		+ "WHEN co.id_tecnologia =  10
-		+ "THEN 'Analoga EOC'
-		+ "WHEN co.id_tecnologia =  11
-		+ "THEN 'Analoga FTTH'
-	+ "END as t_tipo_tecnologia,
-	+ "CONCAT(usr.nombre , ' ' , usr.apellidos) AS vendedor
-	+ "
-	+ "FROM contratos co
-	+ "LEFT JOIN
-	+ "  clientes
-	+ "	ON co.id_cliente = clientes.id_cliente
-	+ "LEFT JOIN
-	+ "  zonas
-	+ "	ON co.id_zona = zonas.id_zona 
-	+ "LEFT JOIN
-	+ "  servicios
-	+ "	ON co.id_servicio = servicios.id_servicio    
-	+ "/**********************************************/
-	+ "LEFT JOIN
-	+ "  deudas deudasb
-	+ "	ON co.id_contrato = deudasb.id_contrato
-	+ "/**********************************************/
-	+ "LEFT JOIN
-	+ "  direcciones
-	+ "	ON co.id_direccion_servicio = direcciones.id_direccion  
-	+ "LEFT JOIN
-	+ "  lista_municipios
-	+ "	ON direcciones.municipio = lista_municipios.id_municipio
-	+ "LEFT JOIN
-	+ "  lista_departamentos
-	+ "	ON direcciones.departamento = lista_departamentos.id_departamento                              
-	+ "LEFT JOIN
-	+ "	tarifas ta
-	+ "	ON co.id_tarifa = ta.id_tarifa    
-	+ "LEFT JOIN
-	+ "	tarifas tb
-	+ "	ON co.id_tarifa_promo = tb.id_tarifa
-	+ "LEFT JOIN
-	+ "		usuarios usr
-	+ "		ON co.id_vendedor = usr.id_usuario
-	+ "
-	+ "/* LEFT JOIN pagos pag 
-	+ "	ON co.id_contrato = pag.id_contrato
-	+ "*/
-	+ "WHERE co.id_servicio = '1' 
-	+ "AND co.estado IN(0,1,2,5)
-	+ "GROUP BY 
-	+ "/* deudasb.mes_servicio,*/
-	+ "co.id_contrato  " , nativeQuery=true)
-	public List<Object[]> carta
+	+ "CASE WHEN co.marca = '0000-00-00 00:00:00' then '2018-01-01 00:00:00' ELSE co.marca END AS ff_marcacontrato,\n"
+	+ "co.inicio AS ff_iniciocontrato,\n"
+	+ "co.grupo AS ff_grupocontra, \n"
+	+ "CASE \n"
+	+ "	WHEN co.estado = 0 THEN 'Por Aprobar'\n"
+	+ "	WHEN co.estado = 1 THEN 'Activo'\n"
+	+ "	WHEN co.estado = 2 THEN 'Cortado'\n"
+	+ "	WHEN co.estado = 3 THEN 'Anulado'\n"
+	+ "	WHEN co.estado = 4 THEN 'Retirado'\n"
+	+ "	WHEN co.estado = 5 THEN 'Suspensión temporal'\n"
+	+ "END ff_estadocontrato,\n"
+	+ "CASE WHEN co.ultimo_pago = '0000-00-00 00:00:00' then '2018-01-01 00:00:00' ELSE co.ultimo_pago END AS ultimo_pago,\n"
+	+ "CASE WHEN co.ultimo_estado = '0000-00-00 00:00:00' then '2018-01-01 00:00:00' ELSE co.ultimo_estado \n"
+	+ "END  AS fecha_ultimo_estado,\n"
+	+ "co.estrato AS estrato_contrato,\n"
+	+ "co.venta as modalidad,\n"
+	+ "ta.valor AS 'tarifa_general_valor',\n"
+	+ "ta.numero_canales AS 'numero_canales',\n"
+	+ "ta.velocidad AS 'velocidad',\n"
+	+ "tb.nombre AS 'tarifa_nombre',\n"
+	+ "tb.valor AS 'tarifa_promo_valor',\n"
+	+ "CASE\n"
+	+ "	WHEN tb.tipo_banda = 0\n"
+	+ "	THEN 'No Aplica'\n"
+	+ "	WHEN tb.tipo_banda = 1\n"
+	+ "	THEN 'Banda Ancha'\n"
+	+ "	WHEN tb.tipo_banda = 2\n"
+	+ "	THEN 'Dedicado'\n"
+	+ "END as t_tipo_banda,\n"
+	+ "concat(clientes.telefono,'/', clientes.celular_a,'/', clientes.celular_b ) as contacto,\n"
+	+ "clientes.documento AS cliente_documento,\n"
+	+ "clientes.dv ,\n"
+	+ "clientes.tipo_cliente AS cliente_tipo_cliente,\n"
+	+ "case \n"
+	+ "	WHEN clientes.tipo_cliente = 'J' THEN clientes.razon_social \n"
+	+ "	WHEN clientes.tipo_cliente = 'N' THEN concat(clientes.apellido_paterno,' ',clientes.apellido_materno,' ',clientes.nombre_primer,' ',clientes.nombre_segundo)\n"
+	+ "END nombre_cliente,\n"
+	+ "clientes.mail,\n"
+	+ "zonas.nombre AS zona_nombre,\n"
+	+ "servicios.nombre AS servicios_nombre,\n"
+	+ "SUM(if(deudasb.instalacion = '0' && deudasb.reconexion = '0' && deudasb.materiales = '0' && deudasb.traslado = '0' && deudasb.otros = '0' && (deudasb.estado = '1' || deudasb.estado = '3') , 1, 0)) AS mesesdebe,\n"
+	+ "SUM(if(deudasb.estado = '1' || deudasb.estado = '3', deudasb.valor_total, 0)) AS total_debe,\n"
+	+ "SUM(if(deudasb.estado = '1' || deudasb.estado = '3', deudasb.valor_parcial, 0)) AS total_abonos,\n"
+	+ "/*SUM(if(deudasb.estado = '1' || deudasb.estado = '3', 1, 0)) AS mesesdebe,*/\n"
+	+ "concat(direcciones.a_tipo , ' ',direcciones.a_numero,' ',direcciones.a_letra,' ',direcciones.b_tipo , ' ',direcciones.b_numero,' ',direcciones.b_letra,' ',direcciones.numero , ' ',direcciones.nota) as direccion ,\n"
+	+ "direcciones.barrio AS dirr_barrio,\n"
+	+ "direcciones.tipo as dirr_tipo, \n"
+	+ "lista_municipios.municipio,\n"
+	+ "lista_departamentos.departamento ,\n"
+	+ "CASE \n"
+	+ "	WHEN co.id_tecnologia =  1\n"
+		+ "THEN 'Fibra'\n"
+		+ "WHEN co.id_tecnologia =  2\n"
+		+ "THEN 'Inalámbrico'\n"
+		+ "WHEN co.id_tecnologia =  3\n"
+		+ "THEN 'EOC'\n"
+		+ "WHEN co.id_tecnologia =  4\n"
+		+ "THEN 'FTTH'\n"
+		+ "WHEN co.id_tecnologia =  5\n"
+		+ "THEN 'Analoga Coaxial'\n"
+		+ "WHEN co.id_tecnologia =  6\n"
+		+ "THEN 'Digital Cerrada'\n"
+		+ "WHEN co.id_tecnologia =  7\n"
+		+ "THEN 'Digital Abierta'\n"
+		+ "WHEN co.id_tecnologia =  8\n"
+		+ "THEN 'FTTH ONU'\n"
+		+ "WHEN co.id_tecnologia =  9\n"
+		+ "THEN '3G'\n"
+		+ "WHEN co.id_tecnologia =  10\n"
+		+ "THEN 'Analoga EOC'\n"
+		+ "WHEN co.id_tecnologia =  11\n"
+		+ "THEN 'Analoga FTTH'\n"
+	+ "END as t_tipo_tecnologia,\n"
+	+ "CONCAT(usr.nombre , ' ' , usr.apellidos) AS vendedor\n"
+	+ "FROM contratos co\n"
+	+ "LEFT JOIN\n"
+	+ "  clientes\n"
+	+ "	ON co.id_cliente = clientes.id_cliente\n"
+	+ "LEFT JOIN\n"
+	+ "  zonas\n"
+	+ "	ON co.id_zona = zonas.id_zona \n"
+	+ "LEFT JOIN\n"
+	+ "  servicios\n"
+	+ "	ON co.id_servicio = servicios.id_servicio    \n"
+	+ "LEFT JOIN\n"
+	+ "  deudas deudasb\n"
+	+ "	ON co.id_contrato = deudasb.id_contrato\n"
+	+ "LEFT JOIN\n"
+	+ "  direcciones\n"
+	+ "	ON co.id_direccion_servicio = direcciones.id_direccion  \n"
+	+ "LEFT JOIN\n"
+	+ "  lista_municipios\n"
+	+ "	ON direcciones.municipio = lista_municipios.id_municipio\n"
+	+ "LEFT JOIN\n"
+	+ "  lista_departamentos\n"
+	+ "	ON direcciones.departamento = lista_departamentos.id_departamento  \n"                            
+	+ "LEFT JOIN\n"
+	+ "	tarifas ta\n"
+	+ "	ON co.id_tarifa = ta.id_tarifa    \n"
+	+ "LEFT JOIN\n"
+	+ "	tarifas tb\n"
+	+ "	ON co.id_tarifa_promo = tb.id_tarifa\n"
+	+ "LEFT JOIN\n"
+	+ "		usuarios usr\n"
+	+ "		ON co.id_vendedor = usr.id_usuario\n"	 
+	+ "WHERE co.id_servicio IN (:servicios) \n"
+	+ "AND co.estado IN(0,1,2,5)\n"
+	+ "GROUP BY \n"
+	+ "co.id_contrato" , nativeQuery=true)
+	public Optional<List<Object[]>> carteraByidServicio(@Param("servicios") List<Integer> servicios);
+
+ 
 }

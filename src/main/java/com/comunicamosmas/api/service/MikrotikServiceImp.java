@@ -18,8 +18,10 @@ import com.comunicamosmas.api.service.dto.MikrotikPPPSecretDTO;
 import com.comunicamosmas.api.service.dto.MikrotikQueueSimpleDTO;
 import com.comunicamosmas.api.service.dto.ValorStringDTO;
 import com.comunicamosmas.api.service.dto.valorDTO;
+import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 
-import java.util.ArrayList; 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -432,12 +434,15 @@ public class MikrotikServiceImp implements IMikrotikService {
         return null;
     }
 
-    ////////////////////////////////////////////////////////////nueva/////////////////////////
+    ////////////////////////////////////////////////////////////nueva/////////////////////////MikrotikApiException
 
     @SuppressWarnings("null")
     @Override
-    public MikrotikPadreSimpleQueue padreQueuesimple(Long idPlan, Long idEstacion, Long idIp) throws MikrotikApiException {
+    public MikrotikPadreSimpleQueue padreQueuesimple(Long idPlan, Long idEstacion, Long idIp)   {
         //consultar recuperar bajada y subida del idPlan y reuso
+        try
+        {
+
         MikrotikTarifaReuso plan = tarifaReusoService.findById(idPlan);
         //
         MikrotikIp mikrotikIp = mikrotikIpService.findById(idIp);
@@ -500,6 +505,15 @@ public class MikrotikServiceImp implements IMikrotikService {
 
             return newPadre;
         }
+    }catch(MikrotikApiException e){
+
+        throw new ExceptionNullSql(new Date(), "Error en Rb", e.getMessage());
+
+    }catch(Exception e)
+    {
+        throw new ExceptionNullSql(new Date() , "Error base de datos" , e.getMessage());
+    }
+    
     }
 
     @Override
@@ -586,7 +600,9 @@ public class MikrotikServiceImp implements IMikrotikService {
 
     @Override
     public MikrotikHijoSimpleQueue hijoQueueSimple(Long idPlan, Long idIp, Long idPadre, Long idContrato, Long idEstacion)
-        throws MikrotikApiException {
+    {
+        try{
+
         //consultar recuperar bajada y subida del idPlan y reuso
         MikrotikTarifaReuso plan = tarifaReusoService.findById(idPlan);
         String limit = this.generarLimit(plan.getSubida(), plan.getBajada(), plan.getReuso());
@@ -631,6 +647,13 @@ public class MikrotikServiceImp implements IMikrotikService {
         padreSimpleQueueService.save(padre);*/
         
         return hijo;
+
+        }catch(MikrotikApiException e)
+        {
+            //no se pudo crear el hijo, por tal motivo se debe validar eliminar el target creado en el anterior 
+            
+            throw new ExceptionNullSql(new Date(), "Error creando hijo", e.getMessage());
+        } 
     }
 
     private String String(Long idContrato) {

@@ -50,7 +50,7 @@ public class Usuario implements Serializable {
     private String avatar;
 
     @Column(name = "last_act")
-    private Long lastAct;
+    private String lastAct;
 
     private String sha;
 
@@ -64,6 +64,62 @@ public class Usuario implements Serializable {
     private Long idZona;
 
     private Long sfa;
+
+    @Column(name="password_dos")
+    private String passwordDos;
+
+    @Column(name="created_date")
+    private String createdDate;
+
+    @Column(name="last_modified_date")
+    private String lastModifiedDate;
+
+    @Column(name="last_modified_by")
+    private String lastModifiedBy;
+
+    @Column(name="created_by")
+    private String createdBy;
+
+
+    public String getPasswordDos() {
+        return passwordDos;
+    }
+
+    public void setPasswordDos(String passwordDos) {
+        this.passwordDos = passwordDos;
+    }
+
+    public String getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(String createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(String lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
 
     public Long getId() {
         return id;
@@ -185,11 +241,11 @@ public class Usuario implements Serializable {
         this.avatar = avatar;
     }
 
-    public Long getLastAct() {
+    public String getLastAct() {
         return lastAct;
     }
 
-    public void setLastAct(Long lastAct) {
+    public void setLastAct(String lastAct) {
         this.lastAct = lastAct;
     }
 

@@ -29,6 +29,7 @@ import com.comunicamosmas.api.service.dto.MikrotikPPPProfileDTO;
 import com.comunicamosmas.api.service.dto.MikrotikPPPSecretDTO;
 import com.comunicamosmas.api.service.dto.MikrotikQueueSimpleDTO;
 import com.comunicamosmas.api.service.dto.ValorStringDTO;
+import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 
 import me.legrange.mikrotik.MikrotikApiException;
 
@@ -311,6 +312,13 @@ public class MikrotikController {
 			response.put("response", padre);
 			
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
+
+		}catch(ExceptionNullSql e)
+		{
+			response.put("response", e.getMessage() +":"+ e.getDetails());
+			
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+		
 		}catch(Exception e)
 		{
 			response.put("response", e.getMessage());
@@ -325,17 +333,26 @@ public class MikrotikController {
 			@RequestParam Long idEstacion , @RequestParam Long idIp  , @RequestParam Long idContrato , @RequestParam Long idPadre   )
 	{
 		Map<String, Object> response = new HashMap<>();
-		try {
+	try {
 			
 			MikrotikHijoSimpleQueue hijo = mikrotikService.hijoQueueSimple(idPlan, idIp, idPadre, idContrato, idEstacion);
 			
 			response.put("response", hijo);
 			
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
-		}catch(Exception e)
+
+		}catch(ExceptionNullSql e)
+		{
+			padreSimpleQueueService.eliminarTarget(idPadre, idIp);
+
+			response.put("response", e.getMessage() + ":"+ e.getDetails());
+
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+		}
+		catch(Exception e)
 		{
 			//ir a base de datos y quitar el padre
-			padreSimpleQueueService.eliminarTarget(idPadre, idIp);
+			
 			response.put("response", e.getMessage());
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
 		}
