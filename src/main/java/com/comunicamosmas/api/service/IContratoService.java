@@ -1,6 +1,7 @@
 package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.Contrato;
+import com.comunicamosmas.api.service.dto.ArrayListDTO;
 import com.comunicamosmas.api.service.dto.CarteraDTO;
 import com.comunicamosmas.api.service.dto.ContratoInfoFacturaDTO;
 import com.comunicamosmas.api.service.dto.DatosClienteDTO;
@@ -31,6 +32,6 @@ public interface IContratoService {
      
 
     //
-    public List<CarteraDTO> carteraByServicio(List<Integer> servicios);
+    public List<CarteraDTO> carteraByServicio(ArrayListDTO datos);
  
 }

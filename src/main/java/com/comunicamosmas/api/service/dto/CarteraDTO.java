@@ -257,6 +257,25 @@ public class CarteraDTO implements Serializable{
     public void setVendedor(String vendedor) {
         this.vendedor = vendedor;
     }
+
+
+    @Override
+    public String toString() {
+        return "CarteraDTO [ff_iddelcontrato=" + ff_iddelcontrato + ", ff_fisico=" + ff_fisico + ", ff_idzonacontra="
+                + ff_idzonacontra + ", ff_marcacontrato=" + ff_marcacontrato + ", ff_iniciocontrato="
+                + ff_iniciocontrato + ", ff_grupocontra=" + ff_grupocontra + ", ff_estadocontrato=" + ff_estadocontrato
+                + ", ultimo_pago=" + ultimo_pago + ", fecha_ultimo_estado=" + fecha_ultimo_estado
+                + ", estrato_contrato=" + estrato_contrato + ", modalidad=" + modalidad + ", tarifa_general_valor="
+                + tarifa_general_valor + ", numero_canales=" + numero_canales + ", velocidad=" + velocidad
+                + ", tarifa_nombre=" + tarifa_nombre + ", tarifa_promo_valor=" + tarifa_promo_valor + ", t_tipo_banda="
+                + t_tipo_banda + ", contacto=" + contacto + ", cliente_documento=" + cliente_documento + ", dv=" + dv
+                + ", cliente_tipo_cliente=" + cliente_tipo_cliente + ", nombre_cliente=" + nombre_cliente + ", mail="
+                + mail + ", zona_nombre=" + zona_nombre + ", servicios_nombre=" + servicios_nombre + ", mesesdebe="
+                + mesesdebe + ", total_debe=" + total_debe + ", total_abonos=" + total_abonos + ", direccion="
+                + direccion + ", dirr_barrio=" + dirr_barrio + ", dirr_tipo=" + dirr_tipo + ", municipio=" + municipio
+                + ", departamento=" + departamento + ", t_tipo_tecnologia=" + t_tipo_tecnologia + ", vendedor="
+                + vendedor + "]";
+    }
      
     
 

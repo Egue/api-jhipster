@@ -1,8 +1,6 @@
 package com.comunicamosmas.api.service.impl;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -13,7 +11,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.comunicamosmas.api.domain.EmailCampaignApi;
 import com.comunicamosmas.api.domain.MailRelaySendMail;
 import com.comunicamosmas.api.service.IMailRelayService;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;

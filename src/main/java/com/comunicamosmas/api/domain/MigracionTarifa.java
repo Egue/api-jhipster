@@ -208,4 +208,16 @@ public class MigracionTarifa implements Serializable {
     public void setEstado(Long estado) {
         this.estado = estado;
     }
+
+    @Override
+    public String toString() {
+        return "MigracionTarifa [id=" + id + ", idContrato=" + idContrato + ", idTarifaPromo=" + idTarifaPromo
+                + ", idTarifaGeneral=" + idTarifaGeneral + ", idTarifaPromoNew=" + idTarifaPromoNew
+                + ", idTarifaGeneralNew=" + idTarifaGeneralNew + ", idUsuario=" + idUsuario + ", idAdmin=" + idAdmin
+                + ", idOrden=" + idOrden + ", idEmpresa=" + idEmpresa + ", idServicio=" + idServicio + ", idCiudad="
+                + idCiudad + ", idCliente=" + idCliente + ", lugar=" + lugar + ", fechaf=" + fechaf + ", marca=" + marca
+                + ", justificacion=" + justificacion + ", estado=" + estado + "]";
+    }
+
+    
 }

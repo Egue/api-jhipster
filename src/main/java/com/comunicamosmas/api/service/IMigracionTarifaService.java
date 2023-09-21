@@ -22,4 +22,7 @@ public interface IMigracionTarifaService {
     public MigracionTarifasInfoDTO migracionTarifaInfo(Long idContrato);
     
     public MigracionTarifaFindContratoDTO migracionFindByContrato(Long idContrato);
+
+    //declinar una tarifa
+    public void decline(Long idMigracion , Long admin);
 }

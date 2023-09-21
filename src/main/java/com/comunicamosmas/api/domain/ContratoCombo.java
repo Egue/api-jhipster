@@ -20,15 +20,15 @@ public class ContratoCombo implements Serializable {
     private Long id;
 
     @Column(name = "id_contrato")
-    private Long idContrato;
+    private Integer idContrato;
 
-    private Long combo;
+    private Integer combo;
 
     @Column(name = "id_usuario")
-    private Long idUsuario;
+    private Integer idUsuario;
 
     @Column(name = "id_empresa")
-    private Long idEmpresa;
+    private Integer idEmpresa;
 
     private String marca;
 
@@ -42,35 +42,35 @@ public class ContratoCombo implements Serializable {
         this.id = id;
     }
 
-    public Long getIdContrato() {
+    public Integer getIdContrato() {
         return idContrato;
     }
 
-    public void setIdContrato(Long idContrato) {
+    public void setIdContrato(Integer idContrato) {
         this.idContrato = idContrato;
     }
 
-    public Long getCombo() {
+    public Integer getCombo() {
         return combo;
     }
 
-    public void setCombo(Long combo) {
+    public void setCombo(Integer combo) {
         this.combo = combo;
     }
 
-    public Long getIdUsuario() {
+    public Integer getIdUsuario() {
         return idUsuario;
     }
 
-    public void setIdUsuario(Long idUsuario) {
+    public void setIdUsuario(Integer idUsuario) {
         this.idUsuario = idUsuario;
     }
 
-    public Long getIdEmpresa() {
+    public Integer getIdEmpresa() {
         return idEmpresa;
     }
 
-    public void setIdEmpresa(Long idEmpresa) {
+    public void setIdEmpresa(Integer idEmpresa) {
         this.idEmpresa = idEmpresa;
     }
 
@@ -89,4 +89,5 @@ public class ContratoCombo implements Serializable {
     public void setGrupo(String grupo) {
         this.grupo = grupo;
     }
+ 
 }

@@ -87,7 +87,7 @@ public class UsuarioServiceImpl implements IUsuarioService {
                 usuarioDao.save(usuario);
 
             } else {
-
+                throw new ExceptionNullSql(new Date(), "Cambio de contraseña", "Error");
             }
         } catch (Exception e) {
             throw new ExceptionNullSql(new Date(), "Cambio de contraseña", e.getMessage());

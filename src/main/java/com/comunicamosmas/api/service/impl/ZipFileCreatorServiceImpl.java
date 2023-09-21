@@ -14,9 +14,11 @@ import java.util.zip.ZipOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.comunicamosmas.api.domain.Empresa;
 import com.comunicamosmas.api.domain.SystemConfig;
 import com.comunicamosmas.api.service.ISystemConfigService;
 import com.comunicamosmas.api.service.IZipFileCreatorService;
+import com.comunicamosmas.api.service.dto.EmailCampaignDetalleDTO;
 import com.comunicamosmas.api.service.dto.RespuestaGeneracionPDFFactura;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 
@@ -27,13 +29,13 @@ public class ZipFileCreatorServiceImpl implements IZipFileCreatorService{
     ISystemConfigService systemService;
 
     @Override
-    public String zipFileFactura(RespuestaGeneracionPDFFactura respuestaPDF) {
+    public String zipFileFactura(RespuestaGeneracionPDFFactura respuestaPDF, EmailCampaignDetalleDTO detalle) {
         // TODO Auto-generated method stub
          
         //String zipPath = "/home/programador/Documentos/"+respuestaPDF.getNit()+respuestaPDF.getFactura()+".zip";
         SystemConfig system = systemService.findByOrigen("facturas");
 
-        String zipPath = system.getComando()+respuestaPDF.getNit()+respuestaPDF.getFactura()+".zip";
+        String zipPath = system.getComando()+respuestaPDF.getNit()+detalle.getIdCliente()+ detalle.getOrigen()+respuestaPDF.getFactura()+".zip";
         try (FileOutputStream fos = new FileOutputStream(zipPath);
         ZipOutputStream zipOut = new ZipOutputStream(fos);
         FileInputStream fis1 = new FileInputStream(respuestaPDF.getPathPDF());

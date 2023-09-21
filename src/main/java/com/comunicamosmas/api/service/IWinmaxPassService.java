@@ -23,5 +23,6 @@ public interface IWinmaxPassService {
     public WinmaxPass findByIdContrato(Long idContrato);
     
     public List<ListWinmaxPassDTO> findByIdEstacionWithDatos(Long idEstacion);
+ 
     
 }

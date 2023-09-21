@@ -3,6 +3,7 @@ package com.comunicamosmas.api.service;
 import java.util.List;
 
 import com.comunicamosmas.api.domain.SystemConfig;
+import com.comunicamosmas.api.service.dto.GrupoMailDTO;
 import com.comunicamosmas.api.service.dto.ValorStringDTO;
 
 public interface ISystemConfigService {
@@ -17,4 +18,6 @@ public interface ISystemConfigService {
 
 
     public List<ValorStringDTO> findTipoPqr();
+
+    public GrupoMailDTO grupoMail();
 }

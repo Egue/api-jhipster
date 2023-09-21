@@ -1,7 +1,9 @@
 package com.comunicamosmas.api.service;
 
-import com.comunicamosmas.api.domain.Cliente; 
 import java.util.List;
+
+import com.comunicamosmas.api.domain.Cliente;
+import com.comunicamosmas.api.service.dto.ClienteDTO;
 
 public interface IClienteService {
     //listar todos
@@ -19,4 +21,10 @@ public interface IClienteService {
     public Cliente getClientByIdContrato(Long idContrato);
 
     public List<Cliente> findByDocumento(String documento);
+
+    public List<ClienteDTO> findByName(String nombre);
+
+    public List<ClienteDTO> findByCus(Long cus);
+
+    public List<ClienteDTO> validExisteCliente(String documento);
 }

@@ -23,6 +23,8 @@ public interface IEmailCampaignDetalleService {
 	//buscar emaildetalle procesado 0
 	public List<EmailCampaignDetalleDTO> findEmailCampaignDetalleSinProcesar(Integer idEmailCampaign);
 
+	public void addFactura(EmailCampaignDetalleDTO detalle);
+
 	
 	
 

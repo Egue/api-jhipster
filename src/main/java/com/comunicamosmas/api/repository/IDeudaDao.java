@@ -1,9 +1,9 @@
 package com.comunicamosmas.api.repository;
 
 import com.comunicamosmas.api.domain.Deuda;
-import com.comunicamosmas.api.domain.Empresa;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -42,8 +42,20 @@ public interface IDeudaDao extends CrudRepository<Deuda, Long> {
 			+ "res.vigencia, res.fecha_resolucion from deudas \n"
 			+ "inner join servicios on servicios.id_servicio = deudas.id_servicio\n"
 			+ "left join resoluciones res on res.id_resolucion = deudas.facturado_id_resolucion\n"
-			+ "where deudas.factura = :factura and deudas.facturado_fecha like concat('%',:mesServicio,'%') and deudas.id_empresa = :idEmpresa", nativeQuery=true)
-	public List<Object[]> findDeudaByFacturaAndMesServiceAndIdEmpresa(@Param("factura") Long factura , @Param("mesServicio") Long mesServicio , @Param("idEmpresa") Long idEmpresa );
+			+ "where deudas.factura = :factura and deudas.facturado_fecha like concat('%',:mesServicio,'%') and deudas.id_empresa = :idEmpresa and deudas.id_cliente = :idCliente and deudas.refiere = :origen ", nativeQuery=true)
+	public Optional<List<Object[]>> findDeudaByFacturaAndMesServiceAndIdEmpresa(@Param("factura") Long factura , 
+	@Param("mesServicio") Long mesServicio , @Param("idEmpresa") Long idEmpresa , @Param("idCliente")Integer idCliente , @Param("origen") String origen);
+
+	@Query(value="SELECT deudas.factura, deudas.refiere , cli.documento, cli.id_cliente, cli.mail, \n" 
+	+" CASE WHEN cli.tipo_cliente ='J' THEN cli.razon_social  \n"
+	+" 		WHEN cli.tipo_cliente ='N' THEN concat(cli.apellido_paterno, ' ', cli.apellido_materno, ' ', cli.nombre_primer, ' ', cli.nombre_segundo)  \n"
+	+" 		END as nombreCliente,  \n"
+	+" servi.id_servicio , servi.nombre FROM deudas \n"
+	+"INNER JOIN clientes cli ON cli.id_cliente = deudas.id_cliente \n"
+	+"INNER JOIN servicios servi ON servi.id_servicio = deudas.id_servicio \n"
+	+"WHERE deudas.id_empresa = :empresa AND deudas.facturado_fecha like concat('%',:mesServicio,'%') AND deudas.factura = :factura AND deudas.refiere = :origen group by deudas.id_contrato \n", nativeQuery=true)
+	public Optional<List<Object[]>> findDeudaByFacturaAndMesEmpresaOrigen(@Param("factura") Integer factura ,@Param("mesServicio")Integer messervicio , @Param("empresa") Long idEmpresa , @Param("origen") String origen);
+ 
 	
 	/***/
 	
@@ -52,6 +64,6 @@ public interface IDeudaDao extends CrudRepository<Deuda, Long> {
 			+ "and deudas.id_contrato in (:consulta)\n"
 			+ "and deudas.factura != 0\n"
 			+ "and deudas.estado in (1,3)" , nativeQuery = true)
-	public List<Object[]> saldoAnterior(@Param("fecha") Integer fecha , @Param("consulta") String consulta);
+	public Optional<List<Object[]>> saldoAnterior(@Param("fecha") Integer fecha , @Param("consulta") List<Integer> consulta);
 
 }

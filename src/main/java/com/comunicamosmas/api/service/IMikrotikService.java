@@ -65,14 +65,23 @@ public interface IMikrotikService {
     //active find name
     public ValorStringDTO pppoeActiveFindByName(Long idEstacion , Long idContrato)throws MikrotikApiException;
     //remove active
-    public void pppoeActiveRemoveById(Long idEstacion , String idrb)throws MikrotikApiException;
+    public void pppoeActiveRemoveById(Long idEstacion , String idrb);
     //secret del pppoe
     public List<MikrotikPPPSecretDTO> pppoeSecrectFindAll(Long idEstacion)throws MikrotikApiException;
     //buscar por name un perfil
-    public ValorStringDTO pppeoSecretFindByName(Long idContrato , Long idEstacion) throws MikrotikApiException;
+    public ValorStringDTO pppeoSecretFindByName(Long idContrato , Long idEstacion);
     //change progile
-    public List<Map<String, String>> pppoeSecretChangeProfile(Long idContrato , Long idTarifa , String idrb , Long idUser , Long idMigracion)throws MikrotikApiException;
+    public List<Map<String, String>> pppoeSecretChangeProfile(Long idContrato , Long idTarifa , String idrb , Long idUser , Long idMigracion);
     
     //cortar cliente por idOrden
     public String cortarClienteMoroso(Long idOrden);
+
+    //removiendo el hijo de los padres
+    public void removeHijoSimpleQueue(Long idContrato);
+
+    //deleteFather por id
+    public void removePadreSimpleQueue(Long idPadre);
+
+    //actualizar profile
+    public List<String> updatedProfileEstacion(Long idEstacion);
 }

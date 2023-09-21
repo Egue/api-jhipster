@@ -21,6 +21,12 @@ public class EmailCampaignDetalleDTO {
 	private String nombreCliente;
 	
 	private Integer idCampaign;
+
+	private String origen;
+
+	private String nameDocument;
+
+	
 	
 
 	public EmailCampaignDetalleDTO() {
@@ -125,6 +131,26 @@ public class EmailCampaignDetalleDTO {
 
 	public void setIdCampaign(Integer idCampaign) {
 		this.idCampaign = idCampaign;
+	}
+
+
+	public String getOrigen() {
+		return origen;
+	}
+
+
+	public void setOrigen(String origen) {
+		this.origen = origen;
+	}
+
+
+	public String getNameDocument() {
+		return nameDocument;
+	}
+
+
+	public void setNameDocument(String nameDocument) {
+		this.nameDocument = nameDocument;
 	}
 	
 	

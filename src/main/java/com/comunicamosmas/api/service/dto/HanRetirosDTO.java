@@ -28,6 +28,9 @@ public class HanRetirosDTO {
 
     private String cliente;
 
+
+    private String reportado;
+    
     
     
     public String getNameUser() {
@@ -116,6 +119,14 @@ public class HanRetirosDTO {
 
     public void setUrl_documento(String url_documento) {
         this.url_documento = url_documento;
+    }
+
+    public String getReportado() {
+        return reportado;
+    }
+
+    public void setReportado(String reportado) {
+        this.reportado = reportado;
     }
 
      

@@ -6,6 +6,7 @@ import com.comunicamosmas.api.domain.MikrotikPadreSimpleQueue;
 import com.comunicamosmas.api.domain.MikrotikSegmentoIp;
 import com.comunicamosmas.api.repository.IMikrotikPadreSimpleQueueDao;
 import com.comunicamosmas.api.repository.IMikrotikSegmentoIpDao;
+import com.comunicamosmas.api.service.dto.MikrotikHijoSimpleDTO;
 import com.comunicamosmas.api.service.dto.PadreSimpleQueeHijosDTO;
 import com.comunicamosmas.api.service.dto.SimpleQueueFindReusoDTO;
 
@@ -161,11 +162,17 @@ public class MikrotikPadreSimpleQueueServiceImp implements IMikrotikPadreSimpleQ
 			obj.setLimitAt((String) rs[4]);
 			obj.setMaxLimit((String) rs[5]);
 			obj.setReuso((Integer) rs[6]);
-			List<MikrotikHijoSimpleQueue> hijos = hijoSimple.findAllByidPadre((Integer) rs[0]);
+			List<MikrotikHijoSimpleDTO> hijos = hijoSimple.findAllByidPadre((Integer) rs[0]);
 			obj.setHijos(hijos);
 			padre.add(obj);
 			
 		}
 		return padre;
+	}
+
+	@Override
+	public void deleteById(Long idPadre) {
+		// TODO Auto-generated method stub
+		mikrotikPadreSimpleDao.deleteById(idPadre);
 	}
 }

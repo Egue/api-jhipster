@@ -33,7 +33,7 @@ public interface IHanRetirosService {
 
     public List<ReporteHanRetirosDTO> reporteHanRetiros(List<Integer>servicios , String estado);
 
-    public void sendMailRetiros(Long id);
+    public void sendMailRetiros(Long id , List<String> email);
 
     
     

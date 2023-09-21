@@ -153,36 +153,45 @@ public interface IOrdenDao extends CrudRepository<Orden, Long> {
      * @Param("fechaFinal")
      * @Param("tipoOrden")
      */
-    @Query(value="SELECT \n" + //
-            "ord.id_orden, \n" + //
-            "es.nombre,\n" + //
-            "ord.causa_solicitud ,\n" + //
-            "ord.id_contrato , \n" + //
-            "ord.fechaf_registra,\n" + //
-            "ord.refiere , \n" + //
-            "cli.tipo_cliente,\n" + //
-            "case \n" + //
-            "\tWHEN cli.tipo_cliente = 'J' THEN CONCAT(cli.razon_social)\n" + //
-            "    WHEN cli.tipo_cliente = 'N' THEN CONCAT(cli.nombre_primer, cli.nombre_segundo , ' / ' , cli.apellido_paterno, cli.apellido_materno)\n" + //
-            "END as cliente,\n" + //
-            "cli.documento,\n" + //
-            "ord.nota,\n" + //
-            "case when ord.estado = 0 THEN 'Sin asignar'\n" + //
-            "\twhen ord.estado = 1 THEN 'Asignada'\n" + //
-            "    when ord.estado = 2 THEN 'En proceso'\n" + //
-            "    when ord.estado = 3 THEN 'Ejecutada'\n" + //
-            "    when ord.estado = 4 THEN 'Anulada'\n" + //
-            "end as estado,\n" + //
-            "ord.nota_final,\n" + //
-            "group_concat(ov.detalle separator ',') visitaFallida \n" + //
-            "FROM ordenes ord \n" + //
-            "inner join clientes cli on cli.id_cliente = ord.id_cliente\n" + //
-            "inner join ordenes_estados es on es.id_estado = ord.tipo_orden\n" + //
-            "left join ordenes_visitas ov on ov.id_orden = ord.id_orden\n" + //
-            "where ord.fechaf_registra between :fechaInicio and :fechaFinal \n" + //
-            "and ord.tipo_orden = :idTipo\n" + //
-            "and ord.id_servicio = :idServicio\n" + //
-            "group by ord.id_orden" , nativeQuery = true)
+    @Query(value="SELECT ord.id_orden,  \n" + //
+            "                        es.nombre, \n" + //
+            "                        ord.causa_solicitud , \n" + //
+            "                        ord.id_contrato ,  \n" + //
+            "                        ord.fechaf_registra, \n" + //
+            "                        ord.refiere ,  \n" + //
+            "                        cli.tipo_cliente, \n" + //
+            "                        case  \n" + //
+            "                        WHEN cli.tipo_cliente = 'J' THEN CONCAT(cli.razon_social) \n" + //
+            "                            WHEN cli.tipo_cliente = 'N' THEN CONCAT(cli.nombre_primer, cli.nombre_segundo , ' / ' , cli.apellido_paterno, cli.apellido_materno) \n" + //
+            "                        END as cliente, \n" + //
+            "                        cli.documento, \n" + //
+            "                        dir.barrio,\n" + //
+            "                        concat(dir.tipo, ' ',dir.a_tipo,' ',dir.a_numero,' ',dir.a_letra,' ', dir.b_tipo , ' ' , dir.b_numero, ' ',dir.b_letra , ' ',dir.numero , '/', dir.nota) as direccion,\n" + //
+            "                        cli.celular_b,\n" + //
+            "                        cli.celular_a,\n" + //
+            "                        tip.nombre as nombre_tecnologia, \n" + //
+            "                        ord.nota, \n" + //
+            "                        case when ord.estado = 0 THEN 'Sin asignar' \n" + //
+            "                        when ord.estado = 1 THEN 'Asignada' \n" + //
+            "                            when ord.estado = 2 THEN 'En proceso' \n" + //
+            "                            when ord.estado = 3 THEN 'Ejecutada' \n" + //
+            "                            when ord.estado = 4 THEN 'Anulada' \n" + //
+            "                        end as estado, \n" + //
+            "                        ord.nota_final, \n" + //
+            "                        ord.anulada, \n" + //
+            "                        group_concat(ov.detalle separator ',') visitaFallida \n" + //
+            "                        \n" + //
+            "                        FROM ordenes ord  \n" + //
+            "                        inner join contratos co on co.id_contrato = ord.id_contrato\n" + //
+            "                        inner join clientes cli on cli.id_cliente = co.id_cliente\n" + //
+            "                        inner join ordenes_estados es on es.id_estado = ord.tipo_orden \n" + //
+            "                        left join ordenes_visitas ov on ov.id_orden = ord.id_orden                         \n" + //
+            "                        left join direcciones dir on dir.id_direccion = co.id_direccion_servicio\n" + //
+            "                        left join tipos_tecnologia tip on tip.id_tecnologia  = co.id_tecnologia\n" + //
+            "                        where ord.fechaf_registra between :fechaInicio and :fechaFinal  \n" + //
+            "                        and ord.tipo_orden = :idTipo \n" + //
+            "                        and ord.id_servicio = :idServicio \n" + //
+            "                        group by ord.id_orden" , nativeQuery = true)
     public Optional<List<Object[]>> findTipoAndIdServicioAndFechaCreadaWithVisitaFallida(@Param("idServicio") Long idServicio , @Param("idTipo") Long idTipo ,
     @Param("fechaInicio") Long fechaInicio, @Param("fechaFinal") Long fechaFinal);
 
@@ -191,7 +200,10 @@ public interface IOrdenDao extends CrudRepository<Orden, Long> {
             "ORDER BY mes ASC" , nativeQuery = true)
     public Optional<List<Object[]>> chatLineCortado(@Param("servicios") List<Integer> servicios , @Param("ano") Integer ano , @Param("tipo")Integer tipo);
     
-
+    //buscar ultimo registro de ordenes del tipo
+    @Query(value="SELECT ord.numero_a , ord.numero_b FROM ordenes ord \n" 
+    +"WHERE ord.refiere = :origen AND ord.id_empresa = :idEmpresa ORDER BY ord.numero_b DESC LIMIT 0, 1" , nativeQuery = true)
+    public Optional<List<Object[]>> findNumeroOrden(@Param("origen") String origen , @Param("idEmpresa") Long idEmpresa);
 
     
 }

@@ -21,4 +21,6 @@ public interface IEstacionService {
     public List<Estacion> findByNombreAndIdServicio(String nombreEstacion, Long idServicio);
     
     public List<EstacionDTO> findAllDTO(Long estado);
+
+    public List<EstacionDTO> findByIdServicio(Long idServicio);
 }

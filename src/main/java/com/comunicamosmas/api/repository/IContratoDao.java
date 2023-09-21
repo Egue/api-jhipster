@@ -100,7 +100,7 @@ public interface IContratoDao extends CrudRepository<Contrato, Long> {
 	+ "#co.limite_promo AS ff_limitepromotarifa,\n"
 	+ "co.id_zona AS ff_idzonacontra,\n"
 	+ "#co.id_direccion_servicio AS ff_iddireccion,\n"
-	+ "CASE WHEN co.marca = '0000-00-00 00:00:00' then '2018-01-01 00:00:00' ELSE co.marca END AS ff_marcacontrato,\n"
+	+ "CASE WHEN co.marca = '0000-00-00 00:00:00' then 'Fecha Desconocida' ELSE DATE_FORMAT(co.marca, '%Y-%m-%d %H:%i:%s') END AS ff_marcacontrato,\n"
 	+ "co.inicio AS ff_iniciocontrato,\n"
 	+ "co.grupo AS ff_grupocontra, \n"
 	+ "CASE \n"
@@ -111,9 +111,8 @@ public interface IContratoDao extends CrudRepository<Contrato, Long> {
 	+ "	WHEN co.estado = 4 THEN 'Retirado'\n"
 	+ "	WHEN co.estado = 5 THEN 'Suspensión temporal'\n"
 	+ "END ff_estadocontrato,\n"
-	+ "CASE WHEN co.ultimo_pago = '0000-00-00 00:00:00' then '2018-01-01 00:00:00' ELSE co.ultimo_pago END AS ultimo_pago,\n"
-	+ "CASE WHEN co.ultimo_estado = '0000-00-00 00:00:00' then '2018-01-01 00:00:00' ELSE co.ultimo_estado \n"
-	+ "END  AS fecha_ultimo_estado,\n"
+	+ "CASE WHEN co.ultimo_pago = '0000-00-00 00:00:00' then 'Fecha Desconocida' ELSE DATE_FORMAT(co.ultimo_pago , '%Y-%m-%d %H:%i:%s')END AS ultimo_pago,\n"
+	+ "CASE WHEN co.ultimo_estado = '0000-00-00 00:00:00' then 'Fecha Desconocida' ELSE DATE_FORMAT(co.ultimo_estado , '%Y-%m-%d %H:%i:%s') END  AS fecha_ultimo_estado,\n"
 	+ "co.estrato AS estrato_contrato,\n"
 	+ "co.venta as modalidad,\n"
 	+ "ta.valor AS 'tarifa_general_valor',\n"
@@ -172,6 +171,7 @@ public interface IContratoDao extends CrudRepository<Contrato, Long> {
 		+ "THEN 'Analoga EOC'\n"
 		+ "WHEN co.id_tecnologia =  11\n"
 		+ "THEN 'Analoga FTTH'\n"
+		+"WHEN co.id_tecnologia = 12 THEN 'Otros' \n"
 	+ "END as t_tipo_tecnologia,\n"
 	+ "CONCAT(usr.nombre , ' ' , usr.apellidos) AS vendedor\n"
 	+ "FROM contratos co\n"
@@ -206,10 +206,11 @@ public interface IContratoDao extends CrudRepository<Contrato, Long> {
 	+ "		usuarios usr\n"
 	+ "		ON co.id_vendedor = usr.id_usuario\n"	 
 	+ "WHERE co.id_servicio IN (:servicios) \n"
-	+ "AND co.estado IN(0,1,2,5)\n"
+	+"AND co.grupo IN (:origen)\n"
+	+ "AND co.estado IN (:estados) \n"
 	+ "GROUP BY \n"
 	+ "co.id_contrato" , nativeQuery=true)
-	public Optional<List<Object[]>> carteraByidServicio(@Param("servicios") List<Integer> servicios);
+	public Optional<List<Object[]>> carteraByidServicio(@Param("servicios") List<Integer> servicios , @Param("estados") List<String> estados, @Param("origen") List<String> origen);
 
  
 }

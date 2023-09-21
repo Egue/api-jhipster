@@ -109,10 +109,10 @@ public class Contrato implements Serializable {
     @Column(name = "id_ap_master")
     private Long idApMaster;
 
-    private Long combo;
+    private Integer combo;
 
     @Column(name = "id_combo")
-    private Long idCombo;
+    private Integer idCombo;
 
     @Column(name = "ip_publica")
     private Long ipPublica;
@@ -413,19 +413,19 @@ public class Contrato implements Serializable {
         this.idApMaster = idApMaster;
     }
 
-    public Long getCombo() {
+    public Integer getCombo() {
         return combo;
     }
 
-    public void setCombo(Long combo) {
+    public void setCombo(Integer combo) {
         this.combo = combo;
     }
 
-    public Long getIdCombo() {
+    public Integer getIdCombo() {
         return idCombo;
     }
 
-    public void setIdCombo(Long idCombo) {
+    public void setIdCombo(Integer idCombo) {
         this.idCombo = idCombo;
     }
 

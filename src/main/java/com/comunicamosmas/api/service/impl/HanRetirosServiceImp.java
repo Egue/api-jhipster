@@ -103,8 +103,9 @@ public class HanRetirosServiceImp implements IHanRetirosService {
                     obj.setEstado((String) rs[6]);
                     obj.setCierre_fecha(rs[7] != null ? (String) rs[7].toString() : "");
                     obj.setUrl_documento((String) rs[8]);
-                    obj.setNameUser((String) rs[11]);
-                    obj.setCliente((String) rs[12]);
+                    obj.setReportado((String) rs[11]);
+                    obj.setNameUser((String) rs[12]);
+                    obj.setCliente((String) rs[13]);
 
                     retiros.add(obj);
                 }
@@ -348,7 +349,7 @@ public class HanRetirosServiceImp implements IHanRetirosService {
     }
 
     @Override
-    public void sendMailRetiros(Long id) {
+    public void sendMailRetiros(Long id , List<String> listMail) {
         // TODO Auto-generated method stub
         // throw new UnsupportedOperationException("Unimplemented method
         // 'sendMailRetiros'");
@@ -371,10 +372,10 @@ public class HanRetirosServiceImp implements IHanRetirosService {
             throw new ExceptionNullSql(new Date(), "Consultado datos de api", "no se encontro registro");
         }
         // consultamos lista de correos a enviar
-        SystemConfig correos = systemService.findByOrigen("user_mail_retiros");
+        /*SystemConfig correos = systemService.findByOrigen("user_mail_retiros");
         if (correos == null) {
             throw new ExceptionNullSql(new Date(), "Consultado datos de correos a enviar", "no se encontro registro");
-        }
+        }*/
         // consumir Clase MailRelaySend
         MailRelaySendMail mail = new MailRelaySendMail();
         // send
@@ -388,11 +389,11 @@ public class HanRetirosServiceImp implements IHanRetirosService {
         // to
         List<MailRelaySendMail.To> listFrom = new ArrayList<>();
 
-        String[] arrayCorreo = correos.getComando().split(",");
+        //String[] arrayCorreo = correos.getComando().split(",");
 
-        List<String> listCorreos = Arrays.asList(arrayCorreo);
+        //List<String> listCorreos = Arrays.asList(arrayCorreo);
 
-        for (String cor : listCorreos) {
+        for (String cor : listMail) {
             MailRelaySendMail.To to = mail.new To();
             to.setEmail(cor);
             to.setName("Destinatario");

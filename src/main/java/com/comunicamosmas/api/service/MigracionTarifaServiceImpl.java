@@ -4,9 +4,11 @@ import com.comunicamosmas.api.domain.MigracionTarifa;
 import com.comunicamosmas.api.repository.IMigracionTarifaDao;
 import com.comunicamosmas.api.service.dto.MigracionTarifaFindContratoDTO;
 import com.comunicamosmas.api.service.dto.MigracionTarifasInfoDTO;
+import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
  
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,6 +131,25 @@ public class MigracionTarifaServiceImpl implements IMigracionTarifaService {
 		}else {
 			return null;
 		}
+	}
+
+	@Override
+	public void decline(Long idMigracion , Long admin) {
+		// TODO Auto-generated method stub
+		//dto.setEstado(0L);
+		//migracionTarifaDao.save(dto);
+		//find migracion
+		MigracionTarifa result = this.findById(idMigracion);
+
+		if(result != null)
+		{
+			result.setIdAdmin(admin);
+			result.setEstado(2L);
+			this.save(result);
+		}else{
+			throw new ExceptionNullSql(new Date(), "Consultando Migración", "No éxiste el id de migración");
+		}
+
 	}
  
 }

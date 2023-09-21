@@ -57,7 +57,7 @@ public class Cliente implements Serializable {
     private Long dv;
 
     @Column(name = "f_nacimiento")
-    private String fNacimiento;
+    private Integer fNacimiento;
 
     @Column(name = "estado_civil")
     private String estadoCivil;
@@ -81,7 +81,7 @@ public class Cliente implements Serializable {
 
     private String mail;
 
-    private String estrato;
+    private Integer estrato;
 
     private String observaciones;
 
@@ -206,11 +206,11 @@ public class Cliente implements Serializable {
         this.dv = dv;
     }
 
-    public String getfNacimiento() {
+    public Integer getfNacimiento() {
         return fNacimiento;
     }
 
-    public void setfNacimiento(String fNacimiento) {
+    public void setfNacimiento(Integer fNacimiento) {
         this.fNacimiento = fNacimiento;
     }
 
@@ -278,11 +278,11 @@ public class Cliente implements Serializable {
         this.mail = mail;
     }
 
-    public String getEstrato() {
+    public Integer getEstrato() {
         return estrato;
     }
 
-    public void setEstrato(String estrato) {
+    public void setEstrato(Integer estrato) {
         this.estrato = estrato;
     }
 

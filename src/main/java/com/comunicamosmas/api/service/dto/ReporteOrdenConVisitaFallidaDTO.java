@@ -20,6 +20,16 @@ public class ReporteOrdenConVisitaFallidaDTO {
 
     private String documento;
 
+    private String barrio;
+
+    private String direccion;
+
+    private String celularA;
+
+    private String celularB;
+
+    private String nombre_tecnologia;
+
     private String nota;
 
     private String estado;
@@ -27,6 +37,50 @@ public class ReporteOrdenConVisitaFallidaDTO {
     private String notaFinal;
 
     private String visitaFallida;
+
+    private String anulada;
+    
+    
+
+    public String getBarrio() {
+        return barrio;
+    }
+
+    public void setBarrio(String barrio) {
+        this.barrio = barrio;
+    }
+
+    public String getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+
+    public String getCelularA() {
+        return celularA;
+    }
+
+    public void setCelularA(String celularA) {
+        this.celularA = celularA;
+    }
+
+    public String getCelularB() {
+        return celularB;
+    }
+
+    public void setCelularB(String celularB) {
+        this.celularB = celularB;
+    }
+
+    public String getNombre_tecnologia() {
+        return nombre_tecnologia;
+    }
+
+    public void setNombre_tecnologia(String nombre_tecnologia) {
+        this.nombre_tecnologia = nombre_tecnologia;
+    }
 
     public Integer getId() {
         return id;
@@ -130,6 +184,14 @@ public class ReporteOrdenConVisitaFallidaDTO {
 
     public void setVisitaFallida(String visitaFallida) {
         this.visitaFallida = visitaFallida;
+    }
+
+    public String getAnulada() {
+        return anulada;
+    }
+
+    public void setAnulada(String anulada) {
+        this.anulada = anulada;
     }
 
     

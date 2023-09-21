@@ -2,7 +2,12 @@ package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.MikrotikHijoSimpleQueue;
 import com.comunicamosmas.api.repository.IMikrotikHijoSimpleQueueDao;
+import com.comunicamosmas.api.service.dto.MikrotikHijoSimpleDTO;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,8 +60,32 @@ public class MikrotikHijoSimpleQueueServiceImpl implements IMikrotikHijoSimpleQu
     }
 
 	@Override
-	public List<MikrotikHijoSimpleQueue> findAllByidPadre(Integer idPadre) {
+	public List<MikrotikHijoSimpleDTO> findAllByidPadre(Integer idPadre) {
+        Optional<List<Object[]>> result = mikrotikHijoSimpleQueueDao.findAllByPadre(idPadre);
+
+        List<MikrotikHijoSimpleDTO> hijos = result.map( resp -> {
+
+            List<MikrotikHijoSimpleDTO> hijo = new ArrayList<>();
+            for(Object[] rs : resp)
+            {
+                MikrotikHijoSimpleDTO obj = new MikrotikHijoSimpleDTO();
+                obj.setId((String) rs[0].toString());
+                obj.setIdPadre((String) rs[1].toString());
+                obj.setIdIp((String) rs[2].toString());
+                obj.setLimitAt((String) rs[3]);
+                obj.setMaxLimit((String) rs[4]);
+                obj.setName((String) rs[5]);
+                obj.setIdContrato((String) rs[6].toString());
+                obj.setQueue((String)rs[7]);
+                obj.setTarget((String) rs[8]);
+                obj.setEstado((String) rs[9].toString());
+                hijo.add(obj);
+            }
+
+            return hijo;
+        }).orElse(new ArrayList<>());
+        
 		
-		return (List<MikrotikHijoSimpleQueue>)mikrotikHijoSimpleQueueDao.findAllByPadre(idPadre);
+		return hijos;
 	}
 }

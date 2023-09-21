@@ -1,39 +1,42 @@
 package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.Admin;
+import com.comunicamosmas.api.domain.Documento;
 import com.comunicamosmas.api.repository.IAdminDao;
+import com.comunicamosmas.api.repository.IDocumentoDao;
+
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class DocumentoServiceImpl implements IAdminService {
+public class DocumentoServiceImpl implements IDocumentoService {
 
-    @Autowired
-    IAdminDao adminDao;
+    @Autowired 
+    IDocumentoDao documentoDao;
 
     @Override
-    public List<Admin> findAll() {
+    public List<Documento> findAll() {
         // TODO Auto-generated method stub
-        return (List<Admin>) adminDao.findAll();
+         return (List<Documento>) documentoDao.findAll();
     }
 
     @Override
-    public Admin save(Admin admin) {
+    public Documento save(Documento documento) {
         // TODO Auto-generated method stub
-        adminDao.save(admin);
-        return null;
+        throw new UnsupportedOperationException("Unimplemented method 'save'");
     }
 
     @Override
     public Long deleteById(Long id) {
         // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException("Unimplemented method 'deleteById'");
     }
 
     @Override
-    public Admin findById(Long id) {
+    public Documento findById(Long id) {
         // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException("Unimplemented method 'findById'");
     }
+ 
 }

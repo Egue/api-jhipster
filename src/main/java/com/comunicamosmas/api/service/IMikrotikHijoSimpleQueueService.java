@@ -1,6 +1,8 @@
 package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.MikrotikHijoSimpleQueue;
+import com.comunicamosmas.api.service.dto.MikrotikHijoSimpleDTO;
+
 import java.util.List;
 
 public interface IMikrotikHijoSimpleQueueService {
@@ -10,7 +12,7 @@ public interface IMikrotikHijoSimpleQueueService {
 
     public MikrotikHijoSimpleQueue findById(Long id);
     
-    public List<MikrotikHijoSimpleQueue> findAllByidPadre(Integer idPadre);
+    public List<MikrotikHijoSimpleDTO> findAllByidPadre(Integer idPadre);
 
     public MikrotikHijoSimpleQueue findByIdContrato(Long idContrato);
 

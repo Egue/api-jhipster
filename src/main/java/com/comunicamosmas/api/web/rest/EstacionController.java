@@ -83,4 +83,23 @@ public class EstacionController {
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
         }
     }
+
+    //estaciones por servicio
+    @GetMapping("/estaciones/findByServicio/{idServicio}")
+    public ResponseEntity<?> findByIdServicio(@PathVariable long idServicio){
+         Map<String, Object> response = new HashMap<>();
+
+        try {
+             List<EstacionDTO> estaciones = estacionService.findByIdServicio(idServicio);
+
+            response.put("response", estaciones);
+
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.put("response", e.getMessage());
+
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }

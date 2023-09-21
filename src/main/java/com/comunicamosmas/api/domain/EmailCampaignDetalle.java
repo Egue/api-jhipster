@@ -38,6 +38,27 @@ public class EmailCampaignDetalle implements Serializable{
 	
 	private Integer procesado;
 
+	private String origen;
+
+	@Column(name="name_document")
+	private String nameDocument;
+
+	public String getNameDocument() {
+		return nameDocument;
+	}
+
+	public void setNameDocument(String nameDocument) {
+		this.nameDocument = nameDocument;
+	}
+
+	public String getOrigen() {
+		return origen;
+	}
+
+	public void setOrigen(String origen) {
+		this.origen = origen;
+	}
+
 	public Integer getId() {
 		return id;
 	}

@@ -56,6 +56,7 @@ public class WinmaxPassServiceImpl implements IWinmaxPassService {
 	public List<ListWinmaxPassDTO> findByIdEstacionWithDatos(Long idEstacion) {
 		
 		List<Object[]> listDTO = winmaxDao.findByIdEstacionConDatos(idEstacion);
+        
 		List<ListWinmaxPassDTO> listWinmaxDTO = new ArrayList<>();
 		
 		
@@ -68,7 +69,7 @@ public class WinmaxPassServiceImpl implements IWinmaxPassService {
 			winmaxDTO.setNombreCliente((String) row[3]);
 			winmaxDTO.setUsuario((String) row[4]);
 			winmaxDTO.setPass((String) row[5]);
-			winmaxDTO.setMarca((Timestamp) row[6]);
+			winmaxDTO.setMarca((String) row[6].toString());
 			winmaxDTO.setNombreTecnologia((String) row[7]);
 			winmaxDTO.setVelocidad((Integer) row[8]);
 			winmaxDTO.setNombreTarifa((String) row[9]);

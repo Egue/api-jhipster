@@ -62,5 +62,6 @@ public interface IOrdenService {
 
     //
     public ChartDataLineDTO chartLineOrdenesCortados(Integer ano , List<Integer> servicios);
-    	
+    //crear orden de cambio de plan
+    public void ordenCambioPlan(Long idContrato , Long idAdmin);	
 }

@@ -11,7 +11,7 @@ public class ListWinmaxPassDTO {
 	private String nombreCliente;
 	private String usuario;
 	private String pass;
-	private Timestamp marca;
+	private String marca;
 	private String nombreTecnologia;
 	private Integer velocidad;
 	private String nombreTarifa;
@@ -23,7 +23,7 @@ public class ListWinmaxPassDTO {
 	}
 
 	public ListWinmaxPassDTO(Integer idContrato, String contratoEstado, String tipoCliente, String nombreCliente,
-			String usuario, String pass, Timestamp marca, String nombreTecnologia, Integer velocidad,
+			String usuario, String pass, String marca, String nombreTecnologia, Integer velocidad,
 			String nombreTarifa, Integer valor, String codigoMikrotik) {
 		super();
 		this.idContrato = idContrato;
@@ -88,11 +88,11 @@ public class ListWinmaxPassDTO {
 		this.pass = pass;
 	}
 
-	public Timestamp getMarca() {
+	public String getMarca() {
 		return marca;
 	}
 
-	public void setMarca(Timestamp marca) {
+	public void setMarca(String marca) {
 		this.marca = marca;
 	}
 

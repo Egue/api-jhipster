@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -114,6 +115,25 @@ public class MigracionTarifaController {
 
 			List<MigracionTarifaFindContratoDTO> result = migracionTarifaService.findAll(id);
 			response.put("response", result);
+
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
+
+		} catch (Exception e) {
+			response.put("response", e.getMessage());
+
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	//rechazar una migración de tarifa
+	@PutMapping("/migraciontarifa/decline/{idMigracion}")
+	public ResponseEntity<?> decline(@PathVariable Long idMigracion , @RequestParam Long idAdmin) {
+
+		Map<String, Object> response = new HashMap<>();
+		try {
+
+			migracionTarifaService.decline(idMigracion , idAdmin); 
+			response.put("response", "Eliminado con éxito");
 
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 

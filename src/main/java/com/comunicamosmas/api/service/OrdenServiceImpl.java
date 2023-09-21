@@ -13,6 +13,7 @@ import com.comunicamosmas.api.service.dto.ReporteOrdenConVisitaFallidaDTO;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 
 import liquibase.pro.packaged.O;
+import liquibase.pro.packaged.fo;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -33,6 +34,9 @@ public class OrdenServiceImpl implements IOrdenService {
 
 	@Autowired
 	IretornarMesAbreviado mesAbreviado;
+
+	@Autowired
+	IContratoService contratoService;
 
 	@Override
 	public List<Orden> findAll() {
@@ -326,10 +330,17 @@ public class OrdenServiceImpl implements IOrdenService {
 					obj.setTipoCliente((String) rs[6]);
 					obj.setCliente((String) rs[7]);
 					obj.setDocumento((String) rs[8].toString());
-					obj.setNota((String) rs[9]);
-					obj.setEstado((String) rs[10]);
-					obj.setNotaFinal((String) rs[11]);
-					obj.setVisitaFallida((String) rs[12]);
+					obj.setBarrio((String) rs[9]);
+					obj.setDireccion((String) rs[10]);
+					obj.setCelularA((String) rs[11].toString());
+					obj.setCelularB((String) rs[12].toString());
+					obj.setNombre_tecnologia((String) rs[13]);
+					obj.setNota((String) rs[14]);
+					obj.setEstado((String) rs[15]);
+					obj.setNotaFinal((String) rs[16]);
+					String anulada = rs[17].toString().equals("1") ? "Si" : "No";
+					obj.setAnulada(anulada);
+					obj.setVisitaFallida((String) rs[18]);
 
 					reporteTipo.add(obj);
 				}
@@ -440,6 +451,99 @@ public class OrdenServiceImpl implements IOrdenService {
 			integer.add((int) (Long.parseLong(rs.getCantidad())));
 		}
 		return integer;
+	}
+
+	@Override
+	public void ordenCambioPlan(Long idContrato , Long idAdmin) {
+		// TODO Auto-generated method stub
+		Orden orden = new Orden();
+		Contrato contrato = contratoService.findById(idContrato);
+		Optional<List<Object[]>> result = ordenDao.findNumeroOrden(contrato.getGrupo(), contrato.getIdEmpresa());
+	 
+		if(result.isPresent())
+		{
+			List<Object[]> rows = result.get();
+
+			for(Object[] row : rows)
+			{
+				if(contrato.getGrupo().equals("A")){
+					orden.setNumeroA(((Integer) row[0]).longValue() + 1);
+					orden.setNumeroB(0L);
+
+				}else{
+					orden.setNumeroB(((Integer) row[1]).longValue() + 1L);
+					orden.setNumeroA(0L);
+				}
+			}
+		}		
+		orden.setTipoOrden(23L);
+		orden.setRefiere(contrato.getGrupo());
+		orden.setCausaSolicitud("Winmax");
+		orden.setIdContrato(idContrato);
+		orden.setIdDireccion(contrato.getIdDireccionServicio());
+		orden.setIdCliente(contrato.getIdCliente());
+		orden.setIdEstacion(0L);
+		orden.setIdZona(contrato.getIdZona());
+		Long fecha = this.fecha();
+		orden.setFechafRegistra(fecha);
+		orden.setFechafSolicita(fecha);
+		orden.setFechafAsigna(fecha);
+		orden.setFechafAsiste(fecha);
+		orden.setFechafAnula(0L);
+		orden.setFechafDescarga(0L);
+		orden.setHoraAsisteInicio("");
+		orden.setHotaAsisteFin("");
+		orden.setEstado(3L);
+		orden.setNota("Orden Para Winmax");
+		orden.setIdCiudad(contrato.getIdCiudad());
+		orden.setIdEmpresa(contrato.getIdEmpresa());
+		orden.setIdServicio(contrato.getIdServicio());
+		orden.setIdUsuarioRegistra(idAdmin);
+		orden.setIdUsuarioAsigna(0L);
+		orden.setIdUsuarioEjecuta(2L);
+		orden.setIdUsuarioDescarga(2L);
+		orden.setIdUsuarioAnula(0L);
+		orden.setAnulaJustifica("");
+		orden.setA(" ");
+		orden.setB(" ");
+		orden.setC(" ");
+		orden.setD(" ");
+		orden.setE(" ");
+		orden.setF(" ");
+		orden.setG(" ");
+		orden.setH(" ");
+		orden.setI(" ");
+		orden.setJ(" ");
+		orden.setUltimaDow(this.formatearFecha("yyyy-MM-dd HH:mm:ss"));	   
+		orden.setAbierta(0L);
+		orden.setAnulada(0L);
+		orden.setNotaFinal(" ");
+		orden.setWinmax(1L);
+		orden.setWinmaxIdUsuario(2L);
+		orden.setWinmaxMarca("");
+		orden.setIdTicketSoporte(0L);
+		orden.setPdfDescargaFecha("");
+		orden.setPdfDescargaUsuario(0L);
+		orden.setIdTecnologia(contrato.getIdTecnologia());
+		orden.setTipoReconecta(0L);
+		orden.setApiAutomatica(1L);
+		orden.setLogApi("Controlmas v2");
+
+		ordenDao.save(orden);		
+	}
+
+	private Long fecha()
+	{
+		LocalDate fechaActual = LocalDate.now();
+        
+        // Crear un formateador para el patrón "yyyyMMdd"
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        
+        // Formatear la fecha actual en el formato deseado y convertirlo a un número
+        Long numero = Long.parseLong(fechaActual.format(formatter));
+
+		return numero;
+
 	}
 
 }

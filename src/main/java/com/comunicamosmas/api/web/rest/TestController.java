@@ -1,9 +1,11 @@
 package com.comunicamosmas.api.web.rest;
 
 import com.comunicamosmas.api.domain.Estacion;
+import com.comunicamosmas.api.service.IApiRBMikrotikService;
 import com.comunicamosmas.api.service.IEstacionService;
 import com.comunicamosmas.api.service.IMikrotikService;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import me.legrange.mikrotik.ApiConnection;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,9 @@ public class TestController {
 
     @Autowired
     IEstacionService estacionService;
+
+    @Autowired
+    IApiRBMikrotikService apimikrotikservice;
 
     @GetMapping("/test")
     public ResponseEntity<?> test() {
@@ -69,6 +74,34 @@ public class TestController {
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
         } catch (Exception e) {
             response.put("response", e.getMessage());
+
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/test/findProfile")
+    public ResponseEntity<?> findProfile(@RequestParam String profile , @RequestParam Long idEstacion)
+    {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            Estacion estacion = estacionService.findById(idEstacion);
+            String comando = "/ppp/profile/print where name="+profile;
+
+            List<Map<String,String>> result = apimikrotikservice.listSendCommand(comando, estacion);
+
+            if(result.isEmpty())
+            {
+                response.put("response" , "Sin resultados");
+            }else{
+                response.put("response" , result);
+            }
+            
+
+             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
+            
+        } catch (Exception e) {
+             response.put("response", e.getMessage());
 
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
         }

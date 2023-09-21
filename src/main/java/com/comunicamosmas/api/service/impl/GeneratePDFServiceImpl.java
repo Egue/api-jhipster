@@ -14,9 +14,11 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -40,6 +42,7 @@ import com.comunicamosmas.api.domain.Deuda;
 import com.comunicamosmas.api.domain.EmailCampaign;
 import com.comunicamosmas.api.service.IApiRestService;
 import com.comunicamosmas.api.service.IClienteService;
+import com.comunicamosmas.api.service.IContratoComboService;
 import com.comunicamosmas.api.service.IContratoService;
 import com.comunicamosmas.api.service.IDeudaService;
 import com.comunicamosmas.api.service.IEmpresaService;
@@ -68,7 +71,6 @@ import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
- 
 
 @Service
 public class GeneratePDFServiceImpl implements IGeneratePDFService {
@@ -90,57 +92,62 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 
 	@Autowired
 	ISystemConfigService systemService;
-	
+
+	@Autowired
+	IContratoComboService comboService;
+
 	@Override
-	public RespuestaGeneracionPDFFactura generateFacturaPDF(EmailCampaignDetalleDTO detalle, List<DeudasForFacturaDTO> deudas , EmailCampaign campaña) {
+	public RespuestaGeneracionPDFFactura generateFacturaPDF(EmailCampaignDetalleDTO detalle,
+			List<DeudasForFacturaDTO> deudas, EmailCampaign campaña) {
 
 		// buscar informacion del contrato
 		// Contrato contrato =
 		// contratoService.findById(detalle.getIdContrato().longValue());
 		// buscar empresa por contrato
 		Long idEmpresa = 0L;
-		//Long idCliente = 0L;
+		// Long idCliente = 0L;
 		Long idContrato = 0L;
-		//System.out.print(deudas.toString());
+		// System.out.print(deudas.toString());
 		for (DeudasForFacturaDTO rs : deudas) {
 			idEmpresa = rs.getId_empresa().longValue();
-			//idCliente = rs.getId_cliente();
+			// idCliente = rs.getId_cliente();
 			idContrato = rs.getId_contrato().longValue();
 		}
 		Empresa empresa = empresaService.findById(idEmpresa);
-		//System.out.print(empresa.toString());
+		// System.out.print(empresa.toString());
 		// Cliente cliente =
 		// clienteService.findById(detalle.getIdCliente().longValue());
 		ContratoInfoFacturaDTO clienteDTO = contratoService.contratoFindFactura(idContrato);
-		//System.out.print(clienteDTO.toString());
-		return this.pdf(empresa, clienteDTO, detalle, deudas , campaña);
+		// System.out.print(clienteDTO.toString());
+		return this.pdf(empresa, clienteDTO, detalle, deudas, campaña);
 
 	}
 
 	/** pdf */
-	private RespuestaGeneracionPDFFactura pdf(Empresa empresa, ContratoInfoFacturaDTO cliente, EmailCampaignDetalleDTO detalle,
-			List<DeudasForFacturaDTO> deudas , EmailCampaign campaña) {
-		
-		//instancia de la respuesta del resultado
+	private RespuestaGeneracionPDFFactura pdf(Empresa empresa, ContratoInfoFacturaDTO cliente,
+			EmailCampaignDetalleDTO detalle,
+			List<DeudasForFacturaDTO> deudas, EmailCampaign campaña) {
+
+		// instancia de la respuesta del resultado
 		RespuestaGeneracionPDFFactura responseFactura = new RespuestaGeneracionPDFFactura();
 		responseFactura.setFactura(detalle.getFactura());
 		responseFactura.setCodigoDocumento("01");
 		responseFactura.setNameComercial(empresa.getNombreComercial());
-		//path para guardar el archivo pdf
-		String namePdf = empresa.getNit()+detalle.getFactura()+".pdf";
+		// path para guardar el archivo pdf
+		String namePdf = empresa.getNit().toString() +empresa.getId() + detalle.getOrigen()+detalle.getFactura() + ".pdf";
 
-		//String pathPdf = "/home/programador/Documentos/"+namePdf;
+		// String pathPdf = "/home/programador/Documentos/"+namePdf;
 		SystemConfig system = systemService.findByOrigen("facturas");
-		String pathPdf = system.getComando()+namePdf;
-		
-		responseFactura.setPathPDF(pathPdf);//guardamos el path del pdf
+		String pathPdf = system.getComando() +  namePdf;
+
+		responseFactura.setPathPDF(pathPdf);// guardamos el path del pdf
 		// buscar datos de la empresa
 
 		// Datos de la factura
 		String nombreEmpresa = empresa.getRazonSocial();
 
-		responseFactura.setRazon_social(nombreEmpresa);//guardamo el nombre de la empresa;
-		responseFactura.setNit(empresa.getNit()+empresa.getDv().toString());
+		responseFactura.setRazon_social(nombreEmpresa);// guardamo el nombre de la empresa;
+		responseFactura.setNit(empresa.getNit() + empresa.getDv().toString());
 		responseFactura.setLogoPublico(empresa.getLogoPublico());
 
 		String nitEmpresa = "NIT:" + empresa.getNit() + "-" + empresa.getDv();
@@ -161,8 +168,9 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 
 		// link de fondo
 		String fondoA = "http://10.111.39.3/control/archivos/fondo_factura/" + empresa.getFondoFactura();
-
+		//String fondoA = "http://190.121.145.227:9050/control/archivos/fondo_factura/" + empresa.getFondoFactura();
 		String fondoB = "http://10.111.39.3/control/archivos/fondo_factura/" + empresa.getFondoFacturaB();
+		//String fondoB = "http://190.121.145.227:9050/control/archivos/fondo_factura/" + empresa.getFondoFacturaB();
 
 		// factura
 		String fechaEmision = "";
@@ -184,134 +192,149 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 		double totalPagar = 0;
 		String cufe = "";
 		String[] web = empresa.getWeb().split("//");
-		
-		String webPago = "pagos."+web[1];
+
+		String webPago = "pagos." + web[1];
 		String numeroResolucion = "";
 		String fechaAprobado = "";
 		String prefijo = "";
 		String numeroInicial = "";
 		String numeroFinal = "";
-		//variables para saldos
+		// variables para saldos
 		Integer saldoAnteriorFecha = 0;
-		//respues de DIAN
-		String resultadoFacturaElectronica ="";
+		// respues de DIAN
+		String resultadoFacturaElectronica = "";
 		String imagenQr = "";
 		// recorrer
 		String[] descripcion = new String[10];
 		String[] valorServicio = new String[10];
 		for (int i = 0; i < 10; i++) {
 			if (i < deudas.size()) {
-				
+
 				DeudasForFacturaDTO deuda = deudas.get(i);
-				//cus
+				// cus
 				cus = deuda.getId_contrato().toString();
 				fechaEmision = this.transformFechaCompleta(deuda.getFacturado_fecha());
 				saldoAnteriorFecha = deuda.getFacturado_fecha();
 				periodoFacturado = this.transformFecha(deuda.getMes_servicio());
 				///
 				mesServicio = deuda.getMes_servicio();
-				//valores factura
+				// valores factura
 				baseImpuesto += deuda.getValor_base();
 				iva += deuda.getValor_iva();
 				totalMes += deuda.getValor_total();
 				pagoCuenta += deuda.getValor_parcial();
 				valorServicio[i] = deuda.getValor_base().toString();
-				//resolucion
+				// resolucion
 				prefijoFactura = deuda.getPrefijo();
 				numeroResolucion = deuda.getNum_resolucion();
 				fechaAprobado = deuda.getFecha_resolucion().toString();
 				prefijo = deuda.getPrefijo();
 				numeroInicial = deuda.getRango_inicio();
 				numeroFinal = deuda.getRango_final();
-				//respuesta a DIAN
+				// respuesta a DIAN
 				resultadoFacturaElectronica = deuda.getResultado_factura_electronica();
-				//mensualidades / instalacion/ reconexion / otros / materiales
-				if (deuda.getInstalacion().equals(1L)) {
-					descripcion[i] = deuda.getNombre() + " / Instalación / "+this.transformFecha(deuda.getMes_servicio());
-				} else if (deuda.getReconexion().equals(1L)) {
-					descripcion[i] = deuda.getNombre() + " / Reconexión / "+this.transformFecha(deuda.getMes_servicio());
-				} else if (deuda.getMateriales().equals(1L)) {
-					descripcion[i] = deuda.getNombre() + " / Materiales / "+this.transformFecha(deuda.getMes_servicio());
-				}else if (deuda.getTraslado().equals(1L)) {
-					descripcion[i] = deuda.getNombre() + " / Traslado / "+this.transformFecha(deuda.getMes_servicio());
-				}else if(deuda.getOtros().equals(1L))
-				{
-					descripcion[i] = deuda.getNombre()+" / "+deuda.getConcepto_aux() + " / "+this.transformFecha(deuda.getMes_servicio());
-				}else {
-					descripcion[i] = deuda.getNombre()+" / Mensualidad / "+this.transformFecha(deuda.getMes_servicio());
+				// mensualidades / instalacion/ reconexion / otros / materiales
+				if (deuda.getInstalacion().equals(1)) {
+					descripcion[i] = deuda.getNombre() + " / Instalación / "
+							+ this.transformFecha(deuda.getMes_servicio());
+				} else if (deuda.getReconexion().equals(1)) {
+					descripcion[i] = deuda.getNombre() + " / Reconexión / "
+							+ this.transformFecha(deuda.getMes_servicio());
+				} else if (deuda.getMateriales().equals(1)) {
+					descripcion[i] = deuda.getNombre() + " / Materiales / "
+							+ this.transformFecha(deuda.getMes_servicio());
+				} else if (deuda.getTraslado().equals(1)) {
+					descripcion[i] = deuda.getNombre() + " / Traslado / "
+							+ this.transformFecha(deuda.getMes_servicio());
+				} else if (deuda.getOtros().equals(1)) {
+					descripcion[i] = deuda.getNombre() + " / " + deuda.getConcepto_aux() + " / "
+							+ this.transformFecha(deuda.getMes_servicio());
+				} else {
+					descripcion[i] = deuda.getNombre() + " / Mensualidad / "
+							+ this.transformFecha(deuda.getMes_servicio());
 				}
 
-			}else {
+			} else {
 				descripcion[i] = "";
 				valorServicio[i] = "";
 			}
-			
-			
+
 		}
-		//finalización del bucle para recorrer facturas
+		// finalización del bucle para recorrer facturas
 		/***/
 		responseFactura.setPrefijo(prefijo);
-		//saldofactura , empresa , 
-		
-		//contrato
+		// saldofactura , empresa ,
+
+		// contrato
 		Contrato contrato = contratoService.findById(Long.parseLong(cus));
-		String consulta ="";
-		 
-		if(contrato.getCombo().equals(1L))
-		{
-			 consulta = "SELECT contratos_combos.id_contrato"+  
-			"from contratos_combo WHERE contratos_combo.id_empresa = "+empresa.getId()+" and contratos_combo.combo = "+contrato.getIdCombo();
-		}else{
+		List<Integer> consulta = new ArrayList<>();
 
-			consulta = cus;
+		if (contrato.getCombo().equals(1)) {
+			Optional<List<Object[]>> listCombo = comboService.findByEmpresaAndIdCombo(empresa.getId(),
+					contrato.getIdCombo());
+
+			consulta = listCombo.map(resp -> {
+				List<Integer> list = new ArrayList<>();
+				for (Object[] rs : resp) {
+					list.add((Integer) Integer.parseInt(rs[0].toString()));
+				}
+
+				return list;
+
+			}).orElse(null);
+		} else {
+
+			consulta.add(Integer.parseInt(cus));
 		}
-		
-		List<Object[]> resultSaldo = deudasService.findSalgoAnterior( saldoAnteriorFecha, consulta);
 
-		
+		Optional<List<Object[]>> resultSaldo = deudasService.findSalgoAnterior(saldoAnteriorFecha, consulta);
 
-		if(!resultSaldo.isEmpty())
-		{	
+		double searchSaldo = resultSaldo.map(resp -> {
+			double sald = 0.0;
 			float parcial = 0;
-			double total = 0;
-				for(Object[] rs :resultSaldo)
-				{
-						parcial += (float) rs[1];
-						total 	+= (double) rs[2];
-				} 
-			saldoAnterior = total - parcial;
-			
-		}
+			double total = 0.0;
+			for (Object[] rs : resp) {
+				parcial += (float) rs[1];
+				total += (double) rs[2];
+			}
 
-		//sumammos totalApagar 
-		//DecimalFormat decimalFormat = new DecimalFormat("#0,00");
+			sald = total - parcial;
+
+			return sald;
+
+		}).orElse(0.0);
+
+		saldoAnterior += searchSaldo;
+		// sumammos totalApagar
+		// DecimalFormat decimalFormat = new DecimalFormat("#0,00");
 
 		totalPagar = totalMes - pagoCuenta + saldoAnterior;
 
-		//String totalPagarString = decimalFormat.format(totalPagar);
-		//System.out.println(totalPagarString+"##########################################hola");
+		// String totalPagarString = decimalFormat.format(totalPagar);
+		// System.out.println(totalPagarString+"##########################################hola");
 		responseFactura.setValorPagar(Double.toString(totalPagar));
-		
-		//deserializar respuesta de DIAN PHP SERIALIZABLE
-		if(!resultadoFacturaElectronica.isEmpty())
-		{
-				//si es != de vacio se procede a buscar el cufe
-				//FacturaElectronicaResponseDTO resultFactura = 
-				FacturaElectronicaResponseDTO facturaDIAN =  this.desSerializable(detalle.getFactura() , mesServicio,  empresa.getId() );
 
-				cufe = facturaDIAN.getCufe();
-				imagenQr = facturaDIAN.getUrl_qr();
+		// deserializar respuesta de DIAN PHP SERIALIZABLE
+		if (!resultadoFacturaElectronica.isEmpty()) {
+			// si es != de vacio se procede a buscar el cufe
+			// FacturaElectronicaResponseDTO resultFactura =
+			FacturaElectronicaResponseDTO facturaDIAN = this.desSerializable(detalle.getFactura(), mesServicio,
+					empresa.getId());
 
-				//descagar XML
-				String pathXML = this.downloadFileXML(facturaDIAN.getUrl_xml_AttachedDocument() , empresa.getNit().toString() , detalle.getFactura());
-				//imagenQr = "QR.png";
-				responseFactura.setPathXML(pathXML);
+			cufe = facturaDIAN.getCufe();
+			imagenQr = facturaDIAN.getUrl_qr();
 
-		}else{
+			// descagar XML
+			String pathXML = this.downloadFileXML(facturaDIAN.getUrl_xml_AttachedDocument(),
+					empresa, detalle);
+			// imagenQr = "QR.png";
+			responseFactura.setPathXML(pathXML);
+
+		} else {
 
 			imagenQr = "QR.png";
 		}
-		
+
 		// PdfFont myFont = PdfFontFactory.createFont(StandardFonts.HELVETICA);
 		// Crear documento PDF
 		Document document = new Document(PageSize.LETTER);
@@ -339,9 +362,9 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 			celda5.setBorder(Rectangle.NO_BORDER);
 			celda5.setHorizontalAlignment(Element.ALIGN_CENTER);
 			tablaEncabezado.addCell(celda5);
-
+			String tipoDocumento = detalle.getOrigen().equals("A") ? "Factura Electrónica" : "Estado de Cuenta";
 			PdfPCell celda6 = new PdfPCell(new Paragraph(
-					"\n\n\n\n\n" + "Factura Electrónica " + "\n" + prefijoFactura + numeroFactura, fontEncabezado));
+					"\n\n\n\n\n" + tipoDocumento + "\n" + prefijoFactura + numeroFactura, fontEncabezado));
 			celda6.setBorder(Rectangle.NO_BORDER);
 			celda6.setHorizontalAlignment(Element.ALIGN_CENTER);
 			tablaEncabezado.addCell(celda6);
@@ -385,7 +408,8 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 					createCell(periodoFacturado, PdfPCell.ALIGN_LEFT, Element.ALIGN_CENTER, fontTable, 1, 1, 0, 1));
 			table.addCell(createCell("Teléfonos: ", PdfPCell.ALIGN_LEFT, Element.RECTANGLE, fontTableBold, 1, 0, 0, 1));
 			table.addCell(createCell(telefonoCliente, PdfPCell.ALIGN_LEFT, Element.RECTANGLE, fontTable, 0, 0, 0, 1));
-			table.addCell(createCell("Fecha Limite", PdfPCell.ALIGN_LEFT, Element.ALIGN_CENTER, fontTableBold, 1, 0, 0, 1));
+			table.addCell(
+					createCell("Fecha Limite", PdfPCell.ALIGN_LEFT, Element.ALIGN_CENTER, fontTableBold, 1, 0, 0, 1));
 			table.addCell(createCell(fechaLimite, PdfPCell.ALIGN_LEFT, Element.ALIGN_CENTER, fontTable, 1, 1, 0, 1));
 			table.addCell(createCell("Dirección: ", PdfPCell.ALIGN_LEFT, Element.RECTANGLE, fontTableBold, 1, 0, 0, 1));
 			table.addCell(createCell(direccionCliente, PdfPCell.ALIGN_LEFT, Element.RECTANGLE, fontTable, 0, 0, 0, 1));
@@ -481,8 +505,9 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 
 			tableTotal.addCell(
 					createCell("BASE IMPUESTO:", PdfPCell.ALIGN_UNDEFINED, Element.ALIGN_RIGHT, font, 0, 0, 0, 0));
-			tableTotal.addCell(createCell(formatCurrencyDouble(baseImpuesto), PdfPCell.ALIGN_LEFT, Element.ALIGN_RIGHT, font,
-					0, 0, 0, 0));
+			tableTotal.addCell(
+					createCell(formatCurrencyDouble(baseImpuesto), PdfPCell.ALIGN_LEFT, Element.ALIGN_RIGHT, font,
+							0, 0, 0, 0));
 
 			// segunda fila
 			tableTotal.addCell(createCell("IVA:", PdfPCell.ALIGN_UNDEFINED, Element.ALIGN_RIGHT, font, 0, 0, 0, 0));
@@ -492,26 +517,30 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 			// tercera fila
 			tableTotal.addCell(createCell("TOTAL FACTURADO MES:", PdfPCell.ALIGN_UNDEFINED, Element.ALIGN_RIGHT,
 					fontBold, 0, 0, 0, 0));
-			tableTotal.addCell(createCell(formatCurrencyDouble(totalMes), PdfPCell.ALIGN_LEFT, Element.ALIGN_RIGHT, fontBold,
-					0, 0, 0, 0));
+			tableTotal.addCell(
+					createCell(formatCurrencyDouble(totalMes), PdfPCell.ALIGN_LEFT, Element.ALIGN_RIGHT, fontBold,
+							0, 0, 0, 0));
 
 			// cuarta fila
 			tableTotal.addCell(
 					createCell("PAGOS A CUENTAS:", PdfPCell.ALIGN_UNDEFINED, Element.ALIGN_RIGHT, font, 0, 0, 0, 0));
 			tableTotal.addCell(
-					createCell(formatCurrencyDouble(pagoCuenta), PdfPCell.ALIGN_LEFT, Element.ALIGN_RIGHT, font, 0, 0, 0, 0));
+					createCell(formatCurrencyDouble(pagoCuenta), PdfPCell.ALIGN_LEFT, Element.ALIGN_RIGHT, font, 0, 0,
+							0, 0));
 
 			// quinta fila
 			tableTotal.addCell(
 					createCell("SALDO ANTERIOR:", PdfPCell.ALIGN_UNDEFINED, Element.ALIGN_RIGHT, font, 0, 0, 0, 0));
-			tableTotal.addCell(createCell(formatCurrencyDouble(saldoAnterior), PdfPCell.ALIGN_LEFT, Element.ALIGN_RIGHT, font,
-					0, 0, 0, 0));
+			tableTotal.addCell(
+					createCell(formatCurrencyDouble(saldoAnterior), PdfPCell.ALIGN_LEFT, Element.ALIGN_RIGHT, font,
+							0, 0, 0, 0));
 
 			// sexta fila
 			tableTotal.addCell(
 					createCell("PAGO ANTERIOR:", PdfPCell.ALIGN_UNDEFINED, Element.ALIGN_RIGHT, font, 0, 0, 0, 0));
-			tableTotal.addCell(createCell(formatCurrencyDouble(pagoAnterior), PdfPCell.ALIGN_LEFT, Element.ALIGN_RIGHT, font,
-					0, 0, 0, 0));
+			tableTotal.addCell(
+					createCell(formatCurrencyDouble(pagoAnterior), PdfPCell.ALIGN_LEFT, Element.ALIGN_RIGHT, font,
+							0, 0, 0, 0));
 
 			// séptima fila
 			tableTotal.addCell(createCell("TOTAL A PAGAR CON SALDO ANTERIOR:", PdfPCell.ALIGN_UNDEFINED,
@@ -522,13 +551,15 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 			document.add(tableTotal);
 
 			// CUFE
-			Font fontParagraph1 = FontFactory.getFont("HELVETICA", 9, Font.NORMAL);
-			Paragraph paragraph1 = new Paragraph("CUFE: " + cufe, fontParagraph1);
-			paragraph1.setAlignment(Element.ALIGN_CENTER);
-			paragraph1.setSpacingBefore(3);
-			paragraph1.setSpacingAfter(3);
+			if (detalle.getOrigen().equals("A")) {
+				Font fontParagraph1 = FontFactory.getFont("HELVETICA", 9, Font.NORMAL);
+				Paragraph paragraph1 = new Paragraph("CUFE: " + cufe, fontParagraph1);
+				paragraph1.setAlignment(Element.ALIGN_CENTER);
+				paragraph1.setSpacingBefore(3);
+				paragraph1.setSpacingAfter(3);
 
-			document.add(paragraph1);
+				document.add(paragraph1);
+			}
 
 			// PAGOS EN LINEA
 			Font fontParagraph2 = FontFactory.getFont("HELVETICA", 9, Font.BOLD);
@@ -539,33 +570,35 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 			paragraph2.setSpacingAfter(3);
 			document.add(paragraph2);
 
-			// TEXTO CON RESOLUCIÓN
-			Font fontParagraph3 = FontFactory.getFont("HELVETICA", 9, Font.NORMAL);
-			PdfPTable tabla = new PdfPTable(2);
-			float[] columnWidths4 = { 0.91f, 0.2f };
-			tabla.setWidths(columnWidths4);
-			tabla.setWidthPercentage(100);
+			if (detalle.getOrigen().equals("A")) {
+				// TEXTO CON RESOLUCIÓN
+				Font fontParagraph3 = FontFactory.getFont("HELVETICA", 9, Font.NORMAL);
+				PdfPTable tabla = new PdfPTable(2);
+				float[] columnWidths4 = { 0.91f, 0.2f };
+				tabla.setWidths(columnWidths4);
+				tabla.setWidthPercentage(100);
 
-			// Crear la celda para la primera columna
-			PdfPCell celda1 = new PdfPCell(new Paragraph(
-					"A esta factura de venta aplica las normas relativas a la letra de cambio (artículo 5 ley 1231 de 2008) resolución y/o autorización de facturación electronica No."
-							+ numeroResolucion + " aprobado en " + fechaAprobado + " prefijo " + prefijo
-							+ " desde el número " + numeroInicial + " al " + numeroFinal
-							+ " estimado cliente, en amparo de la ley habeas data 1266/2008, le informamos que en la eventualidad de tener pagos atrasados en el servicio contratado,se generará el reporte negativo en las centrales de riesgo de información financiera. sí su factura tiene saldos anteriores el servicio será cortado el 1° día del siguiente mes la autoridad de inspección, vigilancia y control en materia de protección de los derechos de los usuarios es la superintendencia de industria y comercio: dirección: cra 13 no. 27 - 00 piso 5, bogotá - línea telefónica nacional: (57) 01 8000 910165 - correo electrónico: info@sic.gov.co",
-					fontParagraph3));
-			celda1.setBorder(Rectangle.NO_BORDER);
-			celda1.setHorizontalAlignment(Element.ALIGN_JUSTIFIED);
-			tabla.addCell(celda1);
+				// Crear la celda para la primera columna
+				PdfPCell celda1 = new PdfPCell(new Paragraph(
+						"A esta factura de venta aplica las normas relativas a la letra de cambio (artículo 5 ley 1231 de 2008) resolución y/o autorización de facturación electronica No."
+								+ numeroResolucion + " aprobado en " + fechaAprobado + " prefijo " + prefijo
+								+ " desde el número " + numeroInicial + " al " + numeroFinal
+								+ " estimado cliente, en amparo de la ley habeas data 1266/2008, le informamos que en la eventualidad de tener pagos atrasados en el servicio contratado,se generará el reporte negativo en las centrales de riesgo de información financiera. sí su factura tiene saldos anteriores el servicio será cortado el 1° día del siguiente mes la autoridad de inspección, vigilancia y control en materia de protección de los derechos de los usuarios es la superintendencia de industria y comercio: dirección: cra 13 no. 27 - 00 piso 5, bogotá - línea telefónica nacional: (57) 01 8000 910165 - correo electrónico: info@sic.gov.co",
+						fontParagraph3));
+				celda1.setBorder(Rectangle.NO_BORDER);
+				celda1.setHorizontalAlignment(Element.ALIGN_JUSTIFIED);
+				tabla.addCell(celda1);
 
-			// CODIGO QR
-			PdfPCell celda2 = new PdfPCell();
-			celda2.setBorder(Rectangle.NO_BORDER);
-			// Crear objeto Image y añadirlo a la celda
-			Image imagen = Image.getInstance(imagenQr);
-			celda2.addElement(imagen);
-			tabla.addCell(celda2);
-			// Agregar la tabla al documento
-			document.add(tabla);
+				// CODIGO QR
+				PdfPCell celda2 = new PdfPCell();
+				celda2.setBorder(Rectangle.NO_BORDER);
+				// Crear objeto Image y añadirlo a la celda
+				Image imagen = Image.getInstance(imagenQr);
+				celda2.addElement(imagen);
+				tabla.addCell(celda2);
+				// Agregar la tabla al documento
+				document.add(tabla);
+			}
 
 			// Agregar un espacio en blanco
 			Paragraph space2 = new Paragraph();
@@ -610,22 +643,24 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 
 			document.add(table2);
 
-			// Configurar la segunda página
-			document.setPageSize(PageSize.LETTER);
-			document.newPage();
-			PdfContentByte content2 = writer.getDirectContentUnder();
-			Image image = Image.getInstance(fondoB);
-			image.scaleToFit(pageSize.getWidth(), pageSize.getHeight());
-			image.setAbsolutePosition(0, 0);
-			content2.addImage(image);
-			Paragraph contenidoSegundaPagina = new Paragraph(" ");
-			document.add(contenidoSegundaPagina);
+			if (detalle.getOrigen().equals("A")) {
+				// Configurar la segunda página
+				document.setPageSize(PageSize.LETTER);
+				document.newPage();
+				PdfContentByte content2 = writer.getDirectContentUnder();
+				Image image = Image.getInstance(fondoB);
+				image.scaleToFit(pageSize.getWidth(), pageSize.getHeight());
+				image.setAbsolutePosition(0, 0);
+				content2.addImage(image);
+				Paragraph contenidoSegundaPagina = new Paragraph(" ");
+				document.add(contenidoSegundaPagina);
+			}
 			document.close();
 
 			return responseFactura;
 
 		} catch (DocumentException | IOException e) {
-			
+
 			throw new ExceptionNullSql(new Date(), "Error generado PDF", e.getMessage());
 
 		}
@@ -651,31 +686,33 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 	}
 
 	/**
-	 * formatear variable string para que sea un $ valro,00*/
+	 * formatear variable string para que sea un $ valro,00
+	 */
 	private String formatCurrency(String amount) {
-		if(!amount.isEmpty())
-		{
+		if (!amount.isEmpty()) {
 			Double valor = Double.parseDouble(amount);
 			Locale locale = new Locale("es", "CO"); // Define la localización a Colombia
 			NumberFormat currencyFormatter = DecimalFormat.getCurrencyInstance(locale);
 			return currencyFormatter.format(valor);
-		}else {
+		} else {
 			return null;
 		}
-		
+
 	}
+
 	/**
-	 * formatear variable double para que sea un $ valor , 00*/
+	 * formatear variable double para que sea un $ valor , 00
+	 */
 	private String formatCurrencyDouble(double amount) {
 		Locale locale = new Locale("es", "CO"); // Define la localización a Colombia
 		NumberFormat currencyFormatter = DecimalFormat.getCurrencyInstance(locale);
 		return currencyFormatter.format(amount);
 	}
-	
+
 	/**
-	 * @param fecha 202303 pasar a Marzo-2023*/
-	private String transformFecha(Integer fecha)
-	{
+	 * @param fecha 202303 pasar a Marzo-2023
+	 */
+	private String transformFecha(Integer fecha) {
 		String convert = fecha.toString();
 		String fechaSalida = "";
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMM");
@@ -684,17 +721,17 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 			SimpleDateFormat dateformatSalid = new SimpleDateFormat("MMMM-yyyy");
 			fechaSalida = dateformatSalid.format(fechaDate);
 		} catch (ParseException e) {
-			
+
 			throw new ExceptionNullSql(new Date(), "Transformando Fecha Integer", e.getMessage());
 		}
-		
+
 		return fechaSalida;
 	}
-	
+
 	/**
-	 * @param fecha 20230309 pasar a dias/mes/año*/
-	private String transformFechaCompleta(Integer fecha)
-	{
+	 * @param fecha 20230309 pasar a dias/mes/año
+	 */
+	private String transformFechaCompleta(Integer fecha) {
 		String convert = fecha.toString();
 		String fechaSalida = "";
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -702,52 +739,53 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 			Date fechaDate = dateFormat.parse(convert);
 			SimpleDateFormat dateformatSalid = new SimpleDateFormat("dd-MM-yyyy");
 			fechaSalida = dateformatSalid.format(fechaDate);
-		}catch(ParseException e)
-		{
+		} catch (ParseException e) {
 			throw new ExceptionNullSql(new Date(), "Transformando Fecha Integer", e.getMessage());
 		}
-		return  fechaSalida;
+		return fechaSalida;
 	}
 
 	/***
-	 * representación serializada de un arreglo asociativo o un mapa en PHP. 
-	 * Para mapearlo en Java, necesitarás utilizar una biblioteca de procesamiento de JSON, 
-	 * como Gson o Jackson, para deserializar el JSON y convertirlo a un objeto Java.
+	 * representación serializada de un arreglo asociativo o un mapa en PHP.
+	 * Para mapearlo en Java, necesitarás utilizar una biblioteca de procesamiento
+	 * de JSON,
+	 * como Gson o Jackson, para deserializar el JSON y convertirlo a un objeto
+	 * Java.
 	 */
-	private FacturaElectronicaResponseDTO desSerializable(String factura , Integer mesServicio , Long idEmpresa)
-	{
-		return  apiRestService.unSerializablePHP(factura , mesServicio , idEmpresa);
+	private FacturaElectronicaResponseDTO desSerializable(String factura, Integer mesServicio, Long idEmpresa) {
+		return apiRestService.unSerializablePHP(factura, mesServicio, idEmpresa);
 	}
 
-	/**DESCARGAR XML
-	 * Recuerda manejar las excepciones adecuadamente en tu código para lidiar con 
-	 * posibles errores de conexión o permisos de escritura en la ubicación de destino.
-	*/
-	private String downloadFileXML(String url , String nameEmpresa , String factura)
-	{
-		String armandoName = nameEmpresa+factura+".xml";
+	/**
+	 * DESCARGAR XML
+	 * Recuerda manejar las excepciones adecuadamente en tu código para lidiar con
+	 * posibles errores de conexión o permisos de escritura en la ubicación de
+	 * destino.
+	 */
+	private String downloadFileXML(String url, Empresa nameEmpresa, EmailCampaignDetalleDTO factura) {
+		String armandoName = nameEmpresa.getNit().toString() + nameEmpresa.getId()+ factura.getOrigen()+ factura.getFactura() + ".xml";
 		SystemConfig system = systemService.findByOrigen("facturas");
-		//String savePath = "/home/programador/Documentos/"+armandoName;
-		String savePath = system.getComando()+armandoName;
-		try { 
+		// String savePath = "/home/programador/Documentos/"+armandoName;
+		String savePath = system.getComando() + armandoName;
+		try {
 			RestTemplate restTemplate = new RestTemplate();
 
-        	ResponseEntity<Resource> response = restTemplate.exchange(url, HttpMethod.GET, null, Resource.class);
-        
+			ResponseEntity<Resource> response = restTemplate.exchange(url, HttpMethod.GET, null, Resource.class);
+
 			Resource resource = response.getBody();
-			
+
 			File file = new File(savePath);
-			
+
 			FileOutputStream outputStream = new FileOutputStream(file);
 
 			FileCopyUtils.copy(resource.getInputStream(), outputStream);
 
 			return savePath;
 
-        } catch (IOException e) { 
+		} catch (IOException e) {
 
-            throw new ExceptionNullSql(new Date(), "Error descargando archivo : "+e.getMessage(), e.getMessage());
-        }
+			throw new ExceptionNullSql(new Date(), "Error descargando archivo : " + e.getMessage(), e.getMessage());
+		}
 
 	}
 }

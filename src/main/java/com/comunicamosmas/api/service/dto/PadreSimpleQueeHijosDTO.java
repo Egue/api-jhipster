@@ -14,7 +14,7 @@ public class PadreSimpleQueeHijosDTO {
 	private String limitAt;
 	private String maxLimit;
 	private Integer reuso;
-	private List<MikrotikHijoSimpleQueue> hijos;
+	private List<MikrotikHijoSimpleDTO> hijos;
 	public PadreSimpleQueeHijosDTO() {
 		 
 	}
@@ -60,10 +60,10 @@ public class PadreSimpleQueeHijosDTO {
 	public void setReuso(Integer reuso) {
 		this.reuso = reuso;
 	}
-	public List<MikrotikHijoSimpleQueue> getHijos() {
+	public List<MikrotikHijoSimpleDTO> getHijos() {
 		return hijos;
 	}
-	public void setHijos(List<MikrotikHijoSimpleQueue> hijos) {
+	public void setHijos(List<MikrotikHijoSimpleDTO> hijos) {
 		this.hijos = hijos;
 	}
 	@Override

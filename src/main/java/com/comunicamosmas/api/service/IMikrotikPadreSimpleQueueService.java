@@ -9,6 +9,8 @@ import java.util.List;
 public interface IMikrotikPadreSimpleQueueService {
     public void save(MikrotikPadreSimpleQueue mikrotikPadreSimpleQueue);
 
+    public void deleteById(Long idPadre);
+
     public MikrotikPadreSimpleQueue findByVelocidad(String namePadre, String velocidad, Long reuso, Long estacion);
 
     public MikrotikPadreSimpleQueue findByIdPlanAndReuso(Long idPlan, Long reuso, Long idEstacion);

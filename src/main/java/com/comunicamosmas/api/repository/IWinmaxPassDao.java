@@ -32,7 +32,7 @@ public interface IWinmaxPassDao extends CrudRepository<WinmaxPass, Long> {
     		+ "END as nombreCliente,\n"
     		+ "winmax_pass.usuario,\n"
     		+ "winmax_pass.pass,\n"
-    		+ "winmax_pass.marca ,\n"
+    		+ " CASE WHEN winmax_pass.marca ='0000-00-00 00:00:00' THEN '2018-08-01 12:00:00' ELSE winmax_pass.marca END as marca,\n"
     		+ "ttg.nombre as nombreTecnologia,\n"
     		+ "ta.velocidad ,\n"
     		+ "ta.nombre as nombreTarifa,\n"

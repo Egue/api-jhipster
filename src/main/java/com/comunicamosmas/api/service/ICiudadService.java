@@ -1,6 +1,8 @@
 package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.Ciudad;
+import com.comunicamosmas.api.service.dto.CiudadesDTO;
+
 import java.util.List;
 
 public interface ICiudadService {
@@ -15,4 +17,6 @@ public interface ICiudadService {
 
     //buscar por id
     public Ciudad findById(Long id);
+
+    public List<CiudadesDTO> findByUser(Long id);
 }

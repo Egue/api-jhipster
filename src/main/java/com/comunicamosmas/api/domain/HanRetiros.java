@@ -52,7 +52,18 @@ public class HanRetiros implements Serializable {
 
     @Column(name="id_servicio")
     private Long idServicio;
+
+    private String reportado;
     
+
+    
+    public String getReportado() {
+        return reportado;
+    }
+
+    public void setReportado(String reportado) {
+        this.reportado = reportado;
+    }
 
     public Long getIdServicio() {
         return idServicio;
