@@ -32,13 +32,13 @@ spring:
       indent-output: true
   datasource:
     #type: com.zaxxer.hikari.HikariDataSource
-    #url: jdbc:mysql://131.221.41.58:33306/controlmas_0731?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+    #url: jdbc:mysql:// /controlmas_0731?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
     #url: jdbc:mysql://127.0.0.1:3306/controlmas?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
     #url: jdbc:mysql://10.111.39.3:3306/controlmas?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
     #username: LNWW(345
     #password: 9C9UAaqKecHRZA79
-    username: root
-    password: '@@@server'
+    username:  
+    password:  
     driver-class-name: com.mysql.jdbc.Driver
     hikari:
       poolName: Hikari
