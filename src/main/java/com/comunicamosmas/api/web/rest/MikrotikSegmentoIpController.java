@@ -5,6 +5,8 @@ import com.comunicamosmas.api.domain.MikrotikSegmentoIp;
 import com.comunicamosmas.api.service.IEstacionService;
 import com.comunicamosmas.api.service.IMikrotikIpService;
 import com.comunicamosmas.api.service.IMikrotikSegmentoIpService;
+import com.comunicamosmas.api.service.dto.SegmentoIPDTO;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +92,7 @@ public class MikrotikSegmentoIpController {
     /**
      *
      * ENDPOINT POST save*/
-    @PostMapping("/mikrotiksegmento/save")
+    /*@PostMapping("/mikrotiksegmento/save")
     public ResponseEntity<?> save(@RequestBody MikrotikSegmentoIp mikrotikSegmentoIp) {
         Map<String, Object> response = new HashMap<>();
         try {
@@ -120,5 +122,23 @@ public class MikrotikSegmentoIpController {
 
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
         }
-    }
+    }*/
+    @PostMapping("/mikrotiksegmento/save")
+    public ResponseEntity<?> save(@RequestBody SegmentoIPDTO segmento)
+    {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+
+            mikrotikSegmentoIpService.save(segmento);
+
+            response.put("response", "creado");
+
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            response.put("response", e.getMessage());
+
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+        }
+    }   
 }

@@ -35,6 +35,8 @@ public class AdminUserDTO {
 
     private boolean activated = false;
 
+    private String activationKey;
+
     @Size(min = 2, max = 10)
     private String langKey;
 
@@ -63,6 +65,7 @@ public class AdminUserDTO {
         this.langKey = user.getLangKey();
         this.createdBy = user.getCreatedBy();
         this.createdDate = user.getCreatedDate();
+        this.activationKey = user.getActivationKey();
         this.lastModifiedBy = user.getLastModifiedBy();
         this.lastModifiedDate = user.getLastModifiedDate();
         this.authorities = user.getAuthorities().stream().map(Authority::getName).collect(Collectors.toSet());
@@ -189,5 +192,13 @@ public class AdminUserDTO {
             ", lastModifiedDate=" + lastModifiedDate +
             ", authorities=" + authorities +
             "}";
+    }
+
+    public String getActivationKey() {
+        return activationKey;
+    }
+
+    public void setActivationKey(String activationKey) {
+        this.activationKey = activationKey;
     }
 }

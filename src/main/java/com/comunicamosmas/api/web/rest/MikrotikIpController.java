@@ -1,12 +1,20 @@
 package com.comunicamosmas.api.web.rest;
 
 import com.comunicamosmas.api.domain.MikrotikIp;
+import com.comunicamosmas.api.domain.MikrotikSegmentoIp;
 import com.comunicamosmas.api.service.IMikrotikIpService;
 import com.comunicamosmas.api.service.IMikrotikSegmentoIpService;
-import com.comunicamosmas.api.service.dto.ClassErrorDTO; 
+import com.comunicamosmas.api.service.dto.ClassErrorDTO;
+import com.comunicamosmas.api.service.dto.MikrotikQueueSimplePadreDTO;
+import com.comunicamosmas.api.service.dto.MikrotikSegmentoIPDTO;
+import com.comunicamosmas.api.service.dto.SegmentoIPDTO;
+import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +22,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -97,24 +107,30 @@ public class MikrotikIpController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            List<MikrotikIp> list = mikrotikIpService.findByIdPool(id);
+            List<MikrotikIp>  list =  mikrotikIpService.findByIdPool(id);
 
             response.put("response", list);
 
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
-        } catch (Exception e) {
-            response.put("response", e.getMessage());
+        }catch(ExceptionNullSql j ) 
+        {
+            response.put("response", j.getMessage());
 
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+        }
+        catch (Exception e) {
+            response.put("response", e.getMessage());
+
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     /**ENDPOINT GET*/
-    @GetMapping("/mikrotikip/updatedforusado/{id}")
-    public ResponseEntity<?> updatedForUsado(@PathVariable Long id) {
+    @PostMapping("/mikrotikip/updatedforusado")
+    public ResponseEntity<?> updatedForUsado(@RequestBody MikrotikQueueSimplePadreDTO.Segmento ip ) {
         Map<String, Object> response = new HashMap<>();
         try {
-            mikrotikIpService.updatedStatus(id);
+            mikrotikIpService.updatedStatus(ip);
 
             response.put("response", "ip Actualizada como usada");
 

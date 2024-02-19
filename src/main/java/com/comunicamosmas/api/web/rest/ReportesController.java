@@ -99,7 +99,8 @@ public class ReportesController {
             headerRow.createCell(23).setCellValue("Modalidad");
             headerRow.createCell(24).setCellValue("Vendedor");
             headerRow.createCell(25).setCellValue("Correo");
-
+            headerRow.createCell(26).setCellValue("Estación");
+            
             int rowNum = 1;
 
             for(CarteraDTO registro : result)
@@ -133,6 +134,7 @@ public class ReportesController {
                 row.createCell(23).setCellValue(registro.getModalidad());
                 row.createCell(24).setCellValue(registro.getVendedor());
                 row.createCell(25).setCellValue(registro.getMail());
+                row.createCell(26).setCellValue(registro.getEstacion());
 
             }
 

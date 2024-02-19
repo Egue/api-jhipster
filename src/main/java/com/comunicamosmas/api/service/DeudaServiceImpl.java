@@ -4,15 +4,13 @@ import com.comunicamosmas.api.domain.Deuda;
 import com.comunicamosmas.api.domain.EmailCampaign;
 import com.comunicamosmas.api.repository.IDeudaDao;
 import com.comunicamosmas.api.repository.IPagoDao;
-import com.comunicamosmas.api.service.dto.DeudasForFacturaDTO;
-import com.comunicamosmas.api.service.dto.EmailCampaignApiDTO;
+import com.comunicamosmas.api.service.dto.DeudasForFacturaDTO; 
 import com.comunicamosmas.api.service.dto.EmailCampaignDetalleDTO;
 import com.comunicamosmas.api.service.dto.EstadoCuentaDeudasDTO;
 import com.comunicamosmas.api.service.dto.PagosEstadoCuentaDTO;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 
-import java.sql.Timestamp;
-import java.time.Instant;
+import java.sql.Timestamp; 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -216,6 +214,12 @@ public class DeudaServiceImpl implements IDeudaService {
 		}).orElse(new ArrayList<>());
 
 		return facturas;
+	}
+
+	@Override
+	public List<Optional<Object[]>> findDeudasByIdContrato(Long idContrato) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'findDeudasByIdContrato'");
 	}
 
 }

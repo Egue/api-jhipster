@@ -180,7 +180,7 @@ public class ContratoServiceImpl implements IContratoService {
 				obj.setDepartamento(rs[32] != null ? rs[32].toString() : "-");
 				obj.setT_tipo_tecnologia(rs[33] != null ? rs[33].toString() : "-");
 				obj.setVendedor(rs[34] != null ? rs[34].toString() : "-");
-
+				obj.setEstacion(rs[35] != null ? rs[35].toString() : "-");
 				return obj;
 			}).collect(Collectors.toList())).orElse(new ArrayList<>());
 

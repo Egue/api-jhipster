@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,9 +31,11 @@ import com.comunicamosmas.api.service.dto.MikrotikPPPActiveDTO;
 import com.comunicamosmas.api.service.dto.MikrotikPPPProfileDTO;
 import com.comunicamosmas.api.service.dto.MikrotikPPPSecretDTO;
 import com.comunicamosmas.api.service.dto.MikrotikQueueSimpleDTO;
+import com.comunicamosmas.api.service.dto.SegmentoIPDTO;
+import com.comunicamosmas.api.service.dto.MikrotikQueueSimplePadreDTO;
 import com.comunicamosmas.api.service.dto.ValorStringDTO;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
-
+ 
 import me.legrange.mikrotik.MikrotikApiException;
 
 @RestController
@@ -335,13 +338,12 @@ public class MikrotikController {
 	 * crear nuevo padre en colas simple
 	 */
 	@PostMapping("/mikrotik/padreQueuesimple/save")
-	public ResponseEntity<?> padreQueuesimple(@RequestParam Long idPlan, @RequestParam Long idEstacion,
-			@RequestParam Long idIp) {
+	public ResponseEntity<?> padreQueuesimple(@RequestBody MikrotikQueueSimplePadreDTO create) {
 		Map<String, Object> response = new HashMap<>();
 		try {
 
-			MikrotikPadreSimpleQueue padre = mikrotikService.padreQueuesimple(idPlan, idEstacion, idIp);
-
+			MikrotikPadreSimpleQueue padre = mikrotikService.padreQueuesimple(create);
+			
 			response.put("response", padre);
 
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
@@ -361,14 +363,11 @@ public class MikrotikController {
 	 * crear nuevo hijo en colas simple de un padre ya existente
 	 */
 	@PostMapping("/mikrotik/hijoQueuesimple/save")
-	public ResponseEntity<?> hijoQueuesimple(@RequestParam Long idPlan,
-			@RequestParam Long idEstacion, @RequestParam Long idIp, @RequestParam Long idContrato,
-			@RequestParam Long idPadre) {
+	public ResponseEntity<?> hijoQueuesimple(@RequestBody MikrotikQueueSimplePadreDTO padre) {
 		Map<String, Object> response = new HashMap<>();
 		try {
 
-			MikrotikHijoSimpleQueue hijo = mikrotikService.hijoQueueSimple(idPlan, idIp, idPadre, idContrato,
-					idEstacion);
+			MikrotikHijoSimpleQueue hijo = mikrotikService.hijoQueueSimple(padre);
 
 			response.put("response", hijo);
 
@@ -471,6 +470,33 @@ public class MikrotikController {
 
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 			
+		} catch (ExceptionNullSql e) {
+			response.put("response", e.getMessage() + ":" + e.getDetails());
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+			// TODO: handle exception
+		}catch(Exception e)
+		{
+			response.put("response", e.getMessage());
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	/*
+	 * MIKROTIK 
+	 * module: IP
+	 * @param idEstacion
+	 */
+	@GetMapping("/mikrotik/ip/pool/{id}")
+	public ResponseEntity<?> mikrotik_ip_pool(@PathVariable Long id)
+	{
+		Map<String , Object> response = new HashMap<>();
+
+		try {
+
+			List<Map<String, String>> result = mikrotikService.findInRBIPPool(id);
+			response.put("response", result);
+
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 		} catch (ExceptionNullSql e) {
 			response.put("response", e.getMessage() + ":" + e.getDetails());
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);

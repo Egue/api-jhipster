@@ -186,8 +186,6 @@ public class ApiRestServiceImpl implements IApiRestService {
 			List<SupergirosPagosDTO> list = supergiros.getResponse();
 
 			for (SupergirosPagosDTO rs : list) {
-				// System.out.print("cliente: " + rs.getCc_cliente() + ", contrato:
-				// "+rs.getNumero_referencia()+"\n");
 				String[] partes = rs.getNumero_referencia().split("A");
 				// [0] contrato;
 				// [1] cedula;

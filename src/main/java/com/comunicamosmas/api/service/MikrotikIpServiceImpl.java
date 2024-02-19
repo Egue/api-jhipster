@@ -1,18 +1,38 @@
 package com.comunicamosmas.api.service;
 
-import com.comunicamosmas.api.domain.MikrotikIp;
-import com.comunicamosmas.api.repository.IMikrotikIpDao;
-import com.comunicamosmas.api.service.dto.ClassErrorDTO; 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.comunicamosmas.api.domain.Estacion;
+import com.comunicamosmas.api.domain.MikrotikIp; 
+import com.comunicamosmas.api.repository.IMikrotikIpDao;
+import com.comunicamosmas.api.service.dto.ClassErrorDTO;
+import com.comunicamosmas.api.service.dto.MikrotikQueueSimplePadreDTO;
+import com.comunicamosmas.api.service.dto.SegmentoIPDTO;
+import com.comunicamosmas.api.service.dto.SegmentoIPDTO.Pool; 
 
 @Service
 public class MikrotikIpServiceImpl implements IMikrotikIpService {
 
     @Autowired
     IMikrotikIpDao mikrotikIpDao;
+
+    @Autowired
+    IEstacionService estacionService;
+
+    @Autowired
+    IApiRBMikrotikService apiRBMikrotikService;
+
+    @Autowired
+    IGlobalFunctionsService globalFunctionsService;
+ 
 
     @Override
     public void save(MikrotikIp mikrotikIp) {
@@ -117,12 +137,21 @@ public class MikrotikIpServiceImpl implements IMikrotikIpService {
     }
 
     @Override
-    public void updatedStatus(Long id) {
-        MikrotikIp findIp = mikrotikIpDao.findById(id).orElse(null);
+    public void updatedStatus(MikrotikQueueSimplePadreDTO.Segmento segmento) {
 
-        findIp.setEstado(1L);
+        //MikrotikIp findIp = mikrotikIpDao.findById(id).orElse(null);
+        MikrotikIp ip = new MikrotikIp();
+        if(segmento.getId() != 0)
+        {
+            ip.setId(segmento.getId());            
+        } 
 
-        mikrotikIpDao.save(findIp);
+        ip.setIp(segmento.getIp());
+        ip.setEstado(1L);
+        ip.setIdSegmentoIp(segmento.getIdSegmentoIp());
+         
+
+        mikrotikIpDao.save(ip);
     }
 
     @Override
@@ -162,8 +191,104 @@ public class MikrotikIpServiceImpl implements IMikrotikIpService {
     }
 
     @Override
-    public List<MikrotikIp> findByIdPool(Long idPool) {
-        // TODO Auto-generated method stub
-        return (List<MikrotikIp>) mikrotikIpDao.findByIdPool(idPool);
+    public List<MikrotikIp>  findByIdPool(Long idPool) {
+         
+
+        Optional<List<Object[]>> result = mikrotikIpDao.findByIdPool(idPool);
+        Pool name = new Pool();
+        SegmentoIPDTO segmento = new SegmentoIPDTO(); 
+        result.ifPresent(resp -> {
+            for(Object[] rs : resp)
+            {
+                name.setName((String) rs[2]);
+                long stationId = (long) (int) rs[1];
+                segmento.setIdEstacion(stationId);
+                long idSegmento = (long) (int) rs[0];
+                segmento.setIdPool(idSegmento);
+            }
+
+        });
+        if(result.isEmpty())
+        {
+            return new ArrayList<>();
+        }
+        //consultar ip disponibles 
+        List<MikrotikIp> mikrotikIp = this.findAllBySegmentoIp(segmento.getIdPool()); //es el id_segmento solo q se guarda en el idPool
+        //realizamos un filtro de disponibles
+        //si esta vacio continuar con el range
+
+        List<MikrotikIp> mikrotikIpActive = mikrotikIp.stream()
+                                    .filter(ip -> ip.getEstado() == 0)
+                                    .collect(Collectors.toList());
+        //validamos si hay disponibles
+        if(!mikrotikIpActive.isEmpty())
+        {
+            return (List<MikrotikIp>) mikrotikIpActive.get(0);
+        }
+        //filtramos las usadas
+        List<MikrotikIp> mikrotikUsadas = mikrotikIp.stream()
+                                    .filter(ip -> ip.getEstado() == 1)
+                                    .collect(Collectors.toList());
+         
+        String command = "/ip/pool/print where name="+name.getName();
+
+        Estacion estacion = estacionService.findById(segmento.getIdEstacion());
+
+        List<Map<String,String>> getPool = apiRBMikrotikService.listSendCommand(command, estacion);
+
+        String range = null;
+        
+        if(getPool != null)
+        {
+            for(Map<String, String> rs : getPool )
+            {
+                range = rs.get("ranges");
+            }
+        }
+
+        String [] rangePart = range.split("\\,");
+        List<String> ips = new ArrayList<>();
+        for(String rang : rangePart)
+        {
+            String[] guion = rang.split("\\-");
+            ips = globalFunctionsService.generateIPRange(guion[0], guion[1]);
+        }
+        //validamos si 
+        if(mikrotikUsadas.isEmpty())
+        {
+            String oneIp = ips.get(0);
+
+            List<MikrotikIp> oneMikrotikIp = new ArrayList<>();
+            MikrotikIp obj = new MikrotikIp();
+            obj.setEstado(0L);
+            obj.setIp(oneIp);
+            obj.setIdSegmentoIp(segmento.getIdPool()); 
+
+            oneMikrotikIp.add(obj);
+
+            return oneMikrotikIp;
+        }else{
+
+            List<String> finalList = new ArrayList<>(ips);
+
+            for(MikrotikIp active: mikrotikUsadas)
+            {
+                    finalList.remove(active.getIp());
+            }
+            String oneIp = finalList.get(0);
+            List<MikrotikIp> oneMikrotikIp = new ArrayList<>();
+            MikrotikIp obj = new MikrotikIp();
+            obj.setEstado(0L);
+            obj.setIp(oneIp);
+            obj.setIdSegmentoIp(segmento.getIdPool()); 
+
+            oneMikrotikIp.add(obj);
+
+            return oneMikrotikIp;
+
+        }
+
+
+
     }
 }

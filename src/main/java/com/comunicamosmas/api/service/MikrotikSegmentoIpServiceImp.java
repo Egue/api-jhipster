@@ -2,6 +2,7 @@ package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.MikrotikSegmentoIp;
 import com.comunicamosmas.api.repository.IMikrotikSegmentoIpDao;
+import com.comunicamosmas.api.service.dto.SegmentoIPDTO;
 import com.comunicamosmas.api.service.dto.SegmentoWithPoolDTO; 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +28,24 @@ public class MikrotikSegmentoIpServiceImp implements IMikrotikSegmentoIpService 
     }
 
     @Override
-    public void save(MikrotikSegmentoIp mikrotikSegmentoIp) {
-        mikrotikSegmentoIpDao.save(mikrotikSegmentoIp);
+    public void save(SegmentoIPDTO mikrotikSegmentoIp) {
+        MikrotikSegmentoIp segmento = new MikrotikSegmentoIp();
+        if(mikrotikSegmentoIp.getId() != null ){
+            
+            segmento.setId(mikrotikSegmentoIp.getId());
+            segmento.setEstado(mikrotikSegmentoIp.getEstado());
+            segmento.setIdEstacion(mikrotikSegmentoIp.getIdEstacion());
+            segmento.setIdPool(mikrotikSegmentoIp.getIdPool());
+            segmento.setSegmento(mikrotikSegmentoIp.getSegmento().getName());
+            
+        }else{
+            
+            segmento.setEstado(mikrotikSegmentoIp.getEstado());
+            segmento.setIdEstacion(mikrotikSegmentoIp.getIdEstacion());
+            segmento.setIdPool(mikrotikSegmentoIp.getIdPool());
+            segmento.setSegmento(mikrotikSegmentoIp.getSegmento().getName());
+        }
+        mikrotikSegmentoIpDao.save(segmento);
     }
 
     @Override

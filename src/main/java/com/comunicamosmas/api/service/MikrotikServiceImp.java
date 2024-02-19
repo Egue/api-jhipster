@@ -30,6 +30,7 @@ import com.comunicamosmas.api.service.dto.MikrotikPPPActiveDTO;
 import com.comunicamosmas.api.service.dto.MikrotikPPPProfileDTO;
 import com.comunicamosmas.api.service.dto.MikrotikPPPSecretDTO;
 import com.comunicamosmas.api.service.dto.MikrotikQueueSimpleDTO;
+import com.comunicamosmas.api.service.dto.MikrotikQueueSimplePadreDTO;
 import com.comunicamosmas.api.service.dto.ValorStringDTO;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 
@@ -461,19 +462,20 @@ public class MikrotikServiceImp implements IMikrotikService {
 
     @SuppressWarnings("null")
     @Override
-    public MikrotikPadreSimpleQueue padreQueuesimple(Long idPlan, Long idEstacion, Long idIp) {
+    public MikrotikPadreSimpleQueue padreQueuesimple(MikrotikQueueSimplePadreDTO create) {
         // consultar recuperar bajada y subida del idPlan y reuso
         try {
 
-            MikrotikTarifaReuso plan = tarifaReusoService.findById(idPlan);
-            //
-            MikrotikIp mikrotikIp = mikrotikIpService.findById(idIp);
+            MikrotikTarifaReuso plan = tarifaReusoService.findById(create.getIdPlan()); //del pladre 
+            //con consultat por q ya viene la ip
+            //MikrotikIp mikrotikIp = mikrotikIpService.findById(idIp);
 
-            String ip = mikrotikIp.getIp();
+            //String ip = mikrotikIp.getIp();
+            String ip = create.getSegmento().getIp();
 
             // consultar si ya existe padre libre
-            MikrotikPadreSimpleQueue padre = padreSimpleQueueService.findByIdPlanAndReuso(idPlan, plan.getReuso(),
-                    idEstacion);
+            MikrotikPadreSimpleQueue padre = padreSimpleQueueService.findByIdPlanAndReuso(create.getIdPlan(), plan.getReuso(),
+                    create.getIdEstacion());
             if (padre != null) {
                 // existe padre disponible retornamos el padre
                 Long reuso = padre.getReuso() + 1;
@@ -484,7 +486,7 @@ public class MikrotikServiceImp implements IMikrotikService {
                 return padre;
             } else {
                 // creamos el padre en la rb
-                Estacion estacion = estacionService.findById(idEstacion);
+                Estacion estacion = estacionService.findById(create.getIdEstacion());
 
                 UUID uuid = UUID.randomUUID();
 
@@ -495,9 +497,6 @@ public class MikrotikServiceImp implements IMikrotikService {
                 String limit = plan.getSubida() + "/" + plan.getBajada();
 
                 String max = limit;
-
-                this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(),
-                        estacion.getApiPort());
 
                 String command = "/queue/simple/add comment='" +
                         plan.getComment() +
@@ -510,14 +509,12 @@ public class MikrotikServiceImp implements IMikrotikService {
                         "' target=" +
                         ip +
                         "/32";
-
-                apiConnection.execute(command);
-
-                this.logout();
+                //se crea en la Rb
+                this.apiMikrotikService.sendCommando(command, estacion);
 
                 MikrotikPadreSimpleQueue newPadre = new MikrotikPadreSimpleQueue();
                 newPadre.setComment(plan.getComment());
-                newPadre.setIdEstacion(idEstacion);
+                newPadre.setIdEstacion(create.getIdEstacion());
                 newPadre.setIdTarifaReuso(plan.getId());
                 newPadre.setLimitAt(limit);
                 newPadre.setMaxLimit(max);
@@ -528,11 +525,7 @@ public class MikrotikServiceImp implements IMikrotikService {
 
                 return newPadre;
             }
-        } catch (MikrotikApiException e) {
-
-            throw new ExceptionNullSql(new Date(), "Error en Rb", e.getMessage());
-
-        } catch (Exception e) {
+        }  catch (Exception e) {
             throw new ExceptionNullSql(new Date(), "Error base de datos", e.getMessage());
         }
 
@@ -616,18 +609,21 @@ public class MikrotikServiceImp implements IMikrotikService {
         // TODO Auto-generated method stub
 
     }
-
+    /**
+     * step 2
+    */
     @Override
-    public MikrotikHijoSimpleQueue hijoQueueSimple(Long idPlan, Long idIp, Long idPadre, Long idContrato,
-            Long idEstacion) {
+    public MikrotikHijoSimpleQueue hijoQueueSimple(MikrotikQueueSimplePadreDTO padre) {
         try {
 
             // consultar recuperar bajada y subida del idPlan y reuso
-            MikrotikTarifaReuso plan = tarifaReusoService.findById(idPlan);
+            MikrotikTarifaReuso plan = tarifaReusoService.findById(padre.getIdPlan());
+            //100M/100M dividido en el reuso 4-8
             String limit = this.generarLimit(plan.getSubida(), plan.getBajada(), plan.getReuso());
             // consultamos la ip
-            MikrotikIp ip = mikrotikIpService.findById(idIp);
-            MikrotikPadreSimpleQueue padre = padreSimpleQueueService.findById(idPadre);
+            //MikrotikIp ip = mikrotikIpService.findById(idIp);
+            String ip = padre.getSegmento().getIp();
+            MikrotikPadreSimpleQueue findPadre = padreSimpleQueueService.findById(padre.getIdPlan());
             String command = "/queue/simple/add limit-at=" +
                     limit +
                     " max-limit=" +
@@ -1223,6 +1219,19 @@ public class MikrotikServiceImp implements IMikrotikService {
         } catch (MikrotikApiException e) {
             throw new ExceptionNullSql(new Date(), "Error ejecuando comando :", commando);
         }
+    }
+
+    /**Mikrotik
+     * Ip->Pool
+     */
+    @Override
+    public List<Map<String, String>> findInRBIPPool(Long idEstacion) {
+        // TODO Auto-generated method stub
+        Estacion estacion = estacionService.findById(idEstacion);
+         String command = "/ip/pool/print";
+         List<Map<String , String>> ipPool = apiMikrotikService.listSendCommand(command, estacion);
+
+         return ipPool;
     }
 
     /*

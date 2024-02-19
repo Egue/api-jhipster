@@ -36,4 +36,7 @@ public interface IDeudaService {
     public Optional<List<Object[]>> findSalgoAnterior(Integer fecha , List<Integer> consulta);
 
     public List<EmailCampaignDetalleDTO> findDeudaByIdCampaingAndOrigen(String factura , Integer idCampaign);
+
+    //find deudas por id_contrato
+    public List<Optional<Object[]>> findDeudasByIdContrato(Long idContrato);
 }

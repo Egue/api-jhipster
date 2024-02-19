@@ -39,9 +39,19 @@ public class CarteraDTO implements Serializable{
     private String departamento;
     private String t_tipo_tecnologia;
     private String vendedor;
-
+    private String estacion;
 
     
+
+    public String getEstacion() {
+        return estacion;
+    }
+
+
+    public void setEstacion(String estacion) {
+        this.estacion = estacion;
+    }
+
 
     public CarteraDTO() {
     }

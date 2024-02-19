@@ -167,9 +167,9 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 		String telefonoCliente = cliente.getCelular();
 
 		// link de fondo
-		String fondoA = "http://10.111.39.3/control/archivos/fondo_factura/" + empresa.getFondoFactura();
+		String fondoA = "http://10.112.109.2/control/archivos/fondo_factura/" + empresa.getFondoFactura();
 		//String fondoA = "http://190.121.145.227:9050/control/archivos/fondo_factura/" + empresa.getFondoFactura();
-		String fondoB = "http://10.111.39.3/control/archivos/fondo_factura/" + empresa.getFondoFacturaB();
+		String fondoB = "http://10.112.109.2/control/archivos/fondo_factura/" + empresa.getFondoFacturaB();
 		//String fondoB = "http://190.121.145.227:9050/control/archivos/fondo_factura/" + empresa.getFondoFacturaB();
 
 		// factura

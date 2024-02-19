@@ -62,6 +62,7 @@ public class ReconexionCron {
 		 
 			
 	}
+	
 	//@Scheduled(cron ="0 0/30 * * * ?")//cada hora
 	//@Scheduled(cron ="0 0/16 * * * *")
 	public void pagosSupergiros()

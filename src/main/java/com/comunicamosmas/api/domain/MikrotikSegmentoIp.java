@@ -31,6 +31,11 @@ public class MikrotikSegmentoIp implements Serializable {
     private Long idPool;
 
     private String estado;
+    
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getEstado() {
         return estado;

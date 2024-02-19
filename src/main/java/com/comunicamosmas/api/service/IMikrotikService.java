@@ -9,13 +9,14 @@ import com.comunicamosmas.api.service.dto.MikrotikPPPActiveDTO;
 import com.comunicamosmas.api.service.dto.MikrotikPPPProfileDTO;
 import com.comunicamosmas.api.service.dto.MikrotikPPPSecretDTO;
 import com.comunicamosmas.api.service.dto.MikrotikQueueSimpleDTO;
+import com.comunicamosmas.api.service.dto.MikrotikQueueSimplePadreDTO;
 import com.comunicamosmas.api.service.dto.ValorStringDTO;
 
 import java.util.List;
 import java.util.Map;
 import me.legrange.mikrotik.ApiConnectionException;
 import me.legrange.mikrotik.MikrotikApiException;
-
+ 
 public interface IMikrotikService {
     //pruebas
     public void conection(String user, String password, String ip, long port) throws MikrotikApiException;
@@ -36,14 +37,16 @@ public interface IMikrotikService {
 
     //nuevas instancias
     //crea solo el padre o busca uno nuevo
-    public MikrotikPadreSimpleQueue padreQueuesimple(Long idPlan, Long idEstacion, Long idIp);
+    /*Step 1 */
+    public MikrotikPadreSimpleQueue padreQueuesimple(MikrotikQueueSimplePadreDTO create);
 
     //crea el secrect en el ppoe
     public WinmaxPass pppSecrect(Long idContrato, Long idEstacion, String profile, String nameSecrect, String pass)
         throws MikrotikApiException;
 
     //crea el hijo
-    public MikrotikHijoSimpleQueue hijoQueueSimple(Long idPlan, Long idIp, Long idPadre, Long idContrato, Long idEstacion);
+    /*step 2 */
+    public MikrotikHijoSimpleQueue hijoQueueSimple(MikrotikQueueSimplePadreDTO padre);
 
     //actualiza el target del hijo creado
     public MikrotikPadreSimpleQueue updatedTargetPadreInRB(Long idEstacion, Long idPadre) throws MikrotikApiException;
@@ -84,4 +87,9 @@ public interface IMikrotikService {
 
     //actualizar profile
     public List<String> updatedProfileEstacion(Long idEstacion);
+
+    /*Mirotik
+     * Ip -> pool
+     */
+    public List<Map<String,String>> findInRBIPPool(Long idEstacion);
 }
