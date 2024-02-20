@@ -31,7 +31,9 @@ import com.comunicamosmas.api.service.dto.MikrotikPPPActiveDTO;
 import com.comunicamosmas.api.service.dto.MikrotikPPPProfileDTO;
 import com.comunicamosmas.api.service.dto.MikrotikPPPSecretDTO;
 import com.comunicamosmas.api.service.dto.MikrotikQueueSimpleDTO;
+import com.comunicamosmas.api.service.dto.MikrotikQueueSimpleHijoDTO;
 import com.comunicamosmas.api.service.dto.SegmentoIPDTO;
+import com.comunicamosmas.api.service.dto.UpdateRemoteAddress;
 import com.comunicamosmas.api.service.dto.MikrotikQueueSimplePadreDTO;
 import com.comunicamosmas.api.service.dto.ValorStringDTO;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
@@ -210,11 +212,10 @@ public class MikrotikController {
 	 * actualizacion del remote address en el secrect
 	 */
 	@PostMapping("/mikrotik/ppp/secret/updatedremoteaddres")
-	public ResponseEntity<?> pppUpdatedremoteaddres(@RequestParam Long idWinmaxPass, @RequestParam Long idEstacion,
-			@RequestParam Long idIp) {
+	public ResponseEntity<?> pppUpdatedremoteaddres(@RequestBody UpdateRemoteAddress remote) {
 		Map<String, Object> response = new HashMap<>();
 		try {
-			WinmaxPass winmaxPass = mikrotikService.updatedRemoteAddress(idWinmaxPass, idEstacion, idIp);
+			WinmaxPass winmaxPass = mikrotikService.updatedRemoteAddress(remote);
 
 			response.put("response", "Remote address actualizado");
 
@@ -363,7 +364,7 @@ public class MikrotikController {
 	 * crear nuevo hijo en colas simple de un padre ya existente
 	 */
 	@PostMapping("/mikrotik/hijoQueuesimple/save")
-	public ResponseEntity<?> hijoQueuesimple(@RequestBody MikrotikQueueSimplePadreDTO padre) {
+	public ResponseEntity<?> hijoQueuesimple(@RequestBody MikrotikQueueSimpleHijoDTO padre) {
 		Map<String, Object> response = new HashMap<>();
 		try {
 
@@ -374,7 +375,7 @@ public class MikrotikController {
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 
 		} catch (ExceptionNullSql e) {
-			padreSimpleQueueService.eliminarTarget(idPadre, idIp);
+			 
 
 			response.put("response", e.getMessage() + ":" + e.getDetails());
 
@@ -383,7 +384,7 @@ public class MikrotikController {
 			// ir a base de datos y quitar el padre
 
 			response.put("response", e.getMessage());
-			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 

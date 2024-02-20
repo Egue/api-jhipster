@@ -7,6 +7,7 @@ import com.comunicamosmas.api.service.IMikrotikSegmentoIpService;
 import com.comunicamosmas.api.service.dto.ClassErrorDTO;
 import com.comunicamosmas.api.service.dto.MikrotikQueueSimplePadreDTO;
 import com.comunicamosmas.api.service.dto.MikrotikSegmentoIPDTO;
+import com.comunicamosmas.api.service.dto.SegmentoDTO;
 import com.comunicamosmas.api.service.dto.SegmentoIPDTO;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 
@@ -127,7 +128,7 @@ public class MikrotikIpController {
 
     /**ENDPOINT GET*/
     @PostMapping("/mikrotikip/updatedforusado")
-    public ResponseEntity<?> updatedForUsado(@RequestBody MikrotikQueueSimplePadreDTO.Segmento ip ) {
+    public ResponseEntity<?> updatedForUsado(@RequestBody SegmentoDTO ip ) {
         Map<String, Object> response = new HashMap<>();
         try {
             mikrotikIpService.updatedStatus(ip);
