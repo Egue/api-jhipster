@@ -71,4 +71,9 @@ public interface IPagoDao extends CrudRepository<Pago, Long> {
 			"\t\tGROUP BY pag.id_pago" , nativeQuery = true)
 	public Optional<List<Object[]>> reciboCaja(@Param("ciudades")List<Integer> ciudades , 
 	@Param("inicial") Integer fecha_iniciar , @Param("final") Integer fecha_final , @Param("origen") List<String> origen);
+
+	@Query(value="SELECT pa.id_recibo_caja FROM pagos pa \n" 
+	+" WHERE pa.id_servicio = :idServicio AND pa.lugar = :origen ORDER BY pa.id_recibo_caja  DESC LIMIT 0 , 1 " , nativeQuery = true)
+	public Optional<List<Object[]>> findLastRc(@Param("idServicio")Long idServicio , @Param("origen") String origen);
+
 }
