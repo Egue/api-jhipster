@@ -8,7 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-@Table(name = "medios_pago.java")
+@Table(name = "medios_pago")
 @Entity
 public class MedioPago implements Serializable {
 

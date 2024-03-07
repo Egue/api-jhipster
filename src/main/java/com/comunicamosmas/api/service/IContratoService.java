@@ -33,5 +33,7 @@ public interface IContratoService {
 
     //
     public List<CarteraDTO> carteraByServicio(ArrayListDTO datos);
+
+    public void updateSaldoFavor(Contrato contrato , Float valor);
  
 }

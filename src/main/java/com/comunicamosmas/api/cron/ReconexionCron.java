@@ -65,6 +65,7 @@ public class ReconexionCron {
 	
 	//@Scheduled(cron ="0 0/30 * * * ?")//cada hora
 	//@Scheduled(cron ="0 0/16 * * * *")
+	//@Scheduled(cron = "0 53 11,23 * * *")//
 	public void pagosSupergiros()
 	{
 		try {

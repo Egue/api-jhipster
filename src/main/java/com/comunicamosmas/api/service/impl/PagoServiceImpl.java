@@ -1,22 +1,32 @@
 package com.comunicamosmas.api.service.impl;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.comunicamosmas.api.domain.Contrato;
+import com.comunicamosmas.api.domain.Deuda;
 import com.comunicamosmas.api.domain.Pago;
-import com.comunicamosmas.api.domain.SystemConfig;
+import com.comunicamosmas.api.domain.SystemConfig; 
 import com.comunicamosmas.api.repository.IPagoDao;
 import com.comunicamosmas.api.repository.ISystemConfigDao;
 import com.comunicamosmas.api.service.ICacheContratoSaldoService;
+import com.comunicamosmas.api.service.IContratoSaldoFavorLogService;
+import com.comunicamosmas.api.service.IDeudaService;
 import com.comunicamosmas.api.service.IPagoRetencionService;
 import com.comunicamosmas.api.service.IPagoService;
+import com.comunicamosmas.api.service.dto.DeudasForFacturaDTO;
 import com.comunicamosmas.api.service.dto.ReciboCajaDTO;
+import com.comunicamosmas.api.service.dto.ReporteMediosPagosDTO;
 
 @Service
 public class PagoServiceImpl implements IPagoService {
@@ -33,6 +43,12 @@ public class PagoServiceImpl implements IPagoService {
     @Autowired
     IPagoRetencionService retencionService;
 
+    @Autowired
+    IDeudaService deudasService;
+
+    @Autowired
+    IContratoSaldoFavorLogService saldoFavorLogService;
+
     @Override
     public List<Pago> findAll() {
         // TODO Auto-generated method stub
@@ -42,7 +58,7 @@ public class PagoServiceImpl implements IPagoService {
     @Override
     public Pago save(Pago pago) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+        return pagoDao.save(pago);
     }
 
     @Override
@@ -213,6 +229,136 @@ public class PagoServiceImpl implements IPagoService {
         }
         return monString + "/" + year;
 
+    }
+
+    @Override
+    public void registerPagoSupergiros(Contrato contrato, int valorTotal , String comprobante) {
+        // TODO Auto-generated method stub
+        if (contrato != null) {
+            // consultar deudas del contrato de la menor a la mayor
+            List<DeudasForFacturaDTO> deudas = deudasService.deudasByIdContrato(contrato.getId());
+            Float resultado = (float) valorTotal;
+            List<Pago> listPago = new ArrayList<>();
+            String uniqueId = UUID.randomUUID().toString();
+            int reciboCaja = this.findLastRc(contrato.getIdServicio(), contrato.getGrupo());
+
+            LocalDate fechaActual = LocalDate.now();
+            DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyyMMdd");
+
+            for (DeudasForFacturaDTO rs : deudas) {
+
+                Float valor_parcial = (float) (rs.getValor_total() - rs.getValor_parcial());
+
+                Deuda deuda = deudasService.findById(rs.getId_deuda().longValue());
+
+                float valorDado = 0L;
+
+                if (resultado > 0L) {
+                    if (resultado >= valor_parcial) { //12000 > 500
+                        resultado = resultado - valor_parcial;
+                        valorDado = valor_parcial;
+                        Float parcial = rs.getValor_parcial() + valor_parcial;
+                        deuda.setEstado(2L);
+                        deuda.setValorParcial(parcial.doubleValue());
+                    } else {
+                        Float parcial = rs.getValor_parcial() + resultado;
+                        valorDado = resultado;
+                        resultado = resultado - resultado;
+                        deuda.setEstado(3L);
+                        deuda.setValorParcial(parcial.doubleValue());
+                    }
+                    deudasService.save(deuda);
+                    //register pago
+                    
+                    Pago pago = new Pago();
+                    pago.setIdReciboCaja(((long)(reciboCaja + 1)));
+                    pago.setIdCiudad(contrato.getIdCiudad());
+                    pago.setIdServicio(contrato.getIdServicio());
+                    pago.setIdDeuda(rs.getId_deuda().longValue());
+                    pago.setIdCliente(rs.getId_cliente().longValue());
+                    pago.setIdCajero(2L);
+                    
+                    pago.setFechaf( Long.parseLong(fechaActual.format(formato)));
+                    pago.setIdMedioPago(32L);
+                    pago.setComprobante(comprobante);
+                    pago.setValorDado(valorDado);
+                    pago.setValorCobro(valorDado);
+                    pago.setValorVueltas((float) 0);
+                    pago.setValorRedondeo((float) 0);
+                    pago.setEstado(1L);
+                    pago.setAnulaIdUsuario(0L);
+                    pago.setAnulaMarca("");
+                    pago.setAnulaJustifica("");
+                    pago.setLugar(contrato.getGrupo());
+                    pago.setTurno(uniqueId);
+                    pago.setIdContrato(contrato.getId());
+                    pago.setIdEmpresa(contrato.getIdEmpresa());
+                    pago.setMesServicio((Long)rs.getMes_servicio().longValue());
+                    pago.setInstalacion(0L);
+                    pago.setReconexion(0L);
+                    pago.setMateriales(0L);
+                    listPago.add(pago);
+                    
+                    //
+                }else{
+                    break;
+                }
+                //update deuda
+                               
+            }
+            saveAll(listPago);
+            //validar si queda saldo
+            if(resultado > 0)
+            {
+                this.saldoFavorLogService.addSaldoBySupergiros(contrato, resultado, uniqueId ,fechaActual.format(formato) );
+            }
+        }
+    }
+
+    @Override
+    public List<Pago> saveAll(List<Pago> pagos) {
+        // TODO Auto-generated method stub
+        return (List<Pago>) pagoDao.saveAll(pagos);
+    }
+
+    @Override
+    public int findLastRc(Long idServicio , String origen) {
+        // TODO Auto-generated method stub
+        Optional<List<Object[]>> result = pagoDao.findLastRc(idServicio , origen);
+        int recibo_pago = result.map(resp->{
+            int rc = 0;
+            for(Object[] rs : resp){
+                rc = (int) rs[0];
+            }
+
+            return rc;
+        }).orElse(0);
+        return recibo_pago;
+    }
+
+    @Override
+    public List<ReporteMediosPagosDTO> findMedioPago(List<Integer> medio, String inicio, String fin) {
+    
+        Optional<List<Object[]>> result = pagoDao.pagosByMedioPago(medio, inicio, fin);        
+        List<ReporteMediosPagosDTO> pagos = result.map(resp -> resp.stream().map(rs -> {
+            ReporteMediosPagosDTO obj = new ReporteMediosPagosDTO();
+            obj.setCodigo((int)rs[0]);
+            obj.setRc((int) rs[1]);
+            obj.setCiudad((String) rs[2]);
+            obj.setServicio((String) rs[3]);
+            obj.setCliente((String) rs[4]);
+            obj.setCajero((String) rs[5]);
+            obj.setValor((float) rs[6]);
+             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                   String timestampAsString = dateFormat.format(rs[7]);
+            obj.setMarca(timestampAsString);
+            obj.setOrigen((String) rs[8]);
+            obj.setContrato((int) rs[9]);
+            obj.setPayments((String) rs[10]);
+            return obj;
+        }).collect(Collectors.toList())).orElse(new ArrayList<>()); 
+
+        return pagos;
     }
 
 }

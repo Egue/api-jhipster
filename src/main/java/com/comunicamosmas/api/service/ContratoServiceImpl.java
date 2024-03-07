@@ -200,4 +200,10 @@ public class ContratoServiceImpl implements IContratoService {
 			throw new ExceptionNullSql(new Date(), "Cartera Exception", e.getMessage());
 		}
 	}
+
+	@Override
+	public void updateSaldoFavor(Contrato contrato, Float valor) {
+		 contrato.setSaldoFavor((float) valor);
+		 contratoDao.save(contrato);
+	}
 }

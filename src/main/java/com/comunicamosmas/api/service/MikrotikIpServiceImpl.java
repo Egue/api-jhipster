@@ -15,6 +15,7 @@ import com.comunicamosmas.api.domain.MikrotikIp;
 import com.comunicamosmas.api.repository.IMikrotikIpDao;
 import com.comunicamosmas.api.service.dto.ClassErrorDTO;
 import com.comunicamosmas.api.service.dto.MikrotikQueueSimplePadreDTO;
+import com.comunicamosmas.api.service.dto.SegmentoDTO;
 import com.comunicamosmas.api.service.dto.SegmentoIPDTO;
 import com.comunicamosmas.api.service.dto.SegmentoIPDTO.Pool; 
 
@@ -137,7 +138,7 @@ public class MikrotikIpServiceImpl implements IMikrotikIpService {
     }
 
     @Override
-    public void updatedStatus(MikrotikQueueSimplePadreDTO.Segmento segmento) {
+    public MikrotikIp updatedStatus(SegmentoDTO segmento) {
 
         //MikrotikIp findIp = mikrotikIpDao.findById(id).orElse(null);
         MikrotikIp ip = new MikrotikIp();
@@ -151,7 +152,7 @@ public class MikrotikIpServiceImpl implements IMikrotikIpService {
         ip.setIdSegmentoIp(segmento.getIdSegmentoIp());
          
 
-        mikrotikIpDao.save(ip);
+        return mikrotikIpDao.save(ip);
     }
 
     @Override
@@ -190,6 +191,7 @@ public class MikrotikIpServiceImpl implements IMikrotikIpService {
         mikrotikIpDao.saveAll(mikrotikIp);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<MikrotikIp>  findByIdPool(Long idPool) {
          
@@ -223,7 +225,9 @@ public class MikrotikIpServiceImpl implements IMikrotikIpService {
         //validamos si hay disponibles
         if(!mikrotikIpActive.isEmpty())
         {
-            return (List<MikrotikIp>) mikrotikIpActive.get(0);
+            List<MikrotikIp> listActive = new ArrayList<>();
+            listActive.add(mikrotikIpActive.get(0));
+            return  listActive;
         }
         //filtramos las usadas
         List<MikrotikIp> mikrotikUsadas = mikrotikIp.stream()

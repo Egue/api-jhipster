@@ -9,7 +9,9 @@ import com.comunicamosmas.api.service.dto.MikrotikPPPActiveDTO;
 import com.comunicamosmas.api.service.dto.MikrotikPPPProfileDTO;
 import com.comunicamosmas.api.service.dto.MikrotikPPPSecretDTO;
 import com.comunicamosmas.api.service.dto.MikrotikQueueSimpleDTO;
+import com.comunicamosmas.api.service.dto.MikrotikQueueSimpleHijoDTO;
 import com.comunicamosmas.api.service.dto.MikrotikQueueSimplePadreDTO;
+import com.comunicamosmas.api.service.dto.UpdateRemoteAddress;
 import com.comunicamosmas.api.service.dto.ValorStringDTO;
 
 import java.util.List;
@@ -22,18 +24,14 @@ public interface IMikrotikService {
     public void conection(String user, String password, String ip, long port) throws MikrotikApiException;
 
     public void logout() throws ApiConnectionException;
-
-    public void createPadre(MikrotikTarifaReuso mikrotikTarifaReuso) throws MikrotikApiException;
-
-    public ClassErrorDTO instalacion(Long idPlan, Long idEstacion, Long idIp, Long contrato, Long tecnologia);
-
-    public List<Map<String, String>> queueSimpleFindByContrato(Long idContrato, Long idEstacion) throws MikrotikApiException;
+   
+    public List<Map<String, String>> queueSimpleFindByContrato(Long idContrato, Long idEstacion);
 
     public List<Map<String, String>> pppProfiles(Long idEstacion) throws MikrotikApiException;
 
     public ClassErrorDTO pppSecretsNew(Long idAppMaster, Long idContrato, Long idEstacion, String name, String nameSecrect, String pass);
 
-    public void test(Long idEstacion, String ip, Long idContrato) throws MikrotikApiException;
+    public void test(Long idEstacion, String ip, Long idContrato);
 
     //nuevas instancias
     //crea solo el padre o busca uno nuevo
@@ -46,13 +44,13 @@ public interface IMikrotikService {
 
     //crea el hijo
     /*step 2 */
-    public MikrotikHijoSimpleQueue hijoQueueSimple(MikrotikQueueSimplePadreDTO padre);
+    public MikrotikHijoSimpleQueue hijoQueueSimple(MikrotikQueueSimpleHijoDTO padre);
 
     //actualiza el target del hijo creado
     public MikrotikPadreSimpleQueue updatedTargetPadreInRB(Long idEstacion, Long idPadre) throws MikrotikApiException;
 
     //actualiza remote adddes
-    public WinmaxPass updatedRemoteAddress(Long id, Long idEstacion, Long idIp) throws MikrotikApiException;
+    public WinmaxPass updatedRemoteAddress(UpdateRemoteAddress remote);
     /**QUEUESIMPLE*/
     public List<MikrotikQueueSimpleDTO> QueueSimpleAll(Long idEstacion) throws MikrotikApiException;
     //eliminar padre de la rb
@@ -66,7 +64,7 @@ public interface IMikrotikService {
     //active ppp
     public List<MikrotikPPPActiveDTO> pppoeActive(Long idEstacion) throws MikrotikApiException;
     //active find name
-    public ValorStringDTO pppoeActiveFindByName(Long idEstacion , Long idContrato)throws MikrotikApiException;
+    public ValorStringDTO pppoeActiveFindByName(Long idEstacion , Long idContrato);
     //remove active
     public void pppoeActiveRemoveById(Long idEstacion , String idrb);
     //secret del pppoe

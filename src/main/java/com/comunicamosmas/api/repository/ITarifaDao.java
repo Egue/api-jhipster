@@ -35,4 +35,8 @@ public interface ITarifaDao extends CrudRepository<Tarifa, Long> {
 			+ "order by ta.valor" , nativeQuery =  true)
 	public List<Object[]> findTarifaValor(@Param("idServicio")Long idServicio , 
 			@Param("velocidad") Long velocidad , @Param("tipoTarifa")Long tipoTarifa , @Param("idTecnologia") Long idTecnologia);
+
+	@Query(value="select velocidad from tarifas ta 	INNER JOIN contratos co ON co.id_tarifa_promo = ta.id_tarifa \n" 
+				+ "WHERE co.id_contrato = :idContrato" , nativeQuery = true)
+	public int findSpeedByIdContrato(@Param("idContrato") Long idContrato); 
 }

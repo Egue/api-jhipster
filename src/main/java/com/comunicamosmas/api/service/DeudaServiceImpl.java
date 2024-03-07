@@ -40,8 +40,8 @@ public class DeudaServiceImpl implements IDeudaService {
 
 	@Override
 	public Deuda save(Deuda deuda) {
-		// TODO Auto-generated method stub
-		return null;
+		 
+		return deudaDao.save(deuda);
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class DeudaServiceImpl implements IDeudaService {
 	@Override
 	public Deuda findById(Long id) {
 		// TODO Auto-generated method stub
-		return null;
+		return deudaDao.findById(id).orElse(null);
 	}
 
 	@Override
@@ -217,9 +217,29 @@ public class DeudaServiceImpl implements IDeudaService {
 	}
 
 	@Override
-	public List<Optional<Object[]>> findDeudasByIdContrato(Long idContrato) {
+	public List<DeudasForFacturaDTO> deudasByIdContrato(Long idContrato) {
 		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'findDeudasByIdContrato'");
+		 Optional<List<Object[]>> result = deudaDao.deudasByIdContrato(idContrato);
+
+		 List<DeudasForFacturaDTO> deudas = result.map(resp -> {
+			List<DeudasForFacturaDTO> list = new ArrayList<>();
+			for(Object[] rs : resp)
+			{
+				DeudasForFacturaDTO obj = new DeudasForFacturaDTO();
+				obj.setId_deuda((Integer) rs[0]);
+				obj.setId_servicio((Integer) rs[1]);
+				obj.setId_empresa((Integer) rs[2]);
+				obj.setId_contrato((Integer) rs[3]);
+				obj.setId_cliente((Integer) rs[4]);
+				obj.setValor_parcial((Float) rs[5]);
+				obj.setValor_total((Double) rs[6]);
+				obj.setMes_servicio((Integer) rs[7]);
+				list.add(obj);
+			}
+			return list;
+		 }).orElse(new ArrayList<>());
+
+		 return deudas;
 	}
 
 }

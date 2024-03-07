@@ -86,5 +86,11 @@ public class TarifaServiceImpl implements ITarifaService {
 		}
 		return valor;
 	}
+
+	@Override
+	public int findSpeedByIdContrato(Long idContrato)
+	{
+		return tarifaDao.findSpeedByIdContrato(idContrato);
+	}
  
 }

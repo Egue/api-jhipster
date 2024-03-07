@@ -5,7 +5,8 @@ import java.util.Optional;
 
 import com.comunicamosmas.api.domain.MikrotikIp;
 import com.comunicamosmas.api.service.dto.ClassErrorDTO;
-import com.comunicamosmas.api.service.dto.MikrotikQueueSimplePadreDTO; 
+import com.comunicamosmas.api.service.dto.MikrotikQueueSimplePadreDTO;
+import com.comunicamosmas.api.service.dto.SegmentoDTO; 
 
 public interface IMikrotikIpService {
     public void save(MikrotikIp mikrotikIp);
@@ -18,7 +19,7 @@ public interface IMikrotikIpService {
 
     public MikrotikIp findById(Long id);
 
-    public void updatedStatus(MikrotikQueueSimplePadreDTO.Segmento id);
+    public MikrotikIp updatedStatus(SegmentoDTO id);
 
     public ClassErrorDTO deleteByIdSegmento(Long id);
 

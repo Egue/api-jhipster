@@ -30,7 +30,8 @@ public class PortalWebServiceImpl implements IPortalWebService{
 
     PortalWebServiceImpl()
     {
-        this.url = "http://192.168.24.138:8089/api/";
+        //this.url = "http://192.168.24.138:8089/api/";
+        this.url = "http://portalweb-api.server.cableytv.com/api/";
         this.restTemplate = new RestTemplate();
         this.headers = new HttpHeaders();
     }

@@ -31,7 +31,7 @@ public class ContratoSaldoFavorLog implements Serializable {
 
     private String detalle;
 
-    private Long fechaf;
+    private String fechaf;
 
     private String marca;
 
@@ -100,11 +100,11 @@ public class ContratoSaldoFavorLog implements Serializable {
         this.detalle = detalle;
     }
 
-    public Long getFechaf() {
+    public String getFechaf() {
         return fechaf;
     }
 
-    public void setFechaf(Long fechaf) {
+    public void setFechaf(String fechaf) {
         this.fechaf = fechaf;
     }
 
