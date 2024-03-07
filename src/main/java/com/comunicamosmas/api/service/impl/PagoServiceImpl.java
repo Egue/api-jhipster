@@ -1,5 +1,6 @@
 package com.comunicamosmas.api.service.impl;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import com.comunicamosmas.api.service.IPagoRetencionService;
 import com.comunicamosmas.api.service.IPagoService;
 import com.comunicamosmas.api.service.dto.DeudasForFacturaDTO;
 import com.comunicamosmas.api.service.dto.ReciboCajaDTO;
+import com.comunicamosmas.api.service.dto.ReporteMediosPagosDTO;
 
 @Service
 public class PagoServiceImpl implements IPagoService {
@@ -332,6 +334,31 @@ public class PagoServiceImpl implements IPagoService {
             return rc;
         }).orElse(0);
         return recibo_pago;
+    }
+
+    @Override
+    public List<ReporteMediosPagosDTO> findMedioPago(List<Integer> medio, String inicio, String fin) {
+    
+        Optional<List<Object[]>> result = pagoDao.pagosByMedioPago(medio, inicio, fin);        
+        List<ReporteMediosPagosDTO> pagos = result.map(resp -> resp.stream().map(rs -> {
+            ReporteMediosPagosDTO obj = new ReporteMediosPagosDTO();
+            obj.setCodigo((int)rs[0]);
+            obj.setRc((int) rs[1]);
+            obj.setCiudad((String) rs[2]);
+            obj.setServicio((String) rs[3]);
+            obj.setCliente((String) rs[4]);
+            obj.setCajero((String) rs[5]);
+            obj.setValor((float) rs[6]);
+             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                   String timestampAsString = dateFormat.format(rs[7]);
+            obj.setMarca(timestampAsString);
+            obj.setOrigen((String) rs[8]);
+            obj.setContrato((int) rs[9]);
+            obj.setPayments((String) rs[10]);
+            return obj;
+        }).collect(Collectors.toList())).orElse(new ArrayList<>()); 
+
+        return pagos;
     }
 
 }

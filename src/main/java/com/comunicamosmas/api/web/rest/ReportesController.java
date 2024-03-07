@@ -1,21 +1,27 @@
 package com.comunicamosmas.api.web.rest;
 
 import java.io.ByteArrayOutputStream;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.comunicamosmas.api.service.IContratoSaldoFavorLogService;
 import com.comunicamosmas.api.service.IContratoService;
 import com.comunicamosmas.api.service.IHanRetirosService;
 import com.comunicamosmas.api.service.IOrdenService;
@@ -26,16 +32,17 @@ import com.comunicamosmas.api.service.dto.ArrayListDTO;
 import com.comunicamosmas.api.service.dto.CarteraDTO;
 import com.comunicamosmas.api.service.dto.ReciboCajaDTO;
 import com.comunicamosmas.api.service.dto.ReporteHanRetirosDTO;
+import com.comunicamosmas.api.service.dto.ReporteMediosPagosDTO;
 import com.comunicamosmas.api.service.dto.ReporteOrdenConVisitaFallidaDTO;
+import com.comunicamosmas.api.service.dto.SaldoFavorDTO;
 import com.comunicamosmas.api.service.dto.SoporteTicketDTO;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 
 import io.jsonwebtoken.io.IOException;
 
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook; 
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.core.io.Resource;
-
 
 @RestController
 @RequestMapping("/api/controlmas")
@@ -56,6 +63,9 @@ public class ReportesController {
     @Autowired
     IPagoService pagosService;
 
+    @Autowired
+    IContratoSaldoFavorLogService saldoFavorLogService;
+
     @PostMapping("/reportes/cartera")
     public ResponseEntity<Resource> carteraByIdServicio(@RequestBody ArrayListDTO datosDto) {
         Map<String, Object> response = new HashMap<>();
@@ -64,8 +74,7 @@ public class ReportesController {
 
             List<CarteraDTO> result = contratoService.carteraByServicio(datosDto);
 
-            if(result == null)
-            {
+            if (result == null) {
                 return ResponseEntity.notFound().build();
             }
 
@@ -100,31 +109,32 @@ public class ReportesController {
             headerRow.createCell(24).setCellValue("Vendedor");
             headerRow.createCell(25).setCellValue("Correo");
             headerRow.createCell(26).setCellValue("Estación");
-            
+
             int rowNum = 1;
 
-            for(CarteraDTO registro : result)
-            {
+            for (CarteraDTO registro : result) {
                 Row row = sheet.createRow(rowNum++);
                 String origen = registro.getFf_grupocontra().equals("B") ? "*" : "";
                 row.createCell(0).setCellValue(registro.getFf_iddelcontrato() + origen);
                 row.createCell(1).setCellValue(registro.getFf_fisico());
                 row.createCell(2).setCellValue(registro.getZona_nombre());
                 row.createCell(3).setCellValue(registro.getCliente_tipo_cliente());
-                row.createCell(4).setCellValue(registro.getNombre_cliente() + "/"+registro.getCliente_documento());
+                row.createCell(4).setCellValue(registro.getNombre_cliente() + "/" + registro.getCliente_documento());
                 row.createCell(5).setCellValue(registro.getContacto());
-                row.createCell(6).setCellValue(registro.getDirr_barrio()+" "+registro.getMunicipio()+" "+registro.getDepartamento());
+                row.createCell(6).setCellValue(
+                        registro.getDirr_barrio() + " " + registro.getMunicipio() + " " + registro.getDepartamento());
                 row.createCell(7).setCellValue(registro.getDirr_tipo());
-                row.createCell(8).setCellValue(registro.getDireccion());                
+                row.createCell(8).setCellValue(registro.getDireccion());
                 row.createCell(9).setCellValue(registro.getServicios_nombre());
-                row.createCell(10).setCellValue(registro.getVelocidad()+"/"+registro.getNumero_canales());
+                row.createCell(10).setCellValue(registro.getVelocidad() + "/" + registro.getNumero_canales());
                 row.createCell(11).setCellValue(registro.getMesesdebe());
                 Double saldo = registro.getTotal_debe() - registro.getTotal_abonos();
                 row.createCell(12).setCellValue(saldo);
                 row.createCell(13).setCellValue(registro.getFf_marcacontrato());
                 row.createCell(14).setCellValue(registro.getFf_iniciocontrato());
                 row.createCell(15).setCellValue(registro.getUltimo_pago());
-                row.createCell(16).setCellValue(registro.getTarifa_general_valor()+"/"+registro.getTarifa_promo_valor());
+                row.createCell(16)
+                        .setCellValue(registro.getTarifa_general_valor() + "/" + registro.getTarifa_promo_valor());
                 row.createCell(17).setCellValue(registro.getTarifa_nombre());
                 row.createCell(18).setCellValue(registro.getT_tipo_banda());
                 row.createCell(19).setCellValue(registro.getFf_estadocontrato());
@@ -143,16 +153,16 @@ public class ReportesController {
             workbook.close();
 
             ByteArrayResource resource = new ByteArrayResource(byteArrayOutputStream.toByteArray());
-            
+
             return ResponseEntity.ok()
-            .header("Content-Disposition", "attachment; filename=registros.xlsx")
-            .contentType(MediaType.APPLICATION_OCTET_STREAM)
-            .body(resource);
+                    .header("Content-Disposition", "attachment; filename=registros.xlsx")
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
 
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ByteArrayResource(e.getMessage().getBytes()));
-        }catch(ExceptionNullSql e){
-                 response.put("error", e.getMessage() +"-"+ e.getDetails());
+        } catch (ExceptionNullSql e) {
+            response.put("error", e.getMessage() + "-" + e.getDetails());
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ByteArrayResource(e.getMessage().getBytes()));
         } catch (Exception e) {
@@ -244,7 +254,8 @@ public class ReportesController {
 
     // *RECIBOS DE CAJA POR LISTA DE CIUDADES Y RANGO DE FECHAS */
     @PostMapping("/reportes/recibos-caja")
-    public ResponseEntity<Resource> recibosCaja(@RequestParam List<Integer> ciudades, @RequestParam Integer fecha_inicial,
+    public ResponseEntity<Resource> recibosCaja(@RequestParam List<Integer> ciudades,
+            @RequestParam Integer fecha_inicial,
             @RequestParam Integer fecha_final) {
         Map<String, Object> response = new HashMap<>();
 
@@ -271,7 +282,7 @@ public class ReportesController {
             headerRow.createCell(13).setCellValue("Cajero");
             headerRow.createCell(14).setCellValue("Grupo");
             headerRow.createCell(15).setCellValue("Barrio");
-             headerRow.createCell(16).setCellValue("Comprobante");
+            headerRow.createCell(16).setCellValue("Comprobante");
 
             // List<SoporteTicketDTO> result = ticketService.reporteTicket(tipo, inicio,
             int rowNum = 1;
@@ -299,24 +310,85 @@ public class ReportesController {
             // finalf);
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        workbook.write(byteArrayOutputStream);
-        workbook.close();
-
+            workbook.write(byteArrayOutputStream);
+            workbook.close();
 
             ByteArrayResource resource = new ByteArrayResource(byteArrayOutputStream.toByteArray());
 
-        return ResponseEntity.ok()
-            .header("Content-Disposition", "attachment; filename=registros.xlsx")
-            .contentType(MediaType.APPLICATION_OCTET_STREAM)
-            .body(resource); 
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "attachment; filename=registros.xlsx")
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
 
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ByteArrayResource(e.getMessage().getBytes()));
         } catch (Exception e) {
-             
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ByteArrayResource(e.getMessage().getBytes()));
         }
     }
 
+    /* Reporte de pagos por medio_pago independiente de la empresa , fecha */
+
+    @GetMapping("/reportes/medios-pago")
+    public ResponseEntity<Resource> mediosPago(@RequestParam List<Integer> payment, @RequesParam String first,
+            @RequesParam String last) {
+        try {
+            List<ReporteMediosPagosDTO> result = pagosService.findMedioPago(payment, first, last);
+            List<ReporteMediosPagosDTO> saldoFavor = saldoFavorLogService.findByMedioPago(payment, first, last);
+            List<ReporteMediosPagosDTO> union = new ArrayList<>(result);
+            result.addAll(saldoFavor);
+
+            Workbook workbook = new XSSFWorkbook();
+            Sheet sheet = workbook.createSheet("MedioPago");
+            // Crear encabezados
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("Código");
+            headerRow.createCell(1).setCellValue("#Rc");
+            headerRow.createCell(2).setCellValue("Ciudad");
+            headerRow.createCell(3).setCellValue("Servicio");
+            headerRow.createCell(4).setCellValue("Cliente");
+            headerRow.createCell(5).setCellValue("Cajero");
+            headerRow.createCell(6).setCellValue("Valor");
+            headerRow.createCell(7).setCellValue("Marca");
+            headerRow.createCell(8).setCellValue("Origen");
+            headerRow.createCell(9).setCellValue("Contrato");
+            headerRow.createCell(10).setCellValue("Medio de pago");
+            
+             int rowNum = 1;
+             for(ReporteMediosPagosDTO rs: union)
+             {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(rs.getCodigo());
+                row.createCell(1).setCellValue(rs.getRc());
+                row.createCell(2).setCellValue(rs.getCiudad());
+                row.createCell(3).setCellValue(rs.getServicio());
+                row.createCell(4).setCellValue(rs.getCliente());
+                row.createCell(5).setCellValue(rs.getCajero());
+                row.createCell(6).setCellValue(rs.getValor());
+                row.createCell(7).setCellValue(rs.getMarca());
+                row.createCell(8).setCellValue(rs.getOrigen());
+                row.createCell(9).setCellValue(rs.getContrato());
+                row.createCell(10).setCellValue(rs.getPayments());
+             }
+             
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            workbook.write(byteArrayOutputStream);
+            workbook.close();
+
+            ByteArrayResource resource = new ByteArrayResource(byteArrayOutputStream.toByteArray());
+
+            return ResponseEntity.ok()
+                    .header("Content-Disposition", "attachment; filename=registros.xlsx")
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(resource);
+
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ByteArrayResource(e.getMessage().getBytes()));
+        } catch (Exception e) {
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ByteArrayResource(e.getMessage().getBytes()));
+        }
+    }
 }

@@ -76,4 +76,28 @@ public interface IPagoDao extends CrudRepository<Pago, Long> {
 	+" WHERE pa.id_servicio = :idServicio AND pa.lugar = :origen ORDER BY pa.id_recibo_caja  DESC LIMIT 0 , 1 " , nativeQuery = true)
 	public Optional<List<Object[]>> findLastRc(@Param("idServicio")Long idServicio , @Param("origen") String origen);
 
+	@Query(value = "SELECT \n" + //
+				"\tpa.id_pago, \n" + //
+				"\tpa.id_recibo_caja ,\n" + //
+				"\tci.nombre as nombre_ciudad,\n" + //
+				"\tse.nombre as nombre_servicio,\n" + //
+				"\tCASE\n" + //
+				"\t\tWHEN cli.tipo_cliente = \"N\" THEN CONCAT(cli.apellido_paterno , \" \",cli.apellido_materno,\" \", cli.nombre_primer , \" \", cli.nombre_segundo , \" / \", cli.documento)\n" + //
+				"\t\tWHEN cli.tipo_cliente = \"J\" THEN CONCAT(cli.razon_social , \" / \" , cli.documento)\n" + //
+				"\t\tEND AS cliente,\n" + //
+				"\tCONCAT(usu.nombre , \" \" , usu.apellidos) as usuario,\n" + //
+				"\tpa.valor_cobro,\n" + //
+				"\tpa.marca,\n" + //
+				"\tpa.lugar,\n" + //
+				"\tpa.id_contrato,\n" + //
+				"\tme.nombre as medio_pago\n" + //
+				"\tfrom pagos pa\n" + //
+				"\tinner join ciudades ci on ci.id_ciudad = pa.id_ciudad\n" + //
+				"\tinner join servicios se on pa.id_servicio = se.id_servicio \n" + //
+				"\tinner join clientes cli on cli.id_cliente = pa.id_cliente\n" + //
+				"\tinner join usuarios usu on pa.id_cajero = usu.id_usuario\n" + //
+				"\tinner join medios_pago me on me.id_medio_pago = pa.id_medio_pago\t\n" + //
+				"\tWHERE pa.id_medio_pago IN :medio AND pa.fechaf BETWEEN :inicio AND :fin ;" , nativeQuery=true)
+	public Optional<List<Object[]>> pagosByMedioPago(@Param("medio") List<Integer> medio , @Param("inicio") String inicio, @Param("fin") String fin);
+
 }

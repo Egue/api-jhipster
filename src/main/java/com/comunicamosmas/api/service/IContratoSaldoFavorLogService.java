@@ -2,7 +2,10 @@ package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.Contrato;
 import com.comunicamosmas.api.domain.ContratoSaldoFavorLog;
+import com.comunicamosmas.api.service.dto.ReporteMediosPagosDTO;
+
 import java.util.List;
+import java.util.Optional;
 
 public interface IContratoSaldoFavorLogService {
     //listar todos
@@ -18,4 +21,7 @@ public interface IContratoSaldoFavorLogService {
 
     //buscar por id
     public ContratoSaldoFavorLog findById(Long id);
+
+    //find_by_medio_pago
+    public List<ReporteMediosPagosDTO> findByMedioPago(List<Integer> payments , String first , String last);
 }

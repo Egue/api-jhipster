@@ -3,6 +3,7 @@ package com.comunicamosmas.api.service;
 import com.comunicamosmas.api.domain.Contrato;
 import com.comunicamosmas.api.domain.Pago;
 import com.comunicamosmas.api.service.dto.ReciboCajaDTO;
+import com.comunicamosmas.api.service.dto.ReporteMediosPagosDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,4 +29,7 @@ public interface IPagoService {
     public void registerPagoSupergiros(Contrato idContrato , int valorTotal , String comprobante);
 
     public int findLastRc(Long idServicio , String origen);
+
+    //reporteMedio
+    public List<ReporteMediosPagosDTO> findMedioPago(List<Integer> medio , String inicio , String fin);
 }
