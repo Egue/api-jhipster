@@ -38,5 +38,5 @@ public interface IDeudaService {
     public List<EmailCampaignDetalleDTO> findDeudaByIdCampaingAndOrigen(String factura , Integer idCampaign);
 
     //find deudas por id_contrato
-    public List<Optional<Object[]>> findDeudasByIdContrato(Long idContrato);
+    public List<DeudasForFacturaDTO> deudasByIdContrato(Long idContrato);
 }

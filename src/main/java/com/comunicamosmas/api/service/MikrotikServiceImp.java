@@ -30,8 +30,10 @@ import com.comunicamosmas.api.service.dto.MikrotikPPPActiveDTO;
 import com.comunicamosmas.api.service.dto.MikrotikPPPProfileDTO;
 import com.comunicamosmas.api.service.dto.MikrotikPPPSecretDTO;
 import com.comunicamosmas.api.service.dto.MikrotikQueueSimpleDTO;
+import com.comunicamosmas.api.service.dto.MikrotikQueueSimpleHijoDTO;
 import com.comunicamosmas.api.service.dto.MikrotikQueueSimplePadreDTO;
-import com.comunicamosmas.api.service.dto.ValorStringDTO;
+import com.comunicamosmas.api.service.dto.UpdateRemoteAddress;
+import com.comunicamosmas.api.service.dto.ValorStringDTO; 
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 
 import me.legrange.mikrotik.ApiConnection;
@@ -78,6 +80,7 @@ public class MikrotikServiceImp implements IMikrotikService {
 
     @Autowired
     IApiRBMikrotikService apiMikrotikService;
+ 
 
     ApiConnection apiConnection;
 
@@ -93,178 +96,7 @@ public class MikrotikServiceImp implements IMikrotikService {
         apiConnection.close();
     }
 
-    @Override
-    public void createPadre(MikrotikTarifaReuso mikrotikTarifaReuso) throws MikrotikApiException {
-        // armar PAdee
-        /*
-         * String command =
-         * "/queue/simple/add comment='"+mikrotikTarifaReuso.getComment()+"' limit-at="+
-         * mikrotikTarifaReuso.getLimitAt()+" max-limit="+mikrotikTarifaReuso.
-         * getMaxLimit()+
-         * " name='"+mikrotikTarifaReuso.getName()+"' target=0.0.0.0/24";
-         */
-        // String command = "/queue/simple/print";
-        // List<Map<String, String>> rs = apiConnection.execute(command);
-        // System.out.print(rs);
-    }
-
-    @SuppressWarnings("null")
-    @Override
-    public ClassErrorDTO instalacion(Long idPlan, Long idEstacion, Long idIp, Long contrato, Long tecnologia) {
-        ClassErrorDTO error = new ClassErrorDTO();
-        // consultar si ya existe el contrato o ip registrada
-        // recuperar estacion
-        Estacion estacion = estacionService.findById(idEstacion);
-        // consultar recuperar bajada y subida del idPlan y reuso
-        MikrotikTarifaReuso plan = tarifaReusoService.findById(idPlan);
-        // recupera la ip
-        MikrotikIp mikrotikIp = mikrotikIpService.findById(idIp);
-        String ip = mikrotikIp.getIp();
-        // validar si la ip no este registrada en la rb del simple queue
-        try {
-            this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(), estacion.getApiPort());
-            String validarTarget = "/queue/simple/print where target=" + ip + "/32";
-            String result = this.setCommando(validarTarget);
-            if (result != null) {
-                error.setError(true);
-                error.setMsm("Ya existe la ip en la rb");
-                return error;
-            }
-        } catch (MikrotikApiException e) {
-            error.setError(true);
-            error.setMsm(e.getMessage());
-            e.printStackTrace();
-            return error;
-        }
-        // crear el limit con subida y bajada
-        String velocidad = plan.getSubida() + "/" + plan.getBajada();
-        // validamos si existe un padre ya creado
-        // System.out.print(plan.getNombrePadre()+ ","+velocidad+" - "+plan.getReuso()+
-        // " - "+idEstacion);
-        // consultamos si existe un padre libre menor del reuso del plan y con el nombre
-        // del plan
-        // y velocidad por la estación creada
-        MikrotikPadreSimpleQueue padre = padreSimpleQueueService.findByIdPlanAndReuso(idPlan, plan.getReuso(),
-                idEstacion);
-        // si el objecto recuperado es != de null,
-        // entonces procedemos a actualizarlo con un nuevo hijo
-        if (padre != null) {
-            // System.out.print(padre.getId() + "id");
-            // add hijo al padre
-            String hijoLimit = "";
-            try {
-                this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(),
-                        estacion.getApiPort());
-                String target = padre.getTarget() + "," + ip;
-                this.addTarget(target, padre.getName());
-                // anexa al target del padre la nueva ip
-                // hijoLimit = this.crearHijo(plan.getSubida(), plan.getBajada(), contrato,
-                // padre.getName() , ip , plan.getReuso());
-                if (tecnologia != 2) {
-                    this.updatedRemoteAddres(contrato, idEstacion, ip);
-                }
-                // cierra la sesión en el winbox
-                this.logout();
-                // guarda el hijo en la base de datos
-                mikrotikHijoSimpleQueueService.crearHijo(
-                        padre.getId(),
-                        idIp,
-                        hijoLimit,
-                        velocidad,
-                        contrato,
-                        contrato,
-                        "pcq-upload-default/pcq-download-default",
-                        ip);
-                // actualiza el estado de la ip a 1 (ocupado)
-                mikrotikIpService.updatedStatus(idIp);
-                // actualizar el target en la base de datos para el padre
-                padreSimpleQueueService.updatedTargetReuso(ip, padre.getId());
-            } catch (MikrotikApiException e) {
-                error.setError(true);
-                error.setMsm(e.getMessage());
-                e.printStackTrace();
-                return error;
-            }
-        } else {
-            UUID uuid = UUID.randomUUID();
-            String uuidasString = uuid.toString();
-            String newName = plan.getNombrePadre() + "#" + uuidasString;
-            // System.out.print("vacion");
-            String hijoLimit = "";
-            try {
-                this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(),
-                        estacion.getApiPort());
-                // comando
-                this.newPadre(plan.getComment(), velocidad, velocidad, newName, ip);
-                // hijoLimit = this.crearHijo(plan.getSubida(), plan.getBajada(), contrato,
-                // newName , ip, plan.getReuso());
-                if (tecnologia != 2) {
-                    this.updatedRemoteAddres(contrato, idEstacion, ip);
-                }
-                this.logout();
-                // registrar en base de datos
-                Long idPadre = padreSimpleQueueService.newPadre(idPlan, newName, ip, plan.getComment(), velocidad,
-                        velocidad, idEstacion);
-                mikrotikHijoSimpleQueueService.crearHijo(
-                        idPadre,
-                        idIp,
-                        hijoLimit,
-                        velocidad,
-                        contrato,
-                        contrato,
-                        "pcq-upload-default/pcq-download-default",
-                        ip);
-                mikrotikIpService.updatedStatus(idIp);
-            } catch (MikrotikApiException e) {
-                // TODO Auto-generated catch block
-                error.setError(true);
-                error.setMsm(e.getMessage());
-                e.printStackTrace();
-                return error;
-            }
-        }
-
-        error.setError(false);
-        return error;
-    }
-
-    /**
-     *
-     * */
-
-    private void updatedRemoteAddres(Long idContrato, Long idEstacion, String ip) throws MikrotikApiException {
-        // WinmaxPass winmaxPass= winmaxPassService.findByIdContrato(idContrato);
-        Estacion estacion = estacionService.findById(idEstacion);
-        WinmaxPass winmaxPass = winmaxPassService.findByIdContrato(idContrato);
-        String command = "/ppp/secret/set .id=" + winmaxPass.getUsuario() + " remote-address=" + ip;
-        // this.conection(estacion.getApiUser(), estacion.getApiPass(),
-        // estacion.getApiIp(), estacion.getApiPort());
-        apiConnection.execute(command);
-        // this.logout();
-    }
-
-    private void newPadre(String comment, String limit, String max, String name, String ip)
-            throws MikrotikApiException {
-        String command = "/queue/simple/add comment='" +
-                comment +
-                "' limit-at=" +
-                limit +
-                " max-limit=" +
-                max +
-                " name='" +
-                name +
-                "' target=" +
-                ip +
-                "/32";
-
-        apiConnection.execute(command);
-    }
-
-    private void addTarget(String target, String padre) throws MikrotikApiException {
-        String command = "/queue/simple/set .id=" + padre + " target=" + target + "";
-        apiConnection.execute(command);
-    }
-
+      
     // crear el hijo cuan
     // private String crearHijo(String subida, String bajada, Long contrato, String
     // padre , String target , Long reuso )throws MikrotikApiException
@@ -302,41 +134,26 @@ public class MikrotikServiceImp implements IMikrotikService {
             baj = limitBajada + "k";
         }
         String limitAt = sub + "/" + baj;
-
-        /*
-         * String command
-         * ="/queue/simple/add limit-at="+limitAt+" max-limit="+subida+"/"+bajada+
-         * " name="+contrato+" parent="
-         * +padre+" queue=pcq-upload-default/pcq-download-default target="+
-         * target+"/32";
-         * 
-         * apiConnection.execute(command);
-         */
-
+  
         return limitAt;
     }
 
     @Override
-    public List<Map<String, String>> queueSimpleFindByContrato(Long idContrato, Long idEstacion)
-            throws MikrotikApiException {
+    public List<Map<String, String>> queueSimpleFindByContrato(Long idContrato, Long idEstacion){
         // TODO Auto-generated method stub
         Estacion estacion = estacionService.findById(idEstacion);
-        this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(), estacion.getApiPort());
+        
         String command = "/queue/simple/print where name=" + idContrato;
-        List<Map<String, String>> result = apiConnection.execute(command);
-        this.logout();
+        List<Map<String, String>> result = apiMikrotikService.listSendCommand(command, estacion);
+         
         return result;
     }
 
     @Override
     public List<Map<String, String>> pppProfiles(Long idEstacion) throws MikrotikApiException {
         Estacion estacion = estacionService.findById(idEstacion);
-        this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(), estacion.getApiPort());
         String command = "/ppp/profile/print";
-        List<Map<String, String>> result = apiConnection.execute(command);
-
-        this.logout();
-
+        List<Map<String, String>> result = apiMikrotikService.listSendCommand(command, estacion);
         return result;
     }
 
@@ -423,40 +240,15 @@ public class MikrotikServiceImp implements IMikrotikService {
     }
 
     @Override
-    public void test(Long idEstacion, String ip, Long idContrato) throws MikrotikApiException {
+    public void test(Long idEstacion, String ip, Long idContrato){
         Estacion estacion = estacionService.findById(idEstacion);
-        this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(), estacion.getApiPort());
         String command = "/queue/simple/print where target=" + ip + "/32";
-        String execute = this.setCommando(command);
+        String execute = apiMikrotikService.sendCommando(command, estacion);
         System.out.print("comando:" + command + " - result:" + execute);
-        // WinmaxPass winmaxPass = winmaxPassService.findByIdContrato(idContrato);
-        // String command = "/ppp/secret/set .id="+winmaxPass.getUsuario()+"
-        // remote-address="+ip;
-        //
-        // apiConnection.execute(command);
-        this.logout();
+        
     }
-
-    public String setCommando(String commando) throws MikrotikApiException {
-        List<Map<String, String>> result = apiConnection.execute(commando);
-        Iterator<Map<String, String>> iterator = result.iterator();
-        if (iterator.hasNext()) {
-            Map<String, String> r = iterator.next();
-
-            return r.get(".id");
-        }
-
-        return null;
-    }
-
-    public String setnewCommando(String comando) throws MikrotikApiException {
-        List<Map<String, String>> rs = apiConnection.execute(comando);
-        for (Map<String, String> r : rs) {
-            System.out.println(r.get("name"));
-        }
-
-        return null;
-    }
+ 
+ 
 
     //////////////////////////////////////////////////////////// nueva/////////////////////////MikrotikApiException
 
@@ -613,45 +405,52 @@ public class MikrotikServiceImp implements IMikrotikService {
      * step 2
     */
     @Override
-    public MikrotikHijoSimpleQueue hijoQueueSimple(MikrotikQueueSimplePadreDTO padre) {
+    public MikrotikHijoSimpleQueue hijoQueueSimple(MikrotikQueueSimpleHijoDTO padre) {
         try {
 
             // consultar recuperar bajada y subida del idPlan y reuso
             MikrotikTarifaReuso plan = tarifaReusoService.findById(padre.getIdPlan());
-            //100M/100M dividido en el reuso 4-8
+            //100M/100M dividido en el reuso 4-8 va al limit-at
             String limit = this.generarLimit(plan.getSubida(), plan.getBajada(), plan.getReuso());
             // consultamos la ip
             //MikrotikIp ip = mikrotikIpService.findById(idIp);
             String ip = padre.getSegmento().getIp();
-            MikrotikPadreSimpleQueue findPadre = padreSimpleQueueService.findById(padre.getIdPlan());
+            //buscar velocidad del cliente
+            int velocidad = tarifaService.findSpeedByIdContrato(padre.getIdContrato());
+
+            MikrotikPadreSimpleQueue findPadre = padreSimpleQueueService.findById(padre.getIdPadre());
             String command = "/queue/simple/add limit-at=" +
                     limit +
                     " max-limit=" +
-                    plan.getSubida() +
-                    "/" +
-                    plan.getBajada() +
-                    " name=" +
-                    idContrato +
+                    velocidad +
+                    "M/" +
+                    velocidad +
+                    "M name=" +
+                    padre.getIdContrato() +
                     " parent=" +
-                    padre.getName() +
+                    findPadre.getName() +
                     " queue=pcq-upload-default/pcq-download-default target=" +
-                    ip.getIp() +
+                    ip +
                     "/32";
             // consulta de la estacion
-            Estacion estacion = estacionService.findById(idEstacion);
-            this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(), estacion.getApiPort());
+            Estacion estacion = estacionService.findById(padre.getIdEstacion());
+
+            apiMikrotikService.sendCommando(command, estacion);
+            /*this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(), estacion.getApiPort());
             apiConnection.execute(command);
-            this.logout();
+            this.logout();*/
+            //actualizar ip 
+            MikrotikIp segmento = mikrotikIpService.updatedStatus(padre.getSegmento());
             // crear el simplequeue
             MikrotikHijoSimpleQueue hijo = new MikrotikHijoSimpleQueue();
-            hijo.setIdContrato(idContrato);
-            hijo.setIdIp(idIp);
-            hijo.setIdPadre(idPadre);
+            hijo.setIdContrato(padre.getIdContrato());
+            hijo.setIdIp(segmento.getId());
+            hijo.setIdPadre(padre.getIdPadre());
             hijo.setLimitAt(limit);
-            hijo.setMaxLimit(plan.getSubida() + "/" + plan.getBajada());
-            hijo.setName(Long.toString(idContrato));
+            hijo.setMaxLimit(velocidad + "/" + velocidad);
+            hijo.setName(Long.toString(padre.getIdContrato()));
             hijo.setQueue("pcq-upload-default/pcq-download-default");
-            hijo.setTarget(ip.getIp());
+            hijo.setTarget(segmento.getIp());
             mikrotikHijoSimpleQueueService.save(hijo);
             // actualizar el padre
             /*
@@ -664,55 +463,40 @@ public class MikrotikServiceImp implements IMikrotikService {
 
             return hijo;
 
-        } catch (MikrotikApiException e) {
+        } catch (Exception e) {
             // no se pudo crear el hijo, por tal motivo se debe validar eliminar el target
             // creado en el anterior
 
-            throw new ExceptionNullSql(new Date(), "Error creando hijo", e.getMessage());
+            throw new ExceptionNullSql(new Date(), "Error actualizando datos simple Queue", e.getMessage());
         }
     }
 
-    private String String(Long idContrato) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
+     
     @Override
-    public WinmaxPass updatedRemoteAddress(Long id, Long idEstacion, Long idIp) throws MikrotikApiException {
+    public WinmaxPass updatedRemoteAddress(UpdateRemoteAddress remote)  {
         // consultar estacion
-        Estacion estacion = estacionService.findById(idEstacion);
-        // consultar ip
-        MikrotikIp ip = mikrotikIpService.findById(idIp);
+        Estacion estacion = estacionService.findById(remote.getIdEstacion());
         // consultamos el user del ppp/secret
-        WinmaxPass winmaxPass = winmaxPassService.findById(id);
+        WinmaxPass winmaxPass = winmaxPassService.findById(remote.getIdWinmaxPass());
 
-        String command = "/ppp/secret/set .id=" + winmaxPass.getUsuario() + " remote-address=" + ip.getIp();
-        this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(), estacion.getApiPort());
-        System.out.print(command);
-        apiConnection.execute(command);
-        this.logout();
+        String command = "/ppp/secret/set .id=" + winmaxPass.getUsuario() + " remote-address=" + remote.getSegmento().getIp();
+         
+        apiMikrotikService.sendCommando(command, estacion);
+
         return winmaxPass;
     }
 
     @Override
     public MikrotikPadreSimpleQueue updatedTargetPadreInRB(Long idEstacion, Long idPadre) throws MikrotikApiException {
-        // TODO Auto-generated method stub
+        
         Estacion estacion = estacionService.findById(idEstacion);
         // padre
-        MikrotikPadreSimpleQueue padre = padreSimpleQueueService.findById(idPadre);
-
-        // System.out.print(padre.getTarget() +":"+padre.getName());
-        this.conection(estacion.getApiUser(), estacion.getApiPass(), estacion.getApiIp(), estacion.getApiPort());
-        // String id = this.setnewCommando("/queue/simple/print");// where
-        // name="+padre.getName()+"");
-        // System.out.print(id);
+        MikrotikPadreSimpleQueue padre = padreSimpleQueueService.findById(idPadre); 
+         
         String name = padre.getName();
         String target = padre.getTarget();
-        String command = "/queue/simple/set .id=" + name + " target=" + target;
-        // this.addTarget(target, name);
-        // System.out.print(command);
-        apiConnection.execute(command);
-        this.logout();
+        String command = "/queue/simple/set .id=" + name + " target=" + target; 
+        apiMikrotikService.sendCommando(command, estacion);
         return padre;
     }
 
@@ -871,12 +655,10 @@ public class MikrotikServiceImp implements IMikrotikService {
     public void pppoeActiveRemoveById(Long idEstacion, String idrb) {
 
         Estacion estacion = estacionService.findById(idEstacion);
-        // this.conection(estacion.getApiUser(), estacion.getApiPass(),
-        // estacion.getApiIp(), estacion.getApiPort());
+         
         String command = "/ppp/active/remove .id=" + idrb;
         apiMikrotikService.sendCommando(command, estacion);
-        // apiConnection.execute(command);
-        // this.logout();
+          
     }
 
     @Override

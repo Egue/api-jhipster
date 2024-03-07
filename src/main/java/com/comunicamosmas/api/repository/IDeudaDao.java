@@ -68,8 +68,9 @@ public interface IDeudaDao extends CrudRepository<Deuda, Long> {
 
 	//*cargar deudas de un cliente */
 	@Query(value = "SELECT deudas.id_deuda, \n"
-	+"deudas.id_servicio, deudas.id_empresa, deudas.id_contrato, deudas.id_cliente \n" 
-	+"deudas.valor_parcial, deudas.valor_total FROM deudas WHERE id_contrato = :contrato AND estado IN (1,3) ORDER BY id_deuda DESC" , nativeQuery = true)
-	public Optional<List<Object[]>> findDeudaByidContrato(@Param("contrato") Long idContrato);
+	+"deudas.id_servicio, deudas.id_empresa, deudas.id_contrato, deudas.id_cliente, \n" 
+	+"deudas.valor_parcial, deudas.valor_total  , deudas.mes_servicio FROM deudas WHERE id_contrato = :contrato AND estado IN (1,3) ORDER BY id_deuda ASC" , nativeQuery = true)
+	public Optional<List<Object[]>> deudasByIdContrato(@Param("contrato") Long idContrato);
 
+	
 }

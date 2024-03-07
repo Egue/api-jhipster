@@ -38,6 +38,9 @@ public class ApiRestServiceImpl implements IApiRestService {
 	@Autowired
 	IOrdenService ordenService;
 
+	@Autowired
+	IPagoService pagoService;
+
 	RestTemplate restTemplate = new RestTemplate();
 
 	HttpHeaders headers = new HttpHeaders();
@@ -214,6 +217,8 @@ public class ApiRestServiceImpl implements IApiRestService {
 
 					}
 				}
+				//registrar el pago
+				this.pagoService.registerPagoSupergiros(contrato, rs.getValor_total() , rs.getId_transaccion());
 				// actualizar estado_cargue intinalambrico
 
 				this.updatedEstadoCargue(rs.getId());
