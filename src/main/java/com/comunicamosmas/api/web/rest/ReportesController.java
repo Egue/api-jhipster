@@ -337,7 +337,7 @@ public class ReportesController {
             List<ReporteMediosPagosDTO> result = pagosService.findMedioPago(payment, first, last);
             List<ReporteMediosPagosDTO> saldoFavor = saldoFavorLogService.findByMedioPago(payment, first, last);
             List<ReporteMediosPagosDTO> union = new ArrayList<>(result);
-            result.addAll(saldoFavor);
+            union.addAll(saldoFavor);
 
             Workbook workbook = new XSSFWorkbook();
             Sheet sheet = workbook.createSheet("MedioPago");

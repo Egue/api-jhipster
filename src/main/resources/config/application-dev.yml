@@ -31,9 +31,9 @@ spring:
     serialization:
       indent-output: true
   datasource:
-    url:
-    username: 
-    password: 
+    url: jdbc:mysql://10.112.109.2:3306/controlmas?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+    username: LNWW(345
+    password: 9C9UAaqKecHRZA79
     driver-class-name: com.mysql.jdbc.Driver
     hikari:
       poolName: Hikari
