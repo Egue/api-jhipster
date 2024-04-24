@@ -97,8 +97,8 @@ public class ClienteController {
             List<ClienteDTO> findByDocumento = clienteService.validExisteCliente(cliente.getDocumento().toString());
 
             if (!findByDocumento.isEmpty()) {
-                throw new ExceptionNullSql(new Date(), "Documento ya existe",
-                        "el documento " + cliente.getDocumento() + " ya registrado");
+                throw new ExceptionNullSql(new Date(), "Documento existente :",
+                        " Documento " + cliente.getDocumento() + " ya registrado");
             } else {
                 clienteService.save(cliente);
             }

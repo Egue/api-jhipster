@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.comunicamosmas.api.domain.SystemConfig;
 import com.comunicamosmas.api.service.dto.GrupoMailDTO;
+import com.comunicamosmas.api.service.dto.NomenclaturaDTO;
 import com.comunicamosmas.api.service.dto.ValorStringDTO;
 
 public interface ISystemConfigService {
@@ -20,4 +21,9 @@ public interface ISystemConfigService {
     public List<ValorStringDTO> findTipoPqr();
 
     public GrupoMailDTO grupoMail();
+
+    //nomenclatura
+    public void saveNomenclatura(List<NomenclaturaDTO> nomenclaturaDTOs);
+
+    public List<NomenclaturaDTO> listNomenclatura();
 }

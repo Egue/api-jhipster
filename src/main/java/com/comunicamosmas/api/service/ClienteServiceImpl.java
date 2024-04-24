@@ -24,31 +24,29 @@ public class ClienteServiceImpl implements IClienteService {
     }
 
     @Override
-    public Cliente save(Cliente cliente) {
-        if(cliente.getApellidosRep() == null) 
-        {
-            cliente.setApellidosRep(" ");
-            
-        }
-        if( cliente.getNombresRep() == null)
-        {
-            cliente.setNombresRep(" ");
-        }
+    public Cliente save(Cliente cliente) {        
+        
         if(cliente.getNombreComercial() == null)
         {
             cliente.setNombreComercial(" ");
-        }
-        if(cliente.getRazonSocial() == null)
+        }         
+        
+        if(cliente.getTipoCliente().equals("J"))
         {
+            cliente.setApellidoMaterno(" ");
+            cliente.setApellidoPaterno(" ");
+            cliente.setNombrePrimer(" ");
+            cliente.setNombreSegundo(" ");
+            cliente.setGenero("E");
+        }else{
             cliente.setRazonSocial(" ");
-        }
-        if(cliente.getTelefono() == null)
-        {
-            cliente.setTelefono(0L);
+            cliente.setNombresRep(" ");
+            cliente.setApellidosRep(" ");
         }
         // TODO Auto-generated method stub
-        cliente.setAutorizaSms(1L);
-        cliente.setBomberil(1L);
+        cliente.setTelefono(0L);
+        cliente.setAutorizaSms(0L);
+        cliente.setBomberil(0L);
         cliente.setEstadoCivil(" ");
         cliente.setEstrato(0);
         cliente.setfNacimiento(0);

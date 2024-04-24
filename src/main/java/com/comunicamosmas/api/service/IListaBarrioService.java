@@ -15,4 +15,7 @@ public interface IListaBarrioService {
 
     //buscar por id
     public ListaBarrio findById(Long id);
+
+    //findByMunicipio
+    public List<ListaBarrio> findByIdMunicipio(Long idMunicipio);
 }

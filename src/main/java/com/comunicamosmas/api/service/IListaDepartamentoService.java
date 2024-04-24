@@ -15,4 +15,6 @@ public interface IListaDepartamentoService {
 
     //buscar por id
     public ListaDepartamento findById(Long id);
+
+    public List<ListaDepartamento> findByEstado(Long Estado);
 }

@@ -38,7 +38,7 @@ public interface IWinmaxPassDao extends CrudRepository<WinmaxPass, Long> {
     		+ "ta.nombre as nombreTarifa,\n"
     		+ "ta.valor, \n "
     		+ "ta.codigo_mikrotik as codigoMikrotik\n"
-    		+ " FROM controlmas.winmax_pass\n"
+    		+ " FROM winmax_pass\n"
     		+ "inner join contratos co on co.id_contrato = winmax_pass.id_contrato\n"
     		+ "inner join tarifas ta on ta.id_tarifa = co.id_tarifa_promo\n"
     		+ "inner join clientes cli on cli.id_cliente = co.id_cliente\n"

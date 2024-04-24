@@ -5,6 +5,8 @@ import com.comunicamosmas.api.service.IEmpresaService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +43,18 @@ public class EmpresaController {
             response.put("response", e.getMessage());
 
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/empresa/listbystatus")
+    public ResponseEntity<?> listByStatus(){
+        try {
+            Optional<List<Empresa>> list = empresaService.findAllByStatus();
+            
+            return ResponseEntity.status(HttpStatus.OK).body(list);
+        } catch (Exception e) {
+            // TODO: handle exception
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(e.getMessage());
         }
     }
 
