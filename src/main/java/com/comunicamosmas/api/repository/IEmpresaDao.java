@@ -2,6 +2,8 @@ package com.comunicamosmas.api.repository;
 
 import com.comunicamosmas.api.domain.Empresa;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -15,4 +17,10 @@ public interface IEmpresaDao extends CrudRepository<Empresa, Long> {
     		+ "INNER JOIN contratos co on co.id_empresa = m.id_empresa"
     		+ " WHERE co.id_contrato = :idContrato", nativeQuery=true)
     public Empresa findEmpresaByContrato(@Param("idContrato") Long IdContrato);
+
+    @Query(value="SELECT * FROM empresas m WHERE m.estado = 1" , nativeQuery = true)
+    public Optional<List<Empresa>> findAllByStatus();
+
+    @Query(value="SELECT * FROM empresas m WHERE m.id_ciudad IN (SELECT uc.id_ciudad FROM usuarios_ciudades uc WHERE uc.id_usuario = :idUser)" , nativeQuery = true)
+    public List<Empresa> findFilter(@Param("idUser") Long idUser);
 }

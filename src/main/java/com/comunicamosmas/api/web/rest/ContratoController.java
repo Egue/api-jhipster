@@ -1,6 +1,7 @@
 package com.comunicamosmas.api.web.rest;
 
 import com.comunicamosmas.api.service.IContratoService;
+import com.comunicamosmas.api.service.dto.ContratosFirmasDTO;
 import com.comunicamosmas.api.service.dto.DatosClienteDTO;
 import com.comunicamosmas.api.service.dto.ListContratoDTO;  
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin("*")
@@ -63,4 +65,22 @@ public class ContratoController {
     		return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
     	}
     }
+
+    /**
+     * @param idContrato
+     */
+    @GetMapping("/contratos/find")
+    public ResponseEntity<?> find(@RequestParam Long idContrato)
+    {
+        try {
+            String contrato = "ok";
+            return ResponseEntity.status(HttpStatus.OK).body(contrato);
+        } catch (Exception e) {
+            // TODO: handle exception
+            Map<String, Object> response = new HashMap<>();
+             response.put("error", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
 }

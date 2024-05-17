@@ -1,39 +1,53 @@
 package com.comunicamosmas.api.service;
+ 
+import com.comunicamosmas.api.domain.TarifaInstalacion;
+import com.comunicamosmas.api.domain.TipoTecnologia; 
+import com.comunicamosmas.api.repository.ITipoTecnologiaDao;
 
-import com.comunicamosmas.api.domain.Admin;
-import com.comunicamosmas.api.repository.IAdminDao;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Optional;
+ 
 import org.springframework.stereotype.Service;
 
 @Service
-public class TipoTecnologiaServiceImpl implements IAdminService {
+public class TipoTecnologiaServiceImpl implements ITipoTecnologiaService {
 
-    @Autowired
-    IAdminDao adminDao;
+   private final ITipoTecnologiaDao tipoTecnologiaDao;
+
+   public TipoTecnologiaServiceImpl(ITipoTecnologiaDao tipoTecnologiaDao)
+   {
+    this.tipoTecnologiaDao = tipoTecnologiaDao;
+   }
 
     @Override
-    public List<Admin> findAll() {
+    public List<TarifaInstalacion> findAll() {
         // TODO Auto-generated method stub
-        return (List<Admin>) adminDao.findAll();
+        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
     }
 
     @Override
-    public Admin save(Admin admin) {
+    public TarifaInstalacion save(TarifaInstalacion tipoTecnologia) {
         // TODO Auto-generated method stub
-        adminDao.save(admin);
-        return null;
+        throw new UnsupportedOperationException("Unimplemented method 'save'");
     }
 
     @Override
     public Long deleteById(Long id) {
         // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException("Unimplemented method 'deleteById'");
     }
 
     @Override
-    public Admin findById(Long id) {
+    public TarifaInstalacion findById(Long id) {
         // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException("Unimplemented method 'findById'");
     }
+
+    @Override
+    public Optional<List<TipoTecnologia>> findByServicio(Long servicio) {
+        // TODO Auto-generated method stub
+        return tipoTecnologiaDao.findByServicio(servicio);
+    }
+
+     
 }

@@ -14,11 +14,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.comunicamosmas.api.domain.Cliente;
 import com.comunicamosmas.api.security.AuthoritiesConstants;
 import com.comunicamosmas.api.service.IClienteService;
+import com.comunicamosmas.api.service.IContratoService;
 import com.comunicamosmas.api.service.IPortalWebService;
 import com.comunicamosmas.api.service.dto.AdminPortalWebDTO;
 import com.comunicamosmas.api.service.dto.AdminUserDTO;
@@ -31,6 +33,9 @@ public class PortalWebController {
     
     @Autowired
     IPortalWebService portalWebService;
+
+    @Autowired
+    IContratoService contratoService;
 
     @Autowired
     IClienteService clienteService;
@@ -139,6 +144,30 @@ public class PortalWebController {
             response.put("error", e.getMessage());
 
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+    /**
+     * @param generate
+     */
+    @GetMapping("/portalweb/generatelink")
+    public ResponseEntity<?> generate(@RequestParam Long idContrato , @RequestHeader("Authorization") String token)
+    {
+        try {
+            String url = "https://portalweb.server.cableytv.com/#/c3b73a718e2971292c9101fb1b3ea3445754c49261c8ecf513427d84a47bf03c/" + idContrato;
+            contratoService.generateLink(idContrato , token);
+            Map<String,Object> resp = new HashMap<>();
+            resp.put("url" , url);
+            return ResponseEntity.status(HttpStatus.OK).body(resp);  
+        } catch (Exception e) {
+            // TODO: handle exception
+            Map<String ,Object> response = new HashMap<>();
+
+            response.put("error", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 

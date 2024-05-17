@@ -3,6 +3,7 @@ package com.comunicamosmas.api.web.rest;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,8 +17,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
+import org.springframework.core.io.Resource; 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,10 +25,12 @@ import org.springframework.http.ResponseEntity;
 import com.comunicamosmas.api.domain.SystemConfig;
 import com.comunicamosmas.api.service.ISystemConfigService;
 import com.comunicamosmas.api.service.dto.GrupoMailDTO;
+import com.comunicamosmas.api.service.dto.NomenclaturaDTO;
 import com.comunicamosmas.api.service.dto.ValorStringDTO;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 
-import io.jsonwebtoken.io.IOException;
+import io.jsonwebtoken.io.IOException; 
+import tech.jhipster.config.JHipsterProperties.Http;
  
 
 @CrossOrigin("*")
@@ -128,6 +130,43 @@ public class SystemController {
              
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ByteArrayResource(e.getMessage().getBytes()));
+        }
+    }
+
+    @PostMapping("/systemConfig/nomenclatura")
+    public ResponseEntity<?> saveNomenclatura(@RequestBody List<NomenclaturaDTO> nomenclatura)
+    {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            
+            systemService.saveNomenclatura(nomenclatura);
+            response.put("nomenclatura", "OK");
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            // TODO: handle exception
+
+            response.put("error", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @GetMapping("/systemConfig/nomenclatura")
+    public ResponseEntity<?> findNomenclatura()
+    {
+        try {
+            List<NomenclaturaDTO> list = systemService.listNomenclatura();
+
+            return ResponseEntity.status(HttpStatus.OK).body(list);
+        } catch (Exception e) {
+            // TODO: handle exception
+
+            Map<String,Object> response = new HashMap<>();
+
+            response.put("error", e.getMessage());
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
     

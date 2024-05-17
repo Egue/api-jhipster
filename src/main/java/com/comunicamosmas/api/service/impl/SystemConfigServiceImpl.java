@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
- 
 
+import org.apache.poi.hssf.record.ObjRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,8 +13,11 @@ import com.comunicamosmas.api.domain.SystemConfig;
 import com.comunicamosmas.api.repository.ISystemConfigDao;
 import com.comunicamosmas.api.service.ISystemConfigService;
 import com.comunicamosmas.api.service.dto.GrupoMailDTO;
+import com.comunicamosmas.api.service.dto.NomenclaturaDTO;
 import com.comunicamosmas.api.service.dto.ValorStringDTO;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
@@ -95,5 +98,45 @@ public class SystemConfigServiceImpl implements ISystemConfigService {
  
          
     }
+
+    @Override
+    public void saveNomenclatura(List<NomenclaturaDTO> nomenclaturaDTOs){
+        // TODO Auto-generated method stub
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            String json = objectMapper.writeValueAsString(nomenclaturaDTOs);
+
+            SystemConfig system = new SystemConfig();
+
+            system.setOrigen("nomenclatura");
+
+            system.setComando(json);
+
+            systemDao.save(system);
+
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public List<NomenclaturaDTO> listNomenclatura() {
+        // TODO Auto-generated method stub 
+        SystemConfig result = systemDao.findByOrigen("nomenclatura");
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            return objectMapper.readValue(result.getComando(), new TypeReference<List<NomenclaturaDTO>>(){});
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    
 
 }

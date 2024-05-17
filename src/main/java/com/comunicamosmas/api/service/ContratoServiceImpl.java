@@ -1,16 +1,23 @@
 package com.comunicamosmas.api.service;
 
+import com.comunicamosmas.api.domain.ClausulaPermanencia;
+import com.comunicamosmas.api.domain.Cliente;
 import com.comunicamosmas.api.domain.Contrato;
 import com.comunicamosmas.api.domain.SystemConfig;
+import com.comunicamosmas.api.repository.IClausulaPermanenciaDao;
+import com.comunicamosmas.api.repository.IClienteDao;
 import com.comunicamosmas.api.repository.IContratoDao;
 import com.comunicamosmas.api.service.dto.ArrayListDTO;
 import com.comunicamosmas.api.service.dto.CarteraDTO;
 import com.comunicamosmas.api.service.dto.ContratoInfoFacturaDTO;
+import com.comunicamosmas.api.service.dto.ContratosFirmasDTO;
 import com.comunicamosmas.api.service.dto.DatosClienteDTO;
 import com.comunicamosmas.api.service.dto.ListContratoDTO;
+import com.comunicamosmas.api.service.dto.PortalWebSaveContrato;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -37,6 +44,21 @@ public class ContratoServiceImpl implements IContratoService {
 
 	@Autowired
 	ISystemConfigService systemConfigService;
+
+	@Autowired
+	IClienteDao clienteDao;
+
+	@Autowired
+	IDireccionService direccionService;
+
+	@Autowired
+	ITarifaService tarifaService;
+
+	@Autowired
+	IClausulaPermanenciaDao clausulaPermanenciaDao;
+
+	@Autowired
+	IPortalWebService portalWebService;
 
 	@Override
 	public List<Contrato> findAll() {
@@ -106,6 +128,8 @@ public class ContratoServiceImpl implements IContratoService {
 				datosCliente.setLatEstacion((String) datos[12]);
 				datosCliente.setLongEstacion((String) datos[13]);
 				datosCliente.setDireccionServicio((String) datos[14]);
+				datosCliente.setFisico((String) datos[15]);
+				datosCliente.setTipoCliente((String) datos[16]);
 			}
 
 			return datosCliente;
@@ -205,5 +229,74 @@ public class ContratoServiceImpl implements IContratoService {
 	public void updateSaldoFavor(Contrato contrato, Float valor) {
 		 contrato.setSaldoFavor((float) valor);
 		 contratoDao.save(contrato);
+	}
+
+	@Override
+	public ContratosFirmasDTO.Datos generateLink(Long idContrato , String token) {
+		ContratosFirmasDTO.Datos infoAdd = tarifaService.findInfoServicioForFirmasContrato(idContrato);
+		ContratosFirmasDTO contratoFirmas = new ContratosFirmasDTO();
+
+		ContratosFirmasDTO.Datos datos = contratoFirmas.new Datos();
+		datos.setNombre_asesor(infoAdd.getNombre_asesor());
+		datos.setRegistro(infoAdd.getRegistro());
+		datos.setId_contrato(infoAdd.getId_contrato());
+		datos.setId_cliente(infoAdd.getId_cliente());
+		datos.setVigencia(infoAdd.getVigencia());
+		datos.setComentario(infoAdd.getComentario());
+		datos.setReconexion("15000");
+		Cliente cliente = clienteDao.getClientByIdContrato(idContrato);		
+		ContratosFirmasDTO.DatosSuscriptor suscriptor = contratoFirmas.new DatosSuscriptor();
+		suscriptor.setCelular(cliente.getCelularA()  + cliente.getCelularB());
+		suscriptor.setCorreo(cliente.getMail());
+		suscriptor.setEstrato(infoAdd.getDatos_suscriptor().getEstrato());
+		suscriptor.setFisico(infoAdd.getDatos_suscriptor().getFisico());
+		suscriptor.setIdentificacion(cliente.getDocumento().toString());
+		String nameCliente = cliente.getTipoCliente().equals("N") ? cliente.getApellidoPaterno() + " "+cliente.getApellidoMaterno() +" " + cliente.getNombrePrimer() + cliente.getNombreSegundo() : cliente.getRazonSocial();
+		suscriptor.setNombre(nameCliente);
+		datos.setDatos_suscriptor(suscriptor);
+		//contacto		 
+		datos.setDatos_contacto(direccionService.findInfoByFimra(idContrato));
+		//datos servicios
+		ContratosFirmasDTO.DatosServicio servicio = contratoFirmas.new DatosServicio();
+		servicio.setConcepto("Internet Fijo");
+		servicio.setInstalacion(infoAdd.getDatos_servicio().getInstalacion());
+		servicio.setMensualidad(infoAdd.getDatos_servicio().getMensualidad());
+		servicio.setVelocidad(infoAdd.getDatos_servicio().getVelocidad());
+		datos.setDatos_servicio(servicio);
+		//Servicios adicionales
+		ContratosFirmasDTO.ServiciosAdicionales adicionales = contratoFirmas.new ServiciosAdicionales();
+		adicionales.setConcepto(null);
+		adicionales.setMensualidad(null);
+		datos.setServicios_adicionales(adicionales);
+		//Clausula de permanencia
+		ContratosFirmasDTO.ClausulaPermanencia clausura = contratoFirmas.new ClausulaPermanencia();
+		ClausulaPermanencia clau = clausulaPermanenciaDao.findByIdContrato(idContrato);
+		LocalDate initial = LocalDate.parse(infoAdd.getRegistro());
+		LocalDate finale = initial.plusMonths(Integer.parseInt(infoAdd.getVigencia()));
+		clausura.setFin(finale.toString());
+		clausura.setInicio(infoAdd.getRegistro());
+		clausura.setMes_1(clau.getMes1());
+		clausura.setMes_2(clau.getMes2().toString());
+		clausura.setMes_3(clau.getMes3().toString());
+		clausura.setMes_4(clau.getMes4().toString());
+		clausura.setMes_5(clau.getMes5().toString());
+		clausura.setMes_6(clau.getMes6().toString());
+		clausura.setMes_7(clau.getMes7().toString());
+		clausura.setMes_8(clau.getMes8().toString());
+		clausura.setMes_9(clau.getMes9().toString());
+		clausura.setMes_10(clau.getMes10().toString());
+		clausura.setMes_11(clau.getMes11().toString());
+		clausura.setMes_12(clau.getMes12().toString());
+		datos.setClausula_permanencia(clausura);
+		//Optional<Object[]> contrato = contratoDao.findByIdFromFirma(idContrato);
+		PortalWebSaveContrato save = new PortalWebSaveContrato();
+		save.setId_contrato(infoAdd.getId_contrato());
+		save.setId_cliente(infoAdd.getId_cliente());
+		save.setIdServicio(infoAdd.getIdServicio());
+		save.setDatosContrato(datos);
+		
+		portalWebService.sincroniceContratos(save, token);
+
+		return datos;
 	}
 }

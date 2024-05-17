@@ -2,12 +2,18 @@ package com.comunicamosmas.api.service;
  
 import com.comunicamosmas.api.domain.Tarifa; 
 import com.comunicamosmas.api.repository.ITarifaDao;
+import com.comunicamosmas.api.service.dto.ContratosFirmasDTO.DatosServicio;
+import com.comunicamosmas.api.service.dto.ContratosFirmasDTO;
 import com.comunicamosmas.api.service.dto.DisctVelocidadDTO;
 import com.comunicamosmas.api.service.dto.TarifasForCambioDTO;
 import com.comunicamosmas.api.service.dto.valorDTO;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.hibernate.mapping.Collection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -91,6 +97,36 @@ public class TarifaServiceImpl implements ITarifaService {
 	public int findSpeedByIdContrato(Long idContrato)
 	{
 		return tarifaDao.findSpeedByIdContrato(idContrato);
+	}
+
+	@Override
+	public ContratosFirmasDTO.Datos findInfoServicioForFirmasContrato(Long idContrato) {
+		// TODO Auto-generated method stub
+		Optional<List<Object[]>> result = tarifaDao.findInfoForFirma(idContrato);
+		
+		List<ContratosFirmasDTO.Datos> firma = result.map(res->res.stream().map(rs->{
+			ContratosFirmasDTO response = new ContratosFirmasDTO();
+			ContratosFirmasDTO.Datos datos = response.new Datos();
+			datos.setId_contrato((String) rs[9].toString());
+			datos.setId_cliente((String) rs[10].toString());
+			datos.setRegistro((String) rs[0]);
+			datos.setVigencia((String) rs[1].toString());
+			datos.setComentario((String) rs[2]);
+			ContratosFirmasDTO.DatosServicio servicio = response.new DatosServicio();
+			servicio.setInstalacion((String) rs[3].toString());
+			servicio.setVelocidad((String) rs[7].toString());
+			servicio.setMensualidad((String) rs[8].toString());
+			datos.setDatos_servicio(servicio);
+			datos.setNombre_asesor((String) rs[4]);
+			ContratosFirmasDTO.DatosSuscriptor suscriptor = response.new DatosSuscriptor();
+			suscriptor.setEstrato((String) rs[5].toString());
+			suscriptor.setFisico((String) rs[6]);
+			datos.setIdServicio((Integer) rs[11]);
+			datos.setDatos_suscriptor(suscriptor);
+			return datos;
+		}).collect(Collectors.toList())).orElse(new ArrayList<>());
+
+		return firma.get(0);
 	}
  
 }

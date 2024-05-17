@@ -3,11 +3,14 @@ package com.comunicamosmas.api.repository;
 import com.comunicamosmas.api.domain.Tarifa;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface ITarifaDao extends CrudRepository<Tarifa, Long> {
 	
 	@Query(value="select distinct(ta.velocidad) as velocidad from tarifas  ta where ta.id_servicio = :idServicio and ta.id_tecnologia = :idTecnologia order by ta.velocidad" , nativeQuery= true)
@@ -39,4 +42,13 @@ public interface ITarifaDao extends CrudRepository<Tarifa, Long> {
 	@Query(value="select velocidad from tarifas ta 	INNER JOIN contratos co ON co.id_tarifa_promo = ta.id_tarifa \n" 
 				+ "WHERE co.id_contrato = :idContrato" , nativeQuery = true)
 	public int findSpeedByIdContrato(@Param("idContrato") Long idContrato); 
+
+	@Query(value = "select  DATE_FORMAT(c.marca , '%Y-%m-%d') as inicio , c.duracion  , c.nota , ti.valor instalacion, \n"+
+	"CONCAT(u.nombre,' ', u.apellidos) as vendedor, c.estrato , c.fisico ,t.velocidad , t.valor mensualidad, \n" +
+	"c.id_contrato , c.id_cliente, c.id_servicio from contratos c \n" +
+	"inner join tarifas t  on t.id_tarifa = c.id_tarifa_promo \n"+ 
+	"inner join tarifas_instalacion ti on ti.id_tarifa = c.id_tarifa_instalacion\n"+ 
+	"inner join usuarios u on u.id_usuario = c.id_vendedor \n"+
+	"WHERE c.id_contrato = :idContrato" , nativeQuery = true)
+	public Optional<List<Object[]>> findInfoForFirma(@Param("idContrato") Long idContrato);
 }

@@ -8,7 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-@Table(name = "lista_municipios.java")
+@Table(name = "lista_municipios")
 @Entity
 public class ListaMunicipio implements Serializable {
 
@@ -23,7 +23,8 @@ public class ListaMunicipio implements Serializable {
 
     private Long estado;
 
-    private Long departamento_id;
+    @Column(name="departamento_id")
+    private Long departamentoid;
 
     private Long dian;
 
@@ -52,11 +53,11 @@ public class ListaMunicipio implements Serializable {
     }
 
     public Long getDepartamento_id() {
-        return departamento_id;
+        return departamentoid;
     }
 
-    public void setDepartamento_id(Long departamento_id) {
-        this.departamento_id = departamento_id;
+    public void setDepartamento_id(Long departamentoid) {
+        this.departamentoid = departamentoid;
     }
 
     public Long getDian() {

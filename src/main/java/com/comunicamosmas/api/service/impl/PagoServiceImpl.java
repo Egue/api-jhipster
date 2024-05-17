@@ -27,6 +27,7 @@ import com.comunicamosmas.api.service.IPagoService;
 import com.comunicamosmas.api.service.dto.DeudasForFacturaDTO;
 import com.comunicamosmas.api.service.dto.ReciboCajaDTO;
 import com.comunicamosmas.api.service.dto.ReporteMediosPagosDTO;
+import com.comunicamosmas.api.service.dto.ReporteSiustOneThreeDTO;
 
 @Service
 public class PagoServiceImpl implements IPagoService {
@@ -359,6 +360,44 @@ public class PagoServiceImpl implements IPagoService {
         }).collect(Collectors.toList())).orElse(new ArrayList<>()); 
 
         return pagos;
+    }
+
+    @Override
+    public List<ReporteSiustOneThreeDTO>  reporteOneToThree(List<Integer> servicios, Integer firts, Integer end) {
+        // TODO Auto-generated method stub
+            /*headerRow.createCell(1).setCellValue("Tipo Cliente");
+                headerRow.createCell(2).setCellValue("Deuda");
+                headerRow.createCell(3).setCellValue("Contrato");
+                headerRow.createCell(4).setCellValue("Factura");
+                headerRow.createCell(5).setCellValue("Base");
+                headerRow.createCell(6).setCellValue("IVA");
+                headerRow.createCell(7).setCellValue("# Tarifa");
+                headerRow.createCell(8).setCellValue("Estrato");
+                headerRow.createCell(9).setCellValue("Velocidad");
+                headerRow.createCell(10).setCellValue("Tecnologia");
+                headerRow.createCell(11).setCellValue("Concepto");
+                headerRow.createCell(12).setCellValue("NC Base");
+                headerRow.createCell(13).setCellValue("NC IVA"); */ 
+            Optional<List<Object[]>> result = pagoDao.reporteSIUSTOneToThree(servicios, firts, end);
+            List<ReporteSiustOneThreeDTO> reporte = result.map(resp -> resp.stream().map(rs->{
+                ReporteSiustOneThreeDTO obj = new ReporteSiustOneThreeDTO();
+                obj.setServicio((String) rs[0]);
+                obj.setTipoCliente((String) rs[1]);
+                obj.setDeuda((Integer) rs[2]);
+                obj.setContrato((Integer) rs[3]);
+                obj.setFactura((Integer) rs[4]);
+                obj.setBase((Double) rs[5]);
+                obj.setIva((float) rs[6]);
+                obj.setTarifa((Integer) rs[7]);
+                obj.setEstrato((Integer) rs[8]);
+                obj.setVelocidad((Integer) rs[9]);
+                obj.setTecnologia((Integer) rs[10]);
+                obj.setConcepto((String) rs[11]);
+                obj.setNcBase((Double) rs[12]);
+                obj.setNcIva((Double) rs[13]);
+                return obj;
+            }).collect(Collectors.toList())).orElse(new ArrayList<>());
+            return reporte;
     }
 
 }

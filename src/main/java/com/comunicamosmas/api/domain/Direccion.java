@@ -20,7 +20,7 @@ public class Direccion implements Serializable {
     private Long id;
 
     @Column(name = "id_cliente")
-    private Long idCliente;
+    private Long idcliente;
 
     private String pais;
 
@@ -33,22 +33,22 @@ public class Direccion implements Serializable {
     private String tipo;
 
     @Column(name = "a_tipo")
-    private String aTipo;
+    private String atipo;
 
     @Column(name = "a_numero")
-    private Long aNumero;
+    private Long anumero;
 
     @Column(name = "a_letra")
-    private String aLetra;
+    private String aletra;
 
     @Column(name = "b_tipo")
-    private String bTipo;
+    private String btipo;
 
     @Column(name = "b_numero")
-    private Long bNumero;
+    private Long bnumero;
 
     @Column(name = "b_letra")
-    private String bLetra;
+    private String bletra;
 
     private Long numero;
 
@@ -60,7 +60,7 @@ public class Direccion implements Serializable {
 
     private Long estado;
 
-    private String marca;
+    //private String marca;
 
     private Long rara;
 
@@ -72,12 +72,12 @@ public class Direccion implements Serializable {
         this.id = id;
     }
 
-    public Long getIdCliente() {
-        return idCliente;
+    public Long getIdcliente() {
+        return idcliente;
     }
 
-    public void setIdCliente(Long idCliente) {
-        this.idCliente = idCliente;
+    public void setIdcliente(Long idcliente) {
+        this.idcliente = idcliente;
     }
 
     public String getPais() {
@@ -120,52 +120,52 @@ public class Direccion implements Serializable {
         this.tipo = tipo;
     }
 
-    public String getaTipo() {
-        return aTipo;
+    public String getAtipo() {
+        return atipo;
     }
 
-    public void setaTipo(String aTipo) {
-        this.aTipo = aTipo;
+    public void setAtipo(String atipo) {
+        this.atipo = atipo;
     }
 
-    public Long getaNumero() {
-        return aNumero;
+    public Long getAnumero() {
+        return anumero;
     }
 
-    public void setaNumero(Long aNumero) {
-        this.aNumero = aNumero;
+    public void setAnumero(Long anumero) {
+        this.anumero = anumero;
     }
 
-    public String getaLetra() {
-        return aLetra;
+    public String getAletra() {
+        return aletra;
     }
 
-    public void setaLetra(String aLetra) {
-        this.aLetra = aLetra;
+    public void setAletra(String aletra) {
+        this.aletra = aletra;
     }
 
-    public String getbTipo() {
-        return bTipo;
+    public String getBtipo() {
+        return btipo;
     }
 
-    public void setbTipo(String bTipo) {
-        this.bTipo = bTipo;
+    public void setBtipo(String btipo) {
+        this.btipo = btipo;
     }
 
-    public Long getbNumero() {
-        return bNumero;
+    public Long getBnumero() {
+        return bnumero;
     }
 
-    public void setbNumero(Long bNumero) {
-        this.bNumero = bNumero;
+    public void setBnumero(Long bnumero) {
+        this.bnumero = bnumero;
     }
 
-    public String getbLetra() {
-        return bLetra;
+    public String getBletra() {
+        return bletra;
     }
 
-    public void setbLetra(String bLetra) {
-        this.bLetra = bLetra;
+    public void setBletra(String bletra) {
+        this.bletra = bletra;
     }
 
     public Long getNumero() {
@@ -208,14 +208,6 @@ public class Direccion implements Serializable {
         this.estado = estado;
     }
 
-    public String getMarca() {
-        return marca;
-    }
-
-    public void setMarca(String marca) {
-        this.marca = marca;
-    }
-
     public Long getRara() {
         return rara;
     }
@@ -223,4 +215,15 @@ public class Direccion implements Serializable {
     public void setRara(Long rara) {
         this.rara = rara;
     }
+
+    @Override
+    public String toString() {
+        return "Direccion [id=" + id + ", idcliente=" + idcliente + ", pais=" + pais + ", departamento=" + departamento
+                + ", municipio=" + municipio + ", barrio=" + barrio + ", tipo=" + tipo + ", atipo=" + atipo
+                + ", anumero=" + anumero + ", aletra=" + aletra + ", btipo=" + btipo + ", bnumero=" + bnumero
+                + ", bletra=" + bletra + ", numero=" + numero + ", latitud=" + latitud + ", longitud=" + longitud
+                + ", nota=" + nota + ", estado=" + estado + ", rara=" + rara + "]";
+    }
+ 
+    
 }

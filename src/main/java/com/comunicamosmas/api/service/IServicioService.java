@@ -2,6 +2,7 @@ package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.Servicio;
 import java.util.List;
+import java.util.Optional;
 
 public interface IServicioService {
     //listar todos
@@ -17,5 +18,7 @@ public interface IServicioService {
     public Servicio findById(Long id);
 
     public List<Servicio> findByName(String name);
+
+    public Optional<List<Servicio>> findByIdEmpresa(Long idEmpresa);
      
 }

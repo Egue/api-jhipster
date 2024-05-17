@@ -28,7 +28,7 @@ public class ClausulaPermanencia implements Serializable {
     private Long idContrato;
 
     @Column(name = "mes_1")
-    private Long mes1;
+    private String mes1;
 
     @Column(name = "mes_2")
     private Long mes2;
@@ -95,11 +95,11 @@ public class ClausulaPermanencia implements Serializable {
         this.idContrato = idContrato;
     }
 
-    public Long getMes1() {
+    public String getMes1() {
         return mes1;
     }
 
-    public void setMes1(Long mes1) {
+    public void setMes1(String mes1) {
         this.mes1 = mes1;
     }
 

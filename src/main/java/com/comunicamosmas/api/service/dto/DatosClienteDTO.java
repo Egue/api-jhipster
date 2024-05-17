@@ -4,30 +4,32 @@ import java.math.BigInteger;
 
 public class DatosClienteDTO {
 	
-	public Integer idContrato;
-	public Integer estrato;
-	public String nombreCliente;
-	public BigInteger documento; 
-	public String celularA;
-	public String celularB;
-	public String mail;
-	public String nombreTarifa;
-	public Integer velocidad;
-	public String valor;
-	public String longDireccion; 
-	public String latDireccion;
-	public String longEstacion;
-	public String latEstacion;  
-	public String direccionServicio;
+	private Integer idContrato;
+	private Integer estrato;
+	private String nombreCliente;
+	private BigInteger documento; 
+	private String celularA;
+	private String celularB;
+	private String mail;
+	private String nombreTarifa;
+	private Integer velocidad;
+	private String valor;
+	private String longDireccion; 
+	private String latDireccion;
+	private String longEstacion;
+	private String latEstacion;  
+	private String direccionServicio;
+	private String fisico;
+	private String tipoCliente;
 	
+
 	
 	public DatosClienteDTO() {
-		 
 	}
-	public DatosClienteDTO(Integer idContrato, Integer estrato, String nombreCliente, BigInteger documento, String celularA,
-			String celularB, String mail, String nombreTarifa, Integer velocidad, String valor, String longDireccion,
-			String latDireccion, String longEstacion, String latEstacion, String direccionServicio) {
-		 
+	public DatosClienteDTO(Integer idContrato, Integer estrato, String nombreCliente, BigInteger documento,
+			String celularA, String celularB, String mail, String nombreTarifa, Integer velocidad, String valor,
+			String longDireccion, String latDireccion, String longEstacion, String latEstacion,
+			String direccionServicio, String fisico, String tipoCliente) {
 		this.idContrato = idContrato;
 		this.estrato = estrato;
 		this.nombreCliente = nombreCliente;
@@ -43,6 +45,8 @@ public class DatosClienteDTO {
 		this.longEstacion = longEstacion;
 		this.latEstacion = latEstacion;
 		this.direccionServicio = direccionServicio;
+		this.fisico = fisico;
+		this.tipoCliente = tipoCliente;
 	}
 	public Integer getIdContrato() {
 		return idContrato;
@@ -134,14 +138,30 @@ public class DatosClienteDTO {
 	public void setDireccionServicio(String direccionServicio) {
 		this.direccionServicio = direccionServicio;
 	}
+	public String getFisico() {
+		return fisico;
+	}
+	public void setFisico(String fisico) {
+		this.fisico = fisico;
+	}
+	public String getTipoCliente() {
+		return tipoCliente;
+	}
+	public void setTipoCliente(String tipoCliente) {
+		this.tipoCliente = tipoCliente;
+	}
 	@Override
 	public String toString() {
 		return "DatosClienteDTO [idContrato=" + idContrato + ", estrato=" + estrato + ", nombreCliente=" + nombreCliente
 				+ ", documento=" + documento + ", celularA=" + celularA + ", celularB=" + celularB + ", mail=" + mail
 				+ ", nombreTarifa=" + nombreTarifa + ", velocidad=" + velocidad + ", valor=" + valor
 				+ ", longDireccion=" + longDireccion + ", latDireccion=" + latDireccion + ", longEstacion="
-				+ longEstacion + ", latEstacion=" + latEstacion + ", direccionServicio=" + direccionServicio + "]";
+				+ longEstacion + ", latEstacion=" + latEstacion + ", direccionServicio=" + direccionServicio
+				+ ", fisico=" + fisico + ", tipoCliente=" + tipoCliente + "]";
 	}
+	
+	
+	 
 	
 	
 

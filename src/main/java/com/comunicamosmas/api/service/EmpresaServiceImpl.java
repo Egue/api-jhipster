@@ -3,14 +3,20 @@ package com.comunicamosmas.api.service;
 import com.comunicamosmas.api.domain.Empresa;
 import com.comunicamosmas.api.repository.IEmpresaDao;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class EmpresaServiceImpl implements IEmpresaService {
 
-    @Autowired
-    IEmpresaDao empresaDao;
+    private final IEmpresaDao empresaDao;
+
+    public EmpresaServiceImpl(IEmpresaDao empresaDao)
+    {
+        this.empresaDao = empresaDao;
+    }
 
     @Override
     public List<Empresa> findAll() {
@@ -47,4 +53,17 @@ public class EmpresaServiceImpl implements IEmpresaService {
 		// TODO Auto-generated method stub
 		return empresaDao.findEmpresaByContrato(idContrato);
 	}
+
+    @Override
+    public Optional<List<Empresa>> findAllByStatus() {
+        // TODO Auto-generated method stub
+        return empresaDao.findAllByStatus();
+    }
+
+    @Override
+    public List<Empresa> findFilter(Long idUSer) {
+        // TODO Auto-generated method stub
+        return empresaDao.findFilter(idUSer);
+        
+    }
 }

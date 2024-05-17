@@ -31,9 +31,15 @@ spring:
     serialization:
       indent-output: true
   datasource:
+    #url: jdbc:mysql://192.168.24.138:3306/controlmas04?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+    #url: jdbc:mysql://192.168.24.121:33306/controlmas31?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
     url: jdbc:mysql://10.112.109.2:3306/controlmas?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
-    username: LNWW(345
-    password: 9C9UAaqKecHRZA79
+    #username: LNN)W1n
+    #username: root
+    username:  
+    #password: Mysql1234@
+    #password: mysql
+    password: 
     driver-class-name: com.mysql.jdbc.Driver
     hikari:
       poolName: Hikari
@@ -48,7 +54,7 @@ spring:
     use-new-id-generator-mappings: true
   liquibase:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
-    contexts: dev, faker
+    contexts: dev
     enabled: false
   mail:
     host: localhost
@@ -86,7 +92,7 @@ jhipster:
   # CORS is only enabled by default with the "dev" profile
   cors:
     # Allow Ionic for JHipster by default (* no longer allowed in Spring Boot 2.4+)
-    allowed-origins: 'http://localhost:4200,http://10.111.39.2'
+    allowed-origins: 'http://localhost:4200,http://10.111.39.2,http://gestion.cableytv.com:8060'
     #allowed-origins: 'http://190.121.145.227:9050'
     allowed-methods: '*'
     allowed-headers: '*'

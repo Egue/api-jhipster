@@ -20,25 +20,18 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
-import org.springframework.web.client.RequestCallback;
-import org.springframework.web.client.ResponseExtractor;
 import org.springframework.web.client.RestTemplate;
 
 import com.comunicamosmas.api.domain.Contrato;
 import com.comunicamosmas.api.domain.Empresa;
 import com.comunicamosmas.api.domain.SystemConfig;
-import com.comunicamosmas.api.domain.Deuda;
 import com.comunicamosmas.api.domain.EmailCampaign;
 import com.comunicamosmas.api.service.IApiRestService;
 import com.comunicamosmas.api.service.IClienteService;
@@ -53,9 +46,6 @@ import com.comunicamosmas.api.service.dto.EmailCampaignDetalleDTO;
 import com.comunicamosmas.api.service.dto.FacturaElectronicaResponseDTO;
 import com.comunicamosmas.api.service.dto.RespuestaGeneracionPDFFactura;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
 import com.comunicamosmas.api.service.dto.DeudasForFacturaDTO;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
@@ -147,7 +137,7 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 		String nombreEmpresa = empresa.getRazonSocial();
 
 		responseFactura.setRazon_social(nombreEmpresa);// guardamo el nombre de la empresa;
-		responseFactura.setNit(empresa.getNit() + empresa.getDv().toString());
+		responseFactura.setNit(empresa.getNit().toString());
 		responseFactura.setLogoPublico(empresa.getLogoPublico());
 
 		String nitEmpresa = "NIT:" + empresa.getNit() + "-" + empresa.getDv();
