@@ -11,8 +11,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmpresaServiceImpl implements IEmpresaService {
 
-    @Autowired
-    IEmpresaDao empresaDao;
+    private final IEmpresaDao empresaDao;
+
+    public EmpresaServiceImpl(IEmpresaDao empresaDao)
+    {
+        this.empresaDao = empresaDao;
+    }
 
     @Override
     public List<Empresa> findAll() {
@@ -54,5 +58,12 @@ public class EmpresaServiceImpl implements IEmpresaService {
     public Optional<List<Empresa>> findAllByStatus() {
         // TODO Auto-generated method stub
         return empresaDao.findAllByStatus();
+    }
+
+    @Override
+    public List<Empresa> findFilter(Long idUSer) {
+        // TODO Auto-generated method stub
+        return empresaDao.findFilter(idUSer);
+        
     }
 }

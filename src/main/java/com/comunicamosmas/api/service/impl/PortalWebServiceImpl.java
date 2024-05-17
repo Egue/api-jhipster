@@ -17,6 +17,8 @@ import com.comunicamosmas.api.service.IPortalWebService;
 import com.comunicamosmas.api.service.dto.AdminPortalWebDTO;
 import com.comunicamosmas.api.service.dto.AdminUserDTO;
 import com.comunicamosmas.api.service.dto.ClientePortalWebDTO;
+import com.comunicamosmas.api.service.dto.PortalWebSaveContrato;
+import com.comunicamosmas.api.service.dto.ContratosFirmasDTO.Datos;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql; 
 
 @Service
@@ -171,6 +173,30 @@ public class PortalWebServiceImpl implements IPortalWebService{
             this.cliente = cliente;
         }
         
+    }
+
+    @Override
+    public void sincroniceContratos(PortalWebSaveContrato datos , String token) {
+        // TODO Auto-generated method stub
+        try {
+            String endpoint = url + "portal/contratos";
+
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            headers.set("Authorization" , token);
+
+            HttpEntity<PortalWebSaveContrato> cliente = new HttpEntity<>(datos , headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(endpoint, HttpMethod.POST, cliente, String.class);
+
+        } catch(HttpMessageConversionException e){
+
+            throw new ExceptionNullSql(new Date(), "Error enviando a Portal Web", e.getMessage());
+
+        } catch (Exception e) {
+
+            throw new ExceptionNullSql(new Date(), "Error Inesperado con Portal Web", e.getMessage() );
+        }
     }
     
 }

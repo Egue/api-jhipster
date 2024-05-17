@@ -4,6 +4,7 @@ import com.comunicamosmas.api.domain.Contrato;
 import com.comunicamosmas.api.domain.Pago;
 import com.comunicamosmas.api.service.dto.ReciboCajaDTO;
 import com.comunicamosmas.api.service.dto.ReporteMediosPagosDTO;
+import com.comunicamosmas.api.service.dto.ReporteSiustOneThreeDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,4 +33,8 @@ public interface IPagoService {
 
     //reporteMedio
     public List<ReporteMediosPagosDTO> findMedioPago(List<Integer> medio , String inicio , String fin);
+
+    /*Reporte T.1.3 Lineas o accesos y valores facturados o 
+        cobrados de servicios fijos individuales */
+    public List<ReporteSiustOneThreeDTO>  reporteOneToThree(List<Integer> servicios  , Integer firts , Integer end);    
 }

@@ -22,4 +22,6 @@ public interface IEmpresaService {
     public Empresa findByIdContrato(Long idContrato);
 
     public Optional<List<Empresa>> findAllByStatus();
+
+    public List<Empresa> findFilter(Long idUSer);
 }

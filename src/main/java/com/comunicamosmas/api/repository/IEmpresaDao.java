@@ -20,4 +20,7 @@ public interface IEmpresaDao extends CrudRepository<Empresa, Long> {
 
     @Query(value="SELECT * FROM empresas m WHERE m.estado = 1" , nativeQuery = true)
     public Optional<List<Empresa>> findAllByStatus();
+
+    @Query(value="SELECT * FROM empresas m WHERE m.id_ciudad IN (SELECT uc.id_ciudad FROM usuarios_ciudades uc WHERE uc.id_usuario = :idUser)" , nativeQuery = true)
+    public List<Empresa> findFilter(@Param("idUser") Long idUser);
 }

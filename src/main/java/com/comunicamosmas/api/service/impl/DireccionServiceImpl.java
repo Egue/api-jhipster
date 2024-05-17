@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import com.comunicamosmas.api.domain.Direccion; 
 import com.comunicamosmas.api.repository.IDireccionDao;
 import com.comunicamosmas.api.service.IDireccionService;
+import com.comunicamosmas.api.service.dto.ContratosFirmasDTO.DatosContacto;
+import com.comunicamosmas.api.service.dto.ContratosFirmasDTO;
 import com.comunicamosmas.api.service.dto.DireccionDTO;
 
 @Service
@@ -31,7 +33,7 @@ public class DireccionServiceImpl implements IDireccionService{
     @Override
     public Direccion save(Direccion direccion) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+       return direccionDao.save(direccion);
     }
 
     @Override
@@ -68,6 +70,25 @@ public class DireccionServiceImpl implements IDireccionService{
         }).collect(Collectors.toList())).orElse(new ArrayList<>());
         
         return direcciones; 
+    }
+
+    @Override
+    public DatosContacto findInfoByFimra(Long idContrato) {
+        // TODO Auto-generated method stub
+        Optional<List<Object[]>> result = direccionDao.findInfoFirma(idContrato);
+        ContratosFirmasDTO firmas = new ContratosFirmasDTO();
+
+        List<DatosContacto> response = result.map(resp -> resp.stream().map(rs->{
+                DatosContacto obj = firmas.new DatosContacto();
+                obj.setBarrio((String) rs[0]);
+                obj.setDepartamento((String) rs[1]);
+                obj.setMunicipio((String) rs[2]);
+                obj.setDireccion((String) rs[3]); 
+                obj.setDireccion_facturacion((String) rs[4]);
+                return obj;
+        }).collect(Collectors.toList())).orElse(new ArrayList<>());
+
+        return response.get(0);
     }
     
 }
