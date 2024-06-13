@@ -17,8 +17,7 @@ import com.comunicamosmas.api.service.IPortalWebService;
 import com.comunicamosmas.api.service.dto.AdminPortalWebDTO;
 import com.comunicamosmas.api.service.dto.AdminUserDTO;
 import com.comunicamosmas.api.service.dto.ClientePortalWebDTO;
-import com.comunicamosmas.api.service.dto.PortalWebSaveContrato;
-import com.comunicamosmas.api.service.dto.ContratosFirmasDTO.Datos;
+import com.comunicamosmas.api.service.dto.PortalWebSaveContrato; 
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql; 
 
 @Service
@@ -32,8 +31,8 @@ public class PortalWebServiceImpl implements IPortalWebService{
 
     PortalWebServiceImpl()
     {
-        //this.url = "http://192.168.24.138:8089/api/";
-        this.url = "http://portalweb-api.server.cableytv.com/api/";
+        //this.url = "http://192.168.24.113:8089/api/";
+        this.url = "https://portalweb-api.server.cableytv.com/api/";
         this.restTemplate = new RestTemplate();
         this.headers = new HttpHeaders();
     }
