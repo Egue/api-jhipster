@@ -1,13 +1,9 @@
 package com.comunicamosmas.api.web.rest;
 
-import java.io.ByteArrayOutputStream;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
+import java.io.ByteArrayOutputStream; 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Map; 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -34,12 +30,10 @@ import com.comunicamosmas.api.service.dto.ReciboCajaDTO;
 import com.comunicamosmas.api.service.dto.ReporteHanRetirosDTO;
 import com.comunicamosmas.api.service.dto.ReporteMediosPagosDTO;
 import com.comunicamosmas.api.service.dto.ReporteOrdenConVisitaFallidaDTO;
-import com.comunicamosmas.api.service.dto.ReporteSiustOneThreeDTO;
-import com.comunicamosmas.api.service.dto.SaldoFavorDTO;
+import com.comunicamosmas.api.service.dto.ReporteSiustOneThreeDTO; 
 import com.comunicamosmas.api.service.dto.SoporteTicketDTO;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
-
-import java.util.Arrays;
+ 
 import io.jsonwebtoken.io.IOException;
 //import io.jsonwebtoken.lang.Arrays;
 
@@ -117,7 +111,7 @@ public class ReportesController {
 
             for (CarteraDTO registro : result) {
                 Row row = sheet.createRow(rowNum++);
-                String origen = registro.getFf_grupocontra().equals("B") ? "*" : "";
+                String origen = registro.getFf_grupocontra().equals("B") ? "*" : null;
                 row.createCell(0).setCellValue(registro.getFf_iddelcontrato() + origen);
                 row.createCell(1).setCellValue(registro.getFf_fisico());
                 row.createCell(2).setCellValue(registro.getZona_nombre());
@@ -148,7 +142,7 @@ public class ReportesController {
                 row.createCell(24).setCellValue(registro.getVendedor());
                 row.createCell(25).setCellValue(registro.getMail());
                 row.createCell(26).setCellValue(registro.getEstacion());
-
+                origen = null;
             }
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

@@ -243,15 +243,18 @@ public class ContratoServiceImpl implements IContratoService {
 		datos.setId_cliente(infoAdd.getId_cliente());
 		datos.setVigencia(infoAdd.getVigencia());
 		datos.setComentario(infoAdd.getComentario());
-		datos.setReconexion("15000");
+		  
+		
 		Cliente cliente = clienteDao.getClientByIdContrato(idContrato);		
+		String reconexion = cliente.getTipoCliente().equals("N") ? "15000" : "50000";
+		datos.setReconexion(reconexion);
 		ContratosFirmasDTO.DatosSuscriptor suscriptor = contratoFirmas.new DatosSuscriptor();
-		suscriptor.setCelular(cliente.getCelularA()  + cliente.getCelularB());
+		suscriptor.setCelular(cliente.getCelularA()  +"/" + cliente.getCelularB());
 		suscriptor.setCorreo(cliente.getMail());
 		suscriptor.setEstrato(infoAdd.getDatos_suscriptor().getEstrato());
 		suscriptor.setFisico(infoAdd.getDatos_suscriptor().getFisico());
 		suscriptor.setIdentificacion(cliente.getDocumento().toString());
-		String nameCliente = cliente.getTipoCliente().equals("N") ? cliente.getApellidoPaterno() + " "+cliente.getApellidoMaterno() +" " + cliente.getNombrePrimer() + cliente.getNombreSegundo() : cliente.getRazonSocial();
+		String nameCliente = cliente.getTipoCliente().equals("N") ? cliente.getApellidoPaterno() + " "+cliente.getApellidoMaterno() +" " + cliente.getNombrePrimer() +" " +cliente.getNombreSegundo() : cliente.getRazonSocial();
 		suscriptor.setNombre(nameCliente);
 		datos.setDatos_suscriptor(suscriptor);
 		//contacto		 
