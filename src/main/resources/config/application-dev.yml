@@ -31,15 +31,7 @@ spring:
     serialization:
       indent-output: true
   datasource:
-    #url: jdbc:mysql://192.168.24.138:3306/controlmas04?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
-    #url: jdbc:mysql://192.168.24.121:33306/controlmas31?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
-    url: jdbc:mysql://10.112.109.2:3306/controlmas?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
-    #username: LNN)W1n
-    #username: root
-    username:  
-    #password: Mysql1234@
-    #password: mysql
-    password: 
+    
     driver-class-name: com.mysql.jdbc.Driver
     hikari:
       poolName: Hikari
