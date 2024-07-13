@@ -1,5 +1,6 @@
 package com.comunicamosmas.api.service.impl;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -25,6 +26,7 @@ import com.comunicamosmas.api.service.IDeudaService;
 import com.comunicamosmas.api.service.IPagoRetencionService;
 import com.comunicamosmas.api.service.IPagoService;
 import com.comunicamosmas.api.service.dto.DeudasForFacturaDTO;
+import com.comunicamosmas.api.service.dto.PagosEstadoCuentaDTO;
 import com.comunicamosmas.api.service.dto.ReciboCajaDTO;
 import com.comunicamosmas.api.service.dto.ReporteMediosPagosDTO;
 import com.comunicamosmas.api.service.dto.ReporteSiustOneThreeDTO;
@@ -49,6 +51,23 @@ public class PagoServiceImpl implements IPagoService {
 
     @Autowired
     IContratoSaldoFavorLogService saldoFavorLogService;
+    /*private final IPagoDao pagoDao;
+    private final ISystemConfigDao systemDao;
+    private final ICacheContratoSaldoService saldoService;
+    private final IPagoRetencionService retencionService;
+    private final IDeudaService deudasService;
+    private final IContratoSaldoFavorLogService saldoFavorLogService;
+
+    public PagoServiceImpl(IPagoDao pagoDao , ISystemConfigDao systemDao , ICacheContratoSaldoService saldoService , 
+    IPagoRetencionService retencionService , IDeudaService deudaService , IContratoSaldoFavorLogService saldoFavorLogService)
+    {
+        this.pagoDao = pagoDao;
+        this.systemDao = systemDao;
+        this.saldoService = saldoService;
+        this.retencionService = retencionService;
+        this.deudasService = deudaService;
+        this.saldoFavorLogService = saldoFavorLogService;
+    }*/
 
     @Override
     public List<Pago> findAll() {
@@ -82,27 +101,7 @@ public class PagoServiceImpl implements IPagoService {
         SystemConfig origen = systemDao.findByOrigen("origen");
         String[] caracteres = origen.getComando().split(",");
         List<String> listOrigen = new ArrayList<>(Arrays.asList(caracteres));
-        /*
-         * <th># R</th>
-         * <th>Marca</th>
-         * <th>Tipo</th>
-         * <th>Contrato </th>
-         * <th>Cliente </th>
-         * <th>Estrato </th>
-         * <th>ID </th>
-         * <th>Servicio </th>
-         * <th>Concepto</th>
-         * <th>Periodo</th>
-         * <th>Valor</th>
-         * <th>M Pago</th>
-         * <th>Gravado</th>
-         * <th>Cajero</th>
-         * <th>Grupo</th>
-         * <th>Barrio</th>
-         * <th>Comprobante</th>
-         */
-        // recibo de caja pagos
-        // System.out.println(origen.getComando());
+        
         Optional<List<Object[]>> result = pagoDao.reciboCaja(ciudades, fecha_inicial, fecha_final, listOrigen);
 
         List<ReciboCajaDTO> reciboCaja = result.map(resp -> resp.stream().map(rs -> {
@@ -133,20 +132,7 @@ public class PagoServiceImpl implements IPagoService {
             dto.setComprobante((String) rs[11].toString());
             return dto;
         }).collect(Collectors.toList())).orElse(new ArrayList<>());
-        /*
-         * List<ReciboCajaDTO> reciboCaja = result.map(resp -> {
-         * 
-         * List<ReciboCajaDTO> recibo = new ArrayList<>();
-         * 
-         * for (Object[] rs : res) {
-         * 
-         * 
-         * recibo.add(dto);
-         * }
-         * 
-         * return recibo;
-         * }).orElse(new ArrayList<>());
-         */
+         
 
         // cargar saldo a favor
         List<ReciboCajaDTO> saldo_favor = saldoService.reporte_saldo_favor(ciudades, fecha_inicial, fecha_final,
@@ -364,20 +350,7 @@ public class PagoServiceImpl implements IPagoService {
 
     @Override
     public List<ReporteSiustOneThreeDTO>  reporteOneToThree(List<Integer> servicios, Integer firts, Integer end) {
-        // TODO Auto-generated method stub
-            /*headerRow.createCell(1).setCellValue("Tipo Cliente");
-                headerRow.createCell(2).setCellValue("Deuda");
-                headerRow.createCell(3).setCellValue("Contrato");
-                headerRow.createCell(4).setCellValue("Factura");
-                headerRow.createCell(5).setCellValue("Base");
-                headerRow.createCell(6).setCellValue("IVA");
-                headerRow.createCell(7).setCellValue("# Tarifa");
-                headerRow.createCell(8).setCellValue("Estrato");
-                headerRow.createCell(9).setCellValue("Velocidad");
-                headerRow.createCell(10).setCellValue("Tecnologia");
-                headerRow.createCell(11).setCellValue("Concepto");
-                headerRow.createCell(12).setCellValue("NC Base");
-                headerRow.createCell(13).setCellValue("NC IVA"); */ 
+      
             Optional<List<Object[]>> result = pagoDao.reporteSIUSTOneToThree(servicios, firts, end);
             List<ReporteSiustOneThreeDTO> reporte = result.map(resp -> resp.stream().map(rs->{
                 ReporteSiustOneThreeDTO obj = new ReporteSiustOneThreeDTO();
@@ -398,6 +371,28 @@ public class PagoServiceImpl implements IPagoService {
                 return obj;
             }).collect(Collectors.toList())).orElse(new ArrayList<>());
             return reporte;
+    }
+
+    @Override
+    public List<PagosEstadoCuentaDTO> findByIdDeuda(Integer idDeuda) {
+        // TODO Auto-generated method stub
+        List<Object[]> pagos = pagoDao.findByIdDeuda(idDeuda);
+
+        return pagos.stream()
+                    .map(this::convertPagosEstadoCuentaDTO)
+                    .collect(Collectors.toList());
+    }
+
+    private PagosEstadoCuentaDTO convertPagosEstadoCuentaDTO(Object[] pago)
+    {
+        PagosEstadoCuentaDTO pagosCuentaDTO = new PagosEstadoCuentaDTO();
+
+        pagosCuentaDTO.setIdPago((Integer) pago[0]);
+        pagosCuentaDTO.setReciboCaja((Integer) pago[1]);
+        pagosCuentaDTO.setValorCobrado((Float) pago[2]);
+        pagosCuentaDTO.setMarca((Timestamp) pago[3]);
+
+        return pagosCuentaDTO;
     }
 
 }

@@ -2,7 +2,9 @@ package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.Deuda;
 import com.comunicamosmas.api.domain.EmailCampaign;
+import com.comunicamosmas.api.domain.FinancieroNc;
 import com.comunicamosmas.api.repository.IDeudaDao;
+import com.comunicamosmas.api.repository.IFinancieroNcDao;
 import com.comunicamosmas.api.repository.IPagoDao;
 import com.comunicamosmas.api.service.dto.DeudasForFacturaDTO; 
 import com.comunicamosmas.api.service.dto.EmailCampaignDetalleDTO;
@@ -10,14 +12,19 @@ import com.comunicamosmas.api.service.dto.EstadoCuentaDeudasDTO;
 import com.comunicamosmas.api.service.dto.PagosEstadoCuentaDTO;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 
-import java.sql.Timestamp; 
+import java.sql.Timestamp;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,8 +36,23 @@ public class DeudaServiceImpl implements IDeudaService {
 	@Autowired
 	IPagoDao pagoDao;
 
+
 	@Autowired
 	IEmailCampaignService emailCampaignService;
+
+	@Autowired
+	IFinancieroNcDao financieroNcDao;
+
+	/*private final IDeudaDao deudaDao; 
+	private final IPagoService pagoService;
+	private final IEmailCampaignService emailCampaignService;
+
+	public DeudaServiceImpl(IDeudaDao deudaDao , IPagoService pagoService , IEmailCampaignService emailCampaignService)
+	{
+		this.deudaDao = deudaDao;
+		this.pagoService = pagoService;
+		this.emailCampaignService = emailCampaignService;
+	}*/
 
 	@Override
 	public List<Deuda> findAll() {
@@ -45,9 +67,9 @@ public class DeudaServiceImpl implements IDeudaService {
 	}
 
 	@Override
-	public Long deleteById(Long id) {
+	public void deleteById(Long id) {
 		// TODO Auto-generated method stub
-		return null;
+		  deudaDao.deleteById(id);;
 	}
 
 	@Override
@@ -57,34 +79,73 @@ public class DeudaServiceImpl implements IDeudaService {
 	}
 
 	@Override
-	public List<EstadoCuentaDeudasDTO> findByIdContrato(Long contrato) {
-		List<Object[]> deudas = deudaDao.findByIdContrato(contrato);
-		List<EstadoCuentaDeudasDTO> listDeudas = new ArrayList<>();
-		// recorremos la lista para mappear y consultar pagos, nc, saldo favor
-		for (Object[] rs : deudas) {
-			EstadoCuentaDeudasDTO object = new EstadoCuentaDeudasDTO();
-			object.setIdDeuda((Integer) rs[0]);
-			object.setFactura((Integer) rs[1]);
-			object.setPeriodo((Integer) rs[2]);
-			object.setGenerador((String) rs[3]);
-			object.setValor((Double) rs[4]);
-			object.setAbono((Float) rs[5]);
-			// consultamos pagos
-			List<Object[]> resultPagos = pagoDao.findByIdDeuda((Integer) rs[0]);
-			List<PagosEstadoCuentaDTO> pagos = new ArrayList<>();
-			for (Object[] rsPa : resultPagos) {
-				PagosEstadoCuentaDTO obj = new PagosEstadoCuentaDTO();
-				obj.setIdPago((Integer) rsPa[0]);
-				obj.setReciboCaja((Integer) rsPa[1]);
-				obj.setValorCobrado((Float) rsPa[2]);
-				obj.setMarca((Timestamp) rsPa[3]);
-				pagos.add(obj);
-			}
-			object.setPagos((ArrayList) pagos);
-			listDeudas.add(object);
-		}
-		return listDeudas;
+	public Page<EstadoCuentaDeudasDTO> findByIdContrato(Long contrato , Pageable page) {
+		Page<Object[]> deudas = deudaDao.findByIdContrato(contrato , page);
+		return deudas.map(this::convertirAEstadoCuentaDeudasDTO);
+		 
 	}
+
+	private EstadoCuentaDeudasDTO convertirAEstadoCuentaDeudasDTO(Object[] resultado)
+	{
+		EstadoCuentaDeudasDTO obj = new EstadoCuentaDeudasDTO();
+
+		obj.setIdDeuda((Integer) resultado[0]);
+		obj.setFactura((Integer) resultado[1]);
+		String periodo  = this.convertPeriodoToString((Integer) resultado[2]);
+		obj.setPeriodo(periodo);
+		obj.setGenerador((String) resultado[3]);
+		obj.setValor((Double) resultado[4]);
+		obj.setAbono((Float) resultado[5]);
+		String concepto = "";
+		if((Integer) resultado[6] == 1){ 
+			concepto = "Instalación";
+		}else if((Integer) resultado[7] == 1){ 
+			concepto = "Reconexión"; 
+		}else if((Integer) resultado[8] == 1){ 
+			concepto = "Materiales"; 
+		}else if((Integer) resultado[9] == 1){ 
+			concepto = "Traslado";
+		}else if((Integer) resultado[10] == 1){
+			concepto = (String) resultado[11] ;
+		}else{
+			concepto = "Mensualidad";
+		}
+		obj.setConcepto(concepto);
+		List<Object[]> pagosBydeuda = pagoDao.findByIdDeuda((Integer) resultado[0]);
+		List<PagosEstadoCuentaDTO> pagos = pagosBydeuda.stream()
+									.map(this::convertPagosEstadoCuentaDTO)
+										.collect(Collectors.toList());
+		 
+		obj.setPagos(pagos);
+		//nc
+		Integer id_deuda = (Integer) resultado[0];
+		List<FinancieroNc> nc = financieroNcDao.findByIdDeuda(Long.valueOf(id_deuda));
+		obj.setNotasCredito(nc);
+		//saldo favor
+		return obj;
+	} 
+
+	private String convertPeriodoToString(Integer periodo)
+	{
+		DateTimeFormatter inpuTimeFormatter = DateTimeFormatter.ofPattern("yyyyMM");
+		YearMonth yearMonth = YearMonth.parse(periodo.toString() , inpuTimeFormatter);
+
+		DateTimeFormatter ouTimeFormatter  =DateTimeFormatter.ofPattern("MMMM / yyyy" , new Locale("es" , "ES"));
+
+		return yearMonth.format(ouTimeFormatter);
+	}
+
+	private PagosEstadoCuentaDTO convertPagosEstadoCuentaDTO(Object[] pago)
+    {
+        PagosEstadoCuentaDTO pagosCuentaDTO = new PagosEstadoCuentaDTO();
+
+        pagosCuentaDTO.setIdPago((Integer) pago[0]);
+        pagosCuentaDTO.setReciboCaja((Integer) pago[1]);
+        pagosCuentaDTO.setValorCobrado((Float) pago[2]);
+        pagosCuentaDTO.setMarca((Timestamp) pago[3]);
+
+        return pagosCuentaDTO;
+    }
 
 	@Override
 	public String findDeudaByIdContrato(Long idContrato) {

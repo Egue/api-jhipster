@@ -8,6 +8,9 @@ import com.comunicamosmas.api.service.dto.EstadoCuentaDeudasDTO;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 public interface IDeudaService {
     //listar todos
     public List<Deuda> findAll();
@@ -16,13 +19,13 @@ public interface IDeudaService {
     public Deuda save(Deuda deuda);
 
     //eliminar
-    public Long deleteById(Long id);
+    public void deleteById(Long id);
 
     //buscar por id
     public Deuda findById(Long id);
     
     //buscar por contrado
-    public List<EstadoCuentaDeudasDTO> findByIdContrato(Long contrato);
+    public Page<EstadoCuentaDeudasDTO> findByIdContrato(Long contrato , Pageable page);
     
     public String findDeudaByIdContrato(Long idContrato);
     
