@@ -13,6 +13,7 @@ import com.comunicamosmas.api.service.IApiRestService;
 import com.comunicamosmas.api.service.IContratoService;
 import com.comunicamosmas.api.service.IEstacionService;
 import com.comunicamosmas.api.service.IOrdenService;
+import com.comunicamosmas.api.service.IPaymentOnlineService;
 
 @Component
 public class ReconexionCron {
@@ -28,6 +29,9 @@ public class ReconexionCron {
 	
 	@Autowired
 	IApiRestService apiService;
+
+	@Autowired
+	IPaymentOnlineService paymentOnlineService;
 	
 	//@Scheduled(cron ="*/20 * * * * *")
 	public void reconectar()
@@ -76,6 +80,22 @@ public class ReconexionCron {
 		}catch(Exception e)
 		{
 			System.out.print(e.getMessage());
+		}
+	}
+
+	/*
+	 * download pagos pse v2
+	 * save to log 
+	 */
+	public void downloadPaymentOnline()
+	{
+		try {
+
+			paymentOnlineService.downloadPaymentOnline();
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println(e.getMessage());
 		}
 	}
 }
