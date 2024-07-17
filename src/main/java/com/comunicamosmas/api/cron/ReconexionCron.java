@@ -13,6 +13,7 @@ import com.comunicamosmas.api.service.IApiRestService;
 import com.comunicamosmas.api.service.IContratoService;
 import com.comunicamosmas.api.service.IEstacionService;
 import com.comunicamosmas.api.service.IOrdenService;
+import com.comunicamosmas.api.service.IPagoLineaVersionDosService;
 import com.comunicamosmas.api.service.IPaymentOnlineService;
 
 @Component
@@ -32,6 +33,9 @@ public class ReconexionCron {
 
 	@Autowired
 	IPaymentOnlineService paymentOnlineService;
+
+	@Autowired
+	IPagoLineaVersionDosService pagoLineaVersionDosService;
 	
 	//@Scheduled(cron ="*/20 * * * * *")
 	public void reconectar()
@@ -69,7 +73,7 @@ public class ReconexionCron {
 	
 	//@Scheduled(cron ="0 0/30 * * * ?")//cada hora
 	//@Scheduled(cron ="0 0/16 * * * *")
-	//@Scheduled(cron = "0 53 11,23 * * *")//
+	@Scheduled(cron = "0 53 11,23 * * *")//
 	//@Scheduled(cron = "0 16 08 * * *")//
 	public void pagosSupergiros()
 	{
@@ -87,6 +91,7 @@ public class ReconexionCron {
 	 * download pagos pse v2
 	 * save to log 
 	 */
+	@Scheduled(cron = "0 0/15 * * * *")
 	public void downloadPaymentOnline()
 	{
 		try {
@@ -96,6 +101,17 @@ public class ReconexionCron {
 		} catch (Exception e) {
 			// TODO: handle exception
 			System.out.println(e.getMessage());
+		}
+	}
+
+	@Scheduled(cron = "0 0/20 * * * *")
+	public void reconexionAndAnulationCortePse()
+	{
+		try {
+			pagoLineaVersionDosService.iterarReconexionesAndCorte();
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
 		}
 	}
 }

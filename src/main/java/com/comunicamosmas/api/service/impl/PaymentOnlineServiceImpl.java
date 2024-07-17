@@ -1,10 +1,13 @@
 package com.comunicamosmas.api.service.impl;
 
 import java.net.URI;
+import java.util.List;
 
+import org.aspectj.apache.bcel.generic.Type;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -13,10 +16,13 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.comunicamosmas.api.domain.SystemConfig;
+import com.comunicamosmas.api.service.IPagoService;
 import com.comunicamosmas.api.service.IPaymentOnlineService;
 import com.comunicamosmas.api.service.ISystemConfigService;
 import com.comunicamosmas.api.service.dto.PaymentOnlineDTO;
+import com.comunicamosmas.api.service.dto.PaymentOnlineDTO.PagosOnline;
 import com.comunicamosmas.api.service.dto.PaymentOnlineDTO.Auth;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
@@ -28,18 +34,24 @@ public class PaymentOnlineServiceImpl implements IPaymentOnlineService{
 
     private final HttpHeaders httpHeaders;
 
-    public PaymentOnlineServiceImpl(ISystemConfigService  systemConfigService){
+    private final IPagoService pagoService;
+
+    private Auth auth;
+
+    public PaymentOnlineServiceImpl(ISystemConfigService  systemConfigService , IPagoService pagoService){
         this.systemConfigService = systemConfigService;
+        this.pagoService = pagoService;
         this.restTemplate = new RestTemplate();
         this.httpHeaders = new HttpHeaders();
+        
     }
 
     @Override
     public void downloadPaymentOnline() {
         // TODO Auto-generated method stub
-        SystemConfig dataOnline = systemConfigService.findByOrigen("payment_online");
+        SystemConfig systemConfig = systemConfigService.findByOrigen("payment_online");
         
-        Auth auth = convertAuth(dataOnline.getComando());
+        this.auth = convertAuth(systemConfig.getComando());
 
         restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
@@ -54,16 +66,54 @@ public class PaymentOnlineServiceImpl implements IPaymentOnlineService{
 
         try {
             ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET,entity,String.class);
-            if(response.getStatusCode().equals(200))
+            //System.out.println(response.getStatusCode());
+            if(response.getStatusCode().equals(HttpStatus.OK))
             {
-                
+                ObjectMapper objectMapper = new ObjectMapper();
+
+                List<PaymentOnlineDTO.PagosOnline> pagos = objectMapper.readValue(response.getBody(), new TypeReference<List<PaymentOnlineDTO.PagosOnline>>(){});
+
+                iterarPSE(pagos);
             }
         } catch (Exception e) {
             // TODO: handle exception
+
+            e.printStackTrace();
         }
         
 
 
+    }
+
+    private void iterarPSE(List<PaymentOnlineDTO.PagosOnline> pagos)
+    {
+         pagos.stream().forEach(s -> {
+            
+            s.getFacturas().stream().forEach(f -> {
+                this.pagoService.registerPagosOnline(s.getReference(),   f);
+                this.udpatePagoByReference(s.getReference());
+            });
+
+         });
+    }
+
+    private void udpatePagoByReference(String reference)
+    {
+        URI uri = UriComponentsBuilder.fromHttpUrl(auth.getUrl_download())
+                .queryParam("token", auth.getToken())
+                .queryParam("reference", reference)
+                .build()
+                .toUri();
+        HttpEntity<Void> entity = new HttpEntity<>(httpHeaders);
+
+        try {
+
+            ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.PUT,entity,String.class);
+            
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
     }
 
     private PaymentOnlineDTO.Auth convertAuth(String dataOnline)

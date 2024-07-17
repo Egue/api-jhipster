@@ -303,4 +303,10 @@ public class DeudaServiceImpl implements IDeudaService {
 		 return deudas;
 	}
 
+	@Override
+	public Optional<List<Deuda>> findByIdDeudaIn(List<Long> idDeuda) {
+		// TODO Auto-generated method stub
+		 return deudaDao.findByIdIn(idDeuda);
+	}
+
 }

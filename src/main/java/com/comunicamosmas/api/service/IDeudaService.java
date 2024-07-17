@@ -42,4 +42,7 @@ public interface IDeudaService {
 
     //find deudas por id_contrato
     public List<DeudasForFacturaDTO> deudasByIdContrato(Long idContrato);
+
+    //find deudas by id_deuda
+    public Optional<List<Deuda>> findByIdDeudaIn(List<Long> idDeuda);
 }

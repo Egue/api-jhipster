@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.UUID; 
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,16 +17,20 @@ import org.springframework.stereotype.Service;
 import com.comunicamosmas.api.domain.Contrato;
 import com.comunicamosmas.api.domain.Deuda;
 import com.comunicamosmas.api.domain.Pago;
+import com.comunicamosmas.api.domain.PagoLineaVersionDos;
 import com.comunicamosmas.api.domain.SystemConfig; 
 import com.comunicamosmas.api.repository.IPagoDao;
 import com.comunicamosmas.api.repository.ISystemConfigDao;
 import com.comunicamosmas.api.service.ICacheContratoSaldoService;
 import com.comunicamosmas.api.service.IContratoSaldoFavorLogService;
 import com.comunicamosmas.api.service.IDeudaService;
+import com.comunicamosmas.api.service.IPagoLineaVersionDosService;
 import com.comunicamosmas.api.service.IPagoRetencionService;
 import com.comunicamosmas.api.service.IPagoService;
 import com.comunicamosmas.api.service.dto.DeudasForFacturaDTO;
 import com.comunicamosmas.api.service.dto.PagosEstadoCuentaDTO;
+import com.comunicamosmas.api.service.dto.PaymentOnlineDTO;  
+
 import com.comunicamosmas.api.service.dto.ReciboCajaDTO;
 import com.comunicamosmas.api.service.dto.ReporteMediosPagosDTO;
 import com.comunicamosmas.api.service.dto.ReporteSiustOneThreeDTO;
@@ -51,6 +55,9 @@ public class PagoServiceImpl implements IPagoService {
 
     @Autowired
     IContratoSaldoFavorLogService saldoFavorLogService;
+
+    @Autowired
+    IPagoLineaVersionDosService pagoLineaVersionDosService;
     /*private final IPagoDao pagoDao;
     private final ISystemConfigDao systemDao;
     private final ICacheContratoSaldoService saldoService;
@@ -393,6 +400,129 @@ public class PagoServiceImpl implements IPagoService {
         pagosCuentaDTO.setMarca((Timestamp) pago[3]);
 
         return pagosCuentaDTO;
+    }
+
+    @Override
+    public void registerPagosOnline(String reference ,   PaymentOnlineDTO.Facturas facturas) {
+        // TODO Auto-generated method stub
+         //find deudas in deudas
+         String[] deudasArray = facturas.getId_deudas().split(","); 
+         List<Long> deudasLong = Arrays.stream(deudasArray)
+                                .map(Long::parseLong)
+                                .collect(Collectors.toList());
+        /*Pagos */
+        Double total = facturas.getValor();
+        List<Pago> listPago = new ArrayList<>();
+        String uniqueId = UUID.randomUUID().toString();
+        
+
+        LocalDate fechaActual = LocalDate.now();
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyyMMdd");
+        //find id_deuda database
+         Optional<List<Deuda>> findDeudas = deudasService.findByIdDeudaIn(deudasLong);
+
+         Integer reciboCaja = 0;
+        //recorregemos cada deuda y actualizamos 
+        if(findDeudas.isPresent())
+        {
+            List<Deuda> deudas = findDeudas.get();
+
+            for(Deuda rs : deudas)
+            {
+                if(rs.getEstado() != 2)
+                {
+                    if(reciboCaja == 0)
+                    {
+                    reciboCaja = this.findLastRc(rs.getIdServicio(), rs.getRefiere());
+                    }
+                
+                    Double resultado = rs.getValorTotal() - rs.getValorParcial();
+                    
+                    Double valorDado = 0.0;
+                     
+                    int intResultado = resultado.intValue();
+                   
+                    if(total > 0)
+                    {
+                        rs.setEstado(2L);
+                        valorDado = rs.getValorParcial() + resultado;
+                        rs.setValorParcial(valorDado);
+                                            
+                    }else{
+                        valorDado = total;
+                        rs.setEstado(2L);
+                        rs.setValorParcial(total);
+                    }
+
+                    total = total - intResultado;
+
+                    if(valorDado > 0)
+                    {
+                        deudasService.save(rs);
+
+                        Pago pago = new Pago();
+                        pago.setIdReciboCaja(((long)(reciboCaja + 1)));
+                        pago.setIdCiudad(rs.getIdCiudad());
+                        pago.setIdServicio(rs.getIdServicio());
+                        pago.setIdDeuda(rs.getId());
+                        pago.setIdCliente(rs.getIdCliente());
+                        pago.setIdCajero(2L);
+
+                        pago.setFechaf( Long.parseLong(fechaActual.format(formato)));
+                        pago.setIdMedioPago(27L);
+                        pago.setComprobante(reference);
+                        pago.setValorDado(valorDado.floatValue());
+                        pago.setValorCobro(valorDado.floatValue());
+                        pago.setValorVueltas((float) 0);
+                        pago.setValorRedondeo((float) 0);
+                        pago.setEstado(1L);
+                        pago.setAnulaIdUsuario(0L);
+                        pago.setAnulaMarca("");
+                        pago.setAnulaJustifica("");
+                        pago.setLugar(rs.getRefiere());
+                        pago.setTurno(uniqueId);
+                        pago.setIdContrato(rs.getIdContrato());
+                        pago.setIdEmpresa(rs.getIdEmpresa());
+                        pago.setMesServicio(rs.getMesServicio());
+                        pago.setInstalacion(0L);
+                        pago.setReconexion(0L);
+                        pago.setMateriales(0L);
+                        listPago.add(pago);
+                    }
+
+                    PagoLineaVersionDos pagov2 = new PagoLineaVersionDos();
+
+                    pagov2.setIdCliente(rs.getIdCliente());
+                    pagov2.setIdContrato(rs.getIdContrato());
+                    pagov2.setIdDeuda(rs.getId());
+                    pagov2.setValor(valorDado.longValue());
+                    pagov2.setLado(rs.getRefiere());
+                    pagov2.setEjecutado(0L);
+                    pagov2.setFirma(uniqueId);
+                    pagov2.setTransaccion(reference);
+                    pagov2.setIdEmpresa(rs.getIdEmpresa());
+                    pagov2.setMetodo("Online Pse");
+
+                    pagoLineaVersionDosService.save(pagov2);
+
+                }
+                
+                
+                //save descarga
+                
+
+            }
+            if(!listPago.isEmpty())
+            {
+                saveAll(listPago);
+            }
+
+            
+
+            
+        }
+         
+
     }
 
 }

@@ -76,5 +76,8 @@ public interface IDeudaDao extends CrudRepository<Deuda, Long> {
 	+"deudas.valor_parcial, deudas.valor_total  , deudas.mes_servicio FROM deudas WHERE id_contrato = :contrato AND estado IN (1,3) ORDER BY id_deuda ASC" , nativeQuery = true)
 	public Optional<List<Object[]>> deudasByIdContrato(@Param("contrato") Long idContrato);
 
+	//
+	public Optional<List<Deuda>> findByIdIn(List<Long> ids);
+
 	
 }
