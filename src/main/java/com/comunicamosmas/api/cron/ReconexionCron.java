@@ -73,7 +73,7 @@ public class ReconexionCron {
 	
 	//@Scheduled(cron ="0 0/30 * * * ?")//cada hora
 	//@Scheduled(cron ="0 0/16 * * * *")
-	@Scheduled(cron = "0 53 11,23 * * *")//
+	//@Scheduled(cron = "0 53 11,23 * * *")//
 	//@Scheduled(cron = "0 16 08 * * *")//
 	public void pagosSupergiros()
 	{
@@ -91,7 +91,8 @@ public class ReconexionCron {
 	 * download pagos pse v2
 	 * save to log 
 	 */
-	@Scheduled(cron = "0 0/15 * * * *")
+	//@Scheduled(cron = "0 0/15 * * * *")
+	//@Scheduled(cron = "0 41 15 * * *")
 	public void downloadPaymentOnline()
 	{
 		try {
@@ -104,7 +105,7 @@ public class ReconexionCron {
 		}
 	}
 
-	@Scheduled(cron = "0 0/20 * * * *")
+	//@Scheduled(cron = "0 0/20 * * * *")
 	public void reconexionAndAnulationCortePse()
 	{
 		try {

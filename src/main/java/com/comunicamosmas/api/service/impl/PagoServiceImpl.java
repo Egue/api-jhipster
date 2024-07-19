@@ -456,7 +456,7 @@ public class PagoServiceImpl implements IPagoService {
 
                     total = total - intResultado;
 
-                    if(valorDado > 0)
+                    if(valorDado > 1)
                     {
                         deudasService.save(rs);
 
@@ -494,6 +494,7 @@ public class PagoServiceImpl implements IPagoService {
 
                     pagov2.setIdCliente(rs.getIdCliente());
                     pagov2.setIdContrato(rs.getIdContrato());
+                    pagov2.setIdCompra(1L);
                     pagov2.setIdDeuda(rs.getId());
                     pagov2.setValor(valorDado.longValue());
                     pagov2.setLado(rs.getRefiere());

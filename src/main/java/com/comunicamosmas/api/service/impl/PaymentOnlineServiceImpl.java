@@ -2,8 +2,7 @@ package com.comunicamosmas.api.service.impl;
 
 import java.net.URI;
 import java.util.List;
-
-import org.aspectj.apache.bcel.generic.Type;
+ 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -19,8 +18,7 @@ import com.comunicamosmas.api.domain.SystemConfig;
 import com.comunicamosmas.api.service.IPagoService;
 import com.comunicamosmas.api.service.IPaymentOnlineService;
 import com.comunicamosmas.api.service.ISystemConfigService;
-import com.comunicamosmas.api.service.dto.PaymentOnlineDTO;
-import com.comunicamosmas.api.service.dto.PaymentOnlineDTO.PagosOnline;
+import com.comunicamosmas.api.service.dto.PaymentOnlineDTO; 
 import com.comunicamosmas.api.service.dto.PaymentOnlineDTO.Auth;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -69,11 +67,15 @@ public class PaymentOnlineServiceImpl implements IPaymentOnlineService{
             //System.out.println(response.getStatusCode());
             if(response.getStatusCode().equals(HttpStatus.OK))
             {
-                ObjectMapper objectMapper = new ObjectMapper();
+                
+                if(response.getBody() != "null")
+                {
+                    ObjectMapper objectMapper = new ObjectMapper();
 
-                List<PaymentOnlineDTO.PagosOnline> pagos = objectMapper.readValue(response.getBody(), new TypeReference<List<PaymentOnlineDTO.PagosOnline>>(){});
+                    List<PaymentOnlineDTO.PagosOnline> pagos = objectMapper.readValue(response.getBody(), new TypeReference<List<PaymentOnlineDTO.PagosOnline>>(){});
 
-                iterarPSE(pagos);
+                    iterarPSE(pagos);
+                }
             }
         } catch (Exception e) {
             // TODO: handle exception
