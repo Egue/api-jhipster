@@ -20,6 +20,7 @@ import com.comunicamosmas.api.service.IPaymentOnlineService;
 import com.comunicamosmas.api.service.ISystemConfigService;
 import com.comunicamosmas.api.service.dto.PaymentOnlineDTO; 
 import com.comunicamosmas.api.service.dto.PaymentOnlineDTO.Auth;
+import com.comunicamosmas.api.service.dto.PaymentOnlineDTO.ListPagos;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -131,6 +132,48 @@ public class PaymentOnlineServiceImpl implements IPaymentOnlineService{
             e.printStackTrace();
 
             return null;
+        }
+
+    }
+
+    @Override
+    public List<ListPagos> findListPaymentOnlyBetwenn(String dateOne, String dateTwo) {
+        // TODO Auto-generated method stub
+        SystemConfig systemConfig = systemConfigService.findByOrigen("payment_online");
+        
+        this.auth = convertAuth(systemConfig.getComando());
+
+        restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+
+        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        httpHeaders.set("x-login", auth.getLogin());
+
+        URI uri = UriComponentsBuilder.fromHttpUrl(auth.getUrl_list())
+                .queryParam("firts", dateOne)
+                .queryParam("final", dateTwo)
+                .build()
+                .toUri();
+        HttpEntity<Void> entity = new HttpEntity<>(httpHeaders);
+
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(uri, HttpMethod.GET,entity,String.class);
+
+            if(response.getStatusCode().equals(HttpStatus.OK))
+            {
+                ObjectMapper objectMapper = new ObjectMapper();
+
+                 List<PaymentOnlineDTO.ListPagos> pagos = objectMapper.readValue(response.getBody(), new TypeReference<List<PaymentOnlineDTO.ListPagos>>(){});
+
+                 return pagos;
+             }
+
+             return null;
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+
+            return null;
+
         }
 
     }
