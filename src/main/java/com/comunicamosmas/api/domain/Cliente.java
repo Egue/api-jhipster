@@ -91,6 +91,18 @@ public class Cliente implements Serializable {
 
     private Long bomberil;
 
+    private String portalweb;
+
+    
+
+    public String getPortalweb() {
+        return portalweb;
+    }
+
+    public void setPortalweb(String portalweb) {
+        this.portalweb = portalweb;
+    }
+
     @Column(name = "autoriza_sms")
     private Long autorizaSms;
 

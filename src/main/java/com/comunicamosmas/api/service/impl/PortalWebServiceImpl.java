@@ -2,17 +2,21 @@ package com.comunicamosmas.api.service.impl;
  
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;  
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.comunicamosmas.api.domain.Cliente;
+import com.comunicamosmas.api.repository.IClienteDao;
 import com.comunicamosmas.api.service.IPortalWebService;
 import com.comunicamosmas.api.service.dto.AdminPortalWebDTO;
 import com.comunicamosmas.api.service.dto.AdminUserDTO;
@@ -29,12 +33,15 @@ public class PortalWebServiceImpl implements IPortalWebService{
 
     private final HttpHeaders headers;
 
-    PortalWebServiceImpl()
+    private final IClienteDao clienteDao;
+
+    public PortalWebServiceImpl(IClienteDao clienteDao)
     {
         //this.url = "http://192.168.24.113:8089/api/";
         this.url = "https://portalweb-api.server.cableytv.com/api/";
         this.restTemplate = new RestTemplate();
         this.headers = new HttpHeaders();
+        this.clienteDao = clienteDao;
     }
 
     @Override
@@ -51,6 +58,17 @@ public class PortalWebServiceImpl implements IPortalWebService{
 
             ResponseEntity<String> response = restTemplate.exchange(edpoint, HttpMethod.POST, cliente, String.class);
             //System.out.println(clientePortalWebDTO);
+            if(response.getStatusCode().equals(HttpStatus.OK))
+            {
+                //update sincronizado
+                  clienteDao
+                            .findById(clientePortalWebDTO.getIdCliente())
+                            .ifPresent(present ->{
+                                present.setPortalweb("Sincronizado");
+
+                                clienteDao.save(present);
+                            });
+            }
 
         } catch(HttpMessageConversionException e){
 

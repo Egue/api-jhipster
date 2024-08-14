@@ -39,9 +39,9 @@ public class ReporteSiustOneThreeDTO {
 
                 private String concepto;
 
-                private Double ncBase;
+                private Float ncBase;
 
-                private Double ncIva;
+                private Float ncIva;
 
                 public String getServicio() {
                     return servicio;
@@ -139,19 +139,19 @@ public class ReporteSiustOneThreeDTO {
                     this.concepto = concepto;
                 }
 
-                public Double getNcBase() {
+                public Float getNcBase() {
                     return ncBase;
                 }
 
-                public void setNcBase(Double ncBase) {
+                public void setNcBase(Float ncBase) {
                     this.ncBase = ncBase;
                 }
 
-                public Double getNcIva() {
+                public Float getNcIva() {
                     return ncIva;
                 }
 
-                public void setNcIva(Double ncIva) {
+                public void setNcIva(Float ncIva) {
                     this.ncIva = ncIva;
                 }
 

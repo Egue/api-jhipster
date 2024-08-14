@@ -373,8 +373,8 @@ public class PagoServiceImpl implements IPagoService {
                 obj.setVelocidad((Integer) rs[9]);
                 obj.setTecnologia((Integer) rs[10]);
                 obj.setConcepto((String) rs[11]);
-                obj.setNcBase((Double) rs[12]);
-                obj.setNcIva((Double) rs[13]);
+                obj.setNcBase((Float) rs[12]);
+                obj.setNcIva((Float) rs[13]);
                 return obj;
             }).collect(Collectors.toList())).orElse(new ArrayList<>());
             return reporte;
