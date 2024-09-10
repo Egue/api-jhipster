@@ -78,6 +78,10 @@ public interface IDeudaDao extends CrudRepository<Deuda, Long> {
 
 	//
 	public Optional<List<Deuda>> findByIdIn(List<Long> ids);
+  
+	public Optional<List<Deuda>> findByFacturadoFechaLike(Integer mes );
 
-	
+	@Query(value="SELECT * FROM deudas d WHERE d.id_cliente = :idCliente AND d.estado IN (1,3) AND d.factura > 0" , nativeQuery=true)
+    public Optional<List<Deuda>> findActiveDebtsWithInvoiceByClientId(@Param("idCliente") Long idCliente);
+
 }

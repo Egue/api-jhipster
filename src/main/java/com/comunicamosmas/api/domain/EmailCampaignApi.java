@@ -1,16 +1,14 @@
 package com.comunicamosmas.api.domain;
 
 import java.io.Serializable;
-import javax.persistence.*;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+import javax.persistence.*; 
 
 /**
  * A EmailCampaignApi.
  */
 @Entity
 @Table(name = "email_campaign_api")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+//@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class EmailCampaignApi implements Serializable {
 
     private static final long serialVersionUID = 1L;

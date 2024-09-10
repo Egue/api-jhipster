@@ -20,8 +20,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.comunicamosmas.api.domain.Deuda;
+ 
 import com.comunicamosmas.api.security.AuthoritiesConstants;
 import com.comunicamosmas.api.service.IDeudaService;
 import com.comunicamosmas.api.service.dto.EmailCampaignDetalleDTO;

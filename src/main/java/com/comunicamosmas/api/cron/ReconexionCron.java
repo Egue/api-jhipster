@@ -3,8 +3,7 @@ package com.comunicamosmas.api.cron;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.scheduling.annotation.Scheduled; 
 
 import com.comunicamosmas.api.domain.Contrato;
 import com.comunicamosmas.api.domain.Estacion;
@@ -15,8 +14,7 @@ import com.comunicamosmas.api.service.IEstacionService;
 import com.comunicamosmas.api.service.IOrdenService;
 import com.comunicamosmas.api.service.IPagoLineaVersionDosService;
 import com.comunicamosmas.api.service.IPaymentOnlineService;
-
-@Component
+ 
 public class ReconexionCron {
 	
 	@Autowired
@@ -73,7 +71,7 @@ public class ReconexionCron {
 	
 	//@Scheduled(cron ="0 0/30 * * * ?")//cada hora
 	//@Scheduled(cron ="0 0/16 * * * *")
-	@Scheduled(cron = "0 53 11,23 * * *")//
+	//@Scheduled(cron = "0 53 11,23 * * *")//
 	//@Scheduled(cron = "0 16 08 * * *")//
 	public void pagosSupergiros()
 	{
@@ -91,7 +89,7 @@ public class ReconexionCron {
 	 * download pagos pse v2
 	 * save to log 
 	 */
-	@Scheduled(cron = "0 0/15 * * * *")
+	//@Scheduled(cron = "0 0/15 * * * *")
 	//@Scheduled(cron = "0 41 15 * * *")
 	public void downloadPaymentOnline()
 	{
@@ -105,7 +103,7 @@ public class ReconexionCron {
 		}
 	}
 
-	@Scheduled(cron = "0 0/20 * * * *")
+	//@Scheduled(cron = "0 0/20 * * * *")
 	public void reconexionAndAnulationCortePse()
 	{
 		try {

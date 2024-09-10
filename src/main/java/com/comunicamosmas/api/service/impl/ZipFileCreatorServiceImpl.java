@@ -13,8 +13,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.comunicamosmas.api.domain.Empresa;
+ 
 import com.comunicamosmas.api.domain.SystemConfig;
 import com.comunicamosmas.api.service.ISystemConfigService;
 import com.comunicamosmas.api.service.IZipFileCreatorService;

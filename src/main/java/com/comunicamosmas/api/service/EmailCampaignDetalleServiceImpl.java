@@ -6,9 +6,11 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +27,17 @@ import com.comunicamosmas.api.domain.EmailCampaign;
 import com.comunicamosmas.api.domain.EmailCampaignApi;
 import com.comunicamosmas.api.domain.EmailCampaignDetalle;
 import com.comunicamosmas.api.domain.MailRelaySendMail;
+import com.comunicamosmas.api.domainMongo.FacturasEmitidas;
 import com.comunicamosmas.api.repository.IEmailCampaignDetalleDao;
 import com.comunicamosmas.api.service.dto.DeudasForFacturaDTO;
 import com.comunicamosmas.api.service.dto.EmailCampaignApiDTO;
 import com.comunicamosmas.api.service.dto.EmailCampaignDetalleDTO;
 import com.comunicamosmas.api.service.dto.RespuestaGeneracionPDFFactura;
+import com.comunicamosmas.api.service.mapper.EmailCampaingDetalleMapper;
+import com.comunicamosmas.api.serviceMongo.IFacturasEmitidasService;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 import com.fasterxml.jackson.databind.ObjectMapper;
+ 
 
 @Service
 public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleService {
@@ -60,6 +66,12 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 	@Autowired
 	IZipFileCreatorService zipCreatorService;
 
+	@Autowired
+	EmailCampaingDetalleMapper emailCampaingDetalleMapper;
+
+	@Autowired
+	IFacturasEmitidasService facturasEmitidasService;
+
 	/**
 	 * Enviando mail a al cliente por mailrelay api
 	 * 
@@ -68,7 +80,8 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 	 * @param fondo
 	 * @param responseGeneracionFactura informacion de la generacion de factura
 	 */
-	private String mailRelaySendMail(EmailCampaignApi datos, EmailCampaignDetalle destino, String fondo,
+	@Override
+	public String mailRelaySendMail(EmailCampaignApi datos, EmailCampaignDetalle destino, String fondo,
 			RespuestaGeneracionPDFFactura responseGeneracionFactura) {
 		try {
 			RestTemplate restTemplate = new RestTemplate();
@@ -200,24 +213,32 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 		 * Month mes = fechaActual.getMonth();
 		 * String fecha = String.valueOf(anio) + String.valueOf(mes);
 		 */
+		if(campaign.getEstado().equals("PortalWeb"))
+		{
+			invoiceByPortalWeb(idEmailCampaign , campaign);
+		}else{
+			
 
-		String fechaFactura = campaign.getAnno() + campaign.getMes();
-		List<Object[]> result = emailCampaignDetalleDao.findEmailBySend(campaign.getIdEmpresa(), fechaFactura);
+			String fechaFactura = campaign.getAnno() + campaign.getMes();
+		
+			List<Object[]> result = emailCampaignDetalleDao.findEmailBySend(campaign.getIdEmpresa(), fechaFactura);
 
-		if (result != null) {
-			for (Object[] rs : result) {
-				EmailCampaignDetalle obj = new EmailCampaignDetalle();
+			if (result != null) {
+				for (Object[] rs : result) {
+					EmailCampaignDetalle obj = new EmailCampaignDetalle();
 
-				obj.setFactura((String) rs[0].toString());
-				obj.setIdCliente((Integer) rs[1]);
-				obj.setEmail((String) rs[2]);
-				obj.setIdServicio((Integer) rs[3]);
-				obj.setProcesado(0);
-				obj.setIdEmailCampaign(idEmailCampaign);
-				obj.setOrigen((String) rs[4].toString());
-				this.save(obj);
+					obj.setFactura((String) rs[0].toString());
+					obj.setIdCliente((Integer) rs[1]);
+					obj.setEmail((String) rs[2]);
+					obj.setIdServicio((Integer) rs[3]);
+					obj.setProcesado(0);
+					obj.setIdEmailCampaign(idEmailCampaign);
+					obj.setOrigen((String) rs[4].toString());
+					this.save(obj);
+				}
 			}
 		}
+		
 
 	}
 
@@ -229,7 +250,16 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 
 	@Override
 	public List<EmailCampaignDetalleDTO> findByIdEmailCampaing(Long id) {
-		Optional<List<Object[]>> result = emailCampaignDetalleDao.findByIdEmailCampaign(id);
+		EmailCampaign campaign = emailCampaignService.findById(id.intValue());
+
+		if(campaign.getEstado().equals("PortalWeb"))
+		{
+			List<FacturasEmitidas> emitidas = facturasEmitidasService.findByidCampaign(campaign.getId());
+
+			return emitidas.stream().map(this::converterFacturasToDetalleDTO).collect(Collectors.toList());
+
+		}else{
+			Optional<List<Object[]>> result = emailCampaignDetalleDao.findByIdEmailCampaign(id);
 
 		List<EmailCampaignDetalleDTO> email = result.map(resp -> 
 			resp.stream().map(rs ->{
@@ -254,6 +284,9 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 			}).collect(Collectors.toList())).orElse(new ArrayList<>());
 
 		return email;
+		}
+
+		
 	}
 
 	/**
@@ -311,7 +344,8 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 	 * @param idContrato el contrato del la factura
 	 * @param api        el objecto de la informacion del html_part
 	 */
-	private String fondoMail(RespuestaGeneracionPDFFactura response, EmailCampaignApi api) {
+	@Override
+	public String fondoMail(RespuestaGeneracionPDFFactura response, EmailCampaignApi api) {
 
 		if (api.getHtml_part().isEmpty()) {
 			throw new ExceptionNullSql(new Date(), "Campo nullo", "no se encontro información para fondo");
@@ -342,12 +376,14 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 	@Override
 	public String sendMailUnitario(EmailCampaignDetalleDTO detalle) {
 		// TODO Auto-generated method stub
-
+		//System.out.println(detalle.getEmail());
+		//update(detalle);
 		// System.out.print(detalle.getEmail());
 		// generar factura
 		// buscar facturas y enviar a crear pdf
 		try {
 			EmailCampaign campaña = emailCampaignService.findById(detalle.getIdCampaign());
+			 
 			// realizamos la busqueda de la factura y sus componentes
 			String fecha = campaña.getAnno() + campaña.getMes();
 
@@ -390,7 +426,7 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 			throw new ExceptionNullSql(new Date(), "Error generando el envio", e.getMessage());
 
 		}
-
+		
 	}
 
 	@Override
@@ -445,5 +481,75 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 			emailCampaignDetalleDao.save(insert);
 		}
 	}
+
+	@Override
+	public void update(EmailCampaignDetalleDTO detalle) {
+		// TODO Auto-generated method stub
+		this.emailCampaignDetalleDao.findById(detalle.getId())
+				.map(exist-> {
+					emailCampaingDetalleMapper.partialUpdate(exist, detalle);
+
+					return exist;
+				})
+				.map(emailCampaignDetalleDao::save)
+				.map(emailCampaingDetalleMapper::toDto);
+	}
+
+	 
+	private void invoiceByPortalWeb(Integer idEmailCampaign , EmailCampaign campaign) {
+		// TODO Auto-generated method stub
+		//EmailCampaign campaign = emailCampaignService.findById(idEmailCampaign);
+
+		String fechaFactura = campaign.getAnno() + campaign.getMes();
+
+		Optional<List<Object[]>> list = emailCampaignDetalleDao.findFacturaByPortalweb(campaign.getIdEmpresa(), fechaFactura);
+		List<FacturasEmitidas> emitidas = list
+						.map(l -> l.stream()
+						.map(data->converterFacturasEmitidas(data, campaign))
+						.collect(Collectors.toList()))
+						.orElseGet(Collections::emptyList);
+	
+		List<FacturasEmitidas> group = emitidas.stream().collect(Collectors.collectingAndThen(
+			Collectors.toMap(
+				FacturasEmitidas::getFactura,
+				factura -> factura,
+				(facturaExistent  ,factura) -> facturaExistent
+			), map -> new ArrayList<>(map.values())));
+
+		 facturasEmitidasService.saveAll(group);
+		 	
+	}
+
+	private FacturasEmitidas converterFacturasEmitidas(Object[] object , EmailCampaign campaign)
+	{
+		FacturasEmitidas emitidas = new FacturasEmitidas();
+		emitidas.setFactura((String) object[0].toString());
+		emitidas.setIdCliente((Integer) object[1]);
+		emitidas.setEmail((String) object[2]);
+		emitidas.setNombreServicio((String) object[3]);
+		emitidas.setTipoCliente((String) object[4]);
+		emitidas.setOrigen((String) object[5]);
+		emitidas.setFecha_corte(campaign.getFechaCorte());
+		emitidas.setFecha_limite(campaign.getFechaLimitePago());
+		emitidas.setIdCampaign(campaign.getId());
+		return emitidas;
+
+	}
+
+	private EmailCampaignDetalleDTO converterFacturasToDetalleDTO(FacturasEmitidas facturasEmitidas)
+	{
+		EmailCampaignDetalleDTO detalle = new EmailCampaignDetalleDTO();
+		detalle.setEmail(facturasEmitidas.getEmail());
+		detalle.setFactura(facturasEmitidas.getFactura());
+		detalle.setTipoCliente(facturasEmitidas.getTipoCliente());
+		detalle.setNombreCliente(facturasEmitidas.getNombreCliente());
+		detalle.setResponse(facturasEmitidas.getResponse());
+		detalle.setIdCliente(facturasEmitidas.getIdCliente());
+		detalle.setOrigen(facturasEmitidas.getOrigen());
+
+		return detalle;
+	}
+
+	 
 
 }

@@ -3,8 +3,7 @@ package com.comunicamosmas.api.web.rest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
+ 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.comunicamosmas.api.domain.EmailCampaign;
-import com.comunicamosmas.api.service.IEmailCampaignService;
+import com.comunicamosmas.api.service.IEmailCampaignService; 
 import com.comunicamosmas.api.service.dto.EmailCampanignDTO;
  
 
@@ -26,8 +25,12 @@ import com.comunicamosmas.api.service.dto.EmailCampanignDTO;
 @RequestMapping("/api/controlmas")
 public class EmailCampaignController {
 	
-	@Autowired
-	IEmailCampaignService emailCampaignService;
+	private final IEmailCampaignService emailCampaignService; 
+
+	public EmailCampaignController(IEmailCampaignService emailCampaignService)
+	{
+		this.emailCampaignService = emailCampaignService; 
+	}
 	
 	@PostMapping("/emailCampaign/save")
 	public ResponseEntity<?> save(@RequestBody EmailCampaign emailCampaign)
@@ -112,5 +115,7 @@ public class EmailCampaignController {
 			return new ResponseEntity<Map<String, Object>>(response , HttpStatus.BAD_REQUEST);
 		}
 	}
+
+	 
 
 }

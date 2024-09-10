@@ -149,7 +149,7 @@ public class ApiRestServiceImpl implements IApiRestService {
 	/**
 	 * cache @author Edwin egue
 	 */
-	@Cacheable("authTokenCache")
+	//@Cacheable("authTokenCache")
 	public String getAuthToken() {
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 

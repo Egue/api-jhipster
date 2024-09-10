@@ -31,8 +31,7 @@ spring:
     serialization:
       indent-output: true
   datasource:
-   
-    driver-class-name: com.mysql.jdbc.Driver
+    
     hikari:
       poolName: Hikari
       auto-commit: false
@@ -41,6 +40,10 @@ spring:
         prepStmtCacheSize: 250
         prepStmtCacheSqlLimit: 2048
         useServerPrepStmts: true
+  data:
+    mongodb:
+      uri: mongodb://root:mongo12FbKill@localhost:27017
+      database: inconnection
   jpa:
   hibernate:
     use-new-id-generator-mappings: true
@@ -66,6 +69,10 @@ spring:
     locator:
       discovery:
         enabled: true
+  #cache Redis
+  redis:
+    host: localhost
+    port: 6379
 
 server:
   port: 8080

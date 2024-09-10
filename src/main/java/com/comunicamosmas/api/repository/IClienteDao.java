@@ -57,4 +57,6 @@ public interface IClienteDao extends CrudRepository<Cliente, Long> {
 	"WHERE co.estado = 1 AND co.id_servicio IN (1,2,3,4,5,6,7,8,9) AND co.marca BETWEEN  CURRENT_TIMESTAMP - INTERVAL 11 MONTH AND CURRENT_TIMESTAMP - INTERVAL 10 MONTH", nativeQuery = true)
     public List<Object[]> findClientesDeclineClausura();
 
+     
+
 }

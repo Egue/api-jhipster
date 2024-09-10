@@ -13,8 +13,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.mysql.jdbc.Connection;
-
-@Component
+ 
 public class DataBaseMonitoreo {
 	
 	private final DataSource dataSource;
