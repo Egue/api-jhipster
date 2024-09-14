@@ -31,7 +31,8 @@ spring:
     serialization:
       indent-output: true
   datasource:
-    
+   
+    driver-class-name: com.mysql.jdbc.Driver
     hikari:
       poolName: Hikari
       auto-commit: false
@@ -42,8 +43,7 @@ spring:
         useServerPrepStmts: true
   data:
     mongodb:
-      uri: mongodb://root:mongo12FbKill@localhost:27017
-      database: inconnection
+      uri: mongodb://root:mongo12FbKill@localhost:27017/inconnection?minPoolSize=5&maxPoolSize=20&maxIdleTimeMS=30000
   jpa:
   hibernate:
     use-new-id-generator-mappings: true

@@ -113,4 +113,10 @@ public class ReconexionCron {
 			e.printStackTrace();
 		}
 	}
+
+	@Scheduled(cron = "0 53 07 * * *")
+	public void prueba()
+	{
+		System.out.println("hola");
+	}
 }

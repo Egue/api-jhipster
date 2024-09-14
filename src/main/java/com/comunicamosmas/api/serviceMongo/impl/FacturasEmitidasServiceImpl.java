@@ -27,7 +27,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class FacturasEmitidasServiceImpl implements IFacturasEmitidasService{
-
     private final FacturasEmitidasRepository facturasEmitidasRepository;
 
     private final IDeudaService deudaService;
@@ -126,6 +125,10 @@ public class FacturasEmitidasServiceImpl implements IFacturasEmitidasService{
 
             EmailCampaignApi datos = mapper.readValue(config.getComando() ,  EmailCampaignApi.class);
 
+            String html = systemConfigDao.findByOrigen(datos.getHtml_part()).getComando();
+
+            datos.setHtml_part(html);
+
             String fondo = emailCampaignDetalleService.fondoMail(responsePDF, datos);
 
             EmailCampaignDetalle unitario = new EmailCampaignDetalle();
@@ -138,8 +141,8 @@ public class FacturasEmitidasServiceImpl implements IFacturasEmitidasService{
 
             String send =  emailCampaignDetalleService.mailRelaySendMail(datos, unitario, fondo, responsePDF);
 
-            FacturasEmitidas facturas = facturasEmitidasRepository.findByIdClienteAndFacturaAndAndIdCampaign(detalle.getIdCliente(), detalle.getFactura(), detalle.getIdCampaign());
-
+            FacturasEmitidas facturas = facturasEmitidasRepository.findByIdClienteAndFacturaAndIdCampaign(detalle.getIdCliente(), detalle.getFactura(), detalle.getIdCampaign());
+            facturas.setEmail(detalle.getEmail());
             this.save(facturas);
             
             return send;
@@ -155,7 +158,7 @@ public class FacturasEmitidasServiceImpl implements IFacturasEmitidasService{
 		// System.out.print(fondo);
 		
 
-	}
+	} 
    
     
 }

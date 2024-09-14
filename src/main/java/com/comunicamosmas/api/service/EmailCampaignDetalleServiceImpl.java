@@ -516,7 +516,23 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 				(facturaExistent  ,factura) -> facturaExistent
 			), map -> new ArrayList<>(map.values())));
 
-		 facturasEmitidasService.saveAll(group);
+		//consultar por el idCampaing si ya existe una lista cargada
+		List<FacturasEmitidas> searchMongo = facturasEmitidasService.findByidCampaign(idEmailCampaign);
+		if(searchMongo.isEmpty() || searchMongo == null)
+		{
+			facturasEmitidasService.saveAll(group);
+			
+		}else{
+
+			List<FacturasEmitidas> notCoincide = group.stream().filter(data -> searchMongo.stream()
+							.noneMatch(mongo -> data.getFactura().equals(mongo.getFactura()) 
+							&& data.getIdCliente().equals(mongo.getIdCliente()))
+							).collect(Collectors.toList());
+
+			facturasEmitidasService.saveAll(notCoincide);
+		}
+
+		 
 		 	
 	}
 

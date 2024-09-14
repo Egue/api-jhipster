@@ -231,7 +231,7 @@ public class ClienteServiceImpl implements IClienteService {
         return client;
     }
 
-    @Scheduled(cron = "0 0 6 * * *")
+    //@Scheduled(cron = "0 0 6 * * *")
     @Override
     public void clientesDeclineClausura() {
         // TODO Auto-generated method stub

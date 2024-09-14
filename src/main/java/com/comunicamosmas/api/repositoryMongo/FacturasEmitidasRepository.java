@@ -17,5 +17,5 @@ public interface FacturasEmitidasRepository extends MongoRepository<FacturasEmit
 
     public Page<FacturasEmitidas> findByIdCliente(Integer idCliente , Pageable pageable);
 
-    public FacturasEmitidas findByIdClienteAndFacturaAndAndIdCampaign(Integer idCliente , String factura , Integer IdCampaign);
+    public FacturasEmitidas findByIdClienteAndFacturaAndIdCampaign(Integer idCliente , String factura , Integer IdCampaign);
 }
