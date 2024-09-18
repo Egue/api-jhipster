@@ -34,5 +34,9 @@ public interface IUsuarioDao extends CrudRepository<Usuario, Long> {
     @Query(value="SELECT * FROM jhi_authority", nativeQuery = true)
     public Optional<List<Object[]>> findRoleAll();
 
+    public Optional<Usuario> findByNick(@Param("nick") String nick);
+
+    public Optional<Usuario> findOneByPushover(@Param("pushover") String pushover);
+
      
 }

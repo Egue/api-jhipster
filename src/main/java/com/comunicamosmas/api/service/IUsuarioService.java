@@ -30,4 +30,8 @@ public interface IUsuarioService {
     public List<ValorStringDTO> roles();
 
     public void newUser(Integer id, String role);
+
+    public void initResetPassword(String login);
+
+    public boolean finishResetPassword(String code , String newPassword);
 }

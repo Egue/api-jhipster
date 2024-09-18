@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,10 +21,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.comunicamosmas.api.service.IUsuarioService;
 import com.comunicamosmas.api.service.dto.ValorStringDTO;
 import com.comunicamosmas.api.service.dto.userLoginDTO;
-import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
-import com.mysql.fabric.Response;
+import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql; 
+ 
 
-@CrossOrigin("*")
+
 @RestController
 @RequestMapping("/api/controlmas")
 public class UsuarioController {
@@ -156,6 +157,77 @@ public class UsuarioController {
 
     }
 
-    
+
+    /*
+     * init reset passwors
+     * @username
+     */
+    @PostMapping("/usuarios/reset/password-init")
+    public ResponseEntity<?> initResetPassword(@RequestBody String username)
+    {
+        try {
+
+            usuarioService.initResetPassword(username);
+
+            return ResponseEntity.status(HttpStatus.OK).build();
+        } catch (Exception e) {
+            // TODO: handle exception
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+
+    @PostMapping("/usuarios/reset/password-finish")
+    public ResponseEntity<?> validateCode(@RequestBody() ResetPassword resetPassword)
+    {
+        try {
+            Boolean user = usuarioService.finishResetPassword(resetPassword.getCode(), resetPassword.getPassword());
+            if(user)
+            {
+                return ResponseEntity.status(HttpStatus.OK).build();
+
+            } else{
+
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    static class ResetPassword{
+        private String code;
+
+        private String password;
+
+        
+
+        public ResetPassword() {
+        }
+
+        public ResetPassword(String code, String password) {
+            this.code = code;
+            this.password = password;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public void setCode(String code) {
+            this.code = code;
+        }
+
+        public String getPassword() {
+            return password;
+        }
+
+        public void setPassword(String password) {
+            this.password = password;
+        }
+
+        
+    }
     
 }
