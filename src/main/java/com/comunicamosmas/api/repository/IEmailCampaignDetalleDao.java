@@ -3,6 +3,8 @@ package com.comunicamosmas.api.repository;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -17,6 +19,14 @@ public interface IEmailCampaignDetalleDao extends CrudRepository<EmailCampaignDe
 					+ " 	 where deudas.facturado_fecha like concat('%',:fecha,'%')  \n"
 					+ "			 and deudas.id_empresa = :idEmpresa and contratos.preferencia_factura = 2 group by deudas.factura" , nativeQuery=true)
 	public List<Object[]> findEmailBySend(@Param("idEmpresa")Long idEmpresa , @Param("fecha") String fecha);
+
+	@Query(value="SELECT deudas.factura , clientes.id_cliente, clientes.mail , servicios.nombre ,clientes.tipo_cliente, deudas.refiere FROM deudas \n"
+	+	" INNER JOIN contratos ON contratos.id_contrato = deudas.id_contrato \n"
+	+   " INNER JOIN clientes ON contratos.id_cliente = clientes.id_cliente \n"
+	+   " INNER JOIN servicios ON servicios.id_servicio = contratos.id_servicio \n"
+	+ 	" WHERE deudas.facturado_fecha LIKE CONCAT('%', :fecha , '%') \n"
+	+ 	" AND deudas.id_empresa = :idEmpresa" , nativeQuery=true)
+	public Optional<List<Object[]>> findFacturaByPortalweb(@Param("idEmpresa")Long idEmpresa , @Param("fecha") String fecha);
 	
 	@Query(value="SELECT  \n"
 			+ "			detalle.factura as factura,\n"
@@ -64,5 +74,15 @@ public interface IEmailCampaignDetalleDao extends CrudRepository<EmailCampaignDe
 
 	@Query(value="SELECT * FROM email_campaing_detalle detalle WHERE detalle.factura = :factura AND detalle.id_email_campaing = :idCampaign", nativeQuery=true)
 	public Optional<List<Object[]>> validExiste(@Param("factura") String factura , @Param("idCampaign") Integer idCampaign);
+
+	@Query(value="SELECT de.* , se.nombre , ec.fecha_limite_pago , ec.fecha_de_corte  FROM email_campaing_detalle de  " + 
+	" INNER JOIN servicios se ON se.id_servicio = de.id_servicio "+
+	" INNER JOIN email_campaign ec ON ec.id = de.id_email_campaing " +
+	"WHERE de.id_cliente = :idCliente ORDER BY de.id" ,
+	countQuery = "SELECT count(*) FROM email_campaing_detalle ecd WHERE ecd.id_cliente = :idCliente" ,
+	nativeQuery = true)
+	public Page<Object[]> findListByIdClienteAndService(@Param("idCliente") Long idCliente , Pageable page);
+
+
 
 }

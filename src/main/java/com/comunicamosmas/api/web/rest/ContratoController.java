@@ -1,13 +1,13 @@
 package com.comunicamosmas.api.web.rest;
 
-import com.comunicamosmas.api.service.IContratoService;
-import com.comunicamosmas.api.service.dto.ContratosFirmasDTO;
+import com.comunicamosmas.api.service.IContratoService; 
 import com.comunicamosmas.api.service.dto.DatosClienteDTO;
-import com.comunicamosmas.api.service.dto.ListContratoDTO;  
+import com.comunicamosmas.api.service.dto.ListContratoDTO;
+ 
+
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.Map; 
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,8 +35,8 @@ public class ContratoController {
         Map<String, Object> response = new HashMap<>();
         try {
             List<ListContratoDTO> list = contratoService.findByIdCliente(idCliente);
-            response.put("response", list);
-            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
+             
+            return ResponseEntity.status(HttpStatus.OK).body(list);
         } catch (Exception e) {
             response.put("response", e.getMessage());
 

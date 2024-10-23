@@ -5,6 +5,8 @@ import com.comunicamosmas.api.domain.Deuda;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -21,10 +23,12 @@ public interface IDeudaDao extends CrudRepository<Deuda, Long> {
 			+ "    WHEN generador = 2 THEN 'Cargo Manual'\n"
 			+ "END as generador,\n"
 			+ "deu.valor_total as valor, \n"
-			+ "deu.valor_parcial as  abono \n"
-			+ "\n"
-			+ "FROM deudas deu where deu.id_contrato = :contrato" , nativeQuery = true)
-	public List<Object[]> findByIdContrato(@Param("contrato") Long contrato);
+			+ "deu.valor_parcial as  abono, \n"
+			+ "deu.instalacion , deu.reconexion , deu.materiales , deu.traslado , deu.otros , deu.concepto_aux \n"
+			+ "FROM deudas deu where deu.id_contrato = :contrato ORDER BY deu.id_deuda DESC" , 
+			countQuery = "SELECT count(*) FROM deudas deu WHERE deu.id_contrato = :contrato" , 
+			nativeQuery = true)
+	public Page<Object[]> findByIdContrato(@Param("contrato") Long contrato , Pageable pageable);
 	
 	@Query(value="SELECT concat('$ ' , FORMAT(sum(deudas.valor_total - (deudas.valor_parcial)) , 2))  "
 			+ "as parcial FROM deudas where deudas.id_contrato = :idContrato and deudas.estado in (1,3)" , nativeQuery=true)
@@ -72,5 +76,12 @@ public interface IDeudaDao extends CrudRepository<Deuda, Long> {
 	+"deudas.valor_parcial, deudas.valor_total  , deudas.mes_servicio FROM deudas WHERE id_contrato = :contrato AND estado IN (1,3) ORDER BY id_deuda ASC" , nativeQuery = true)
 	public Optional<List<Object[]>> deudasByIdContrato(@Param("contrato") Long idContrato);
 
-	
+	//
+	public Optional<List<Deuda>> findByIdIn(List<Long> ids);
+  
+	public Optional<List<Deuda>> findByFacturadoFechaLike(Integer mes );
+
+	@Query(value="SELECT * FROM deudas d WHERE d.id_cliente = :idCliente AND d.estado IN (1,3) AND d.factura > 0" , nativeQuery=true)
+    public Optional<List<Deuda>> findActiveDebtsWithInvoiceByClientId(@Param("idCliente") Long idCliente);
+
 }

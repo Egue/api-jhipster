@@ -328,8 +328,8 @@ public class ReportesController {
     /* Reporte de pagos por medio_pago independiente de la empresa , fecha */
 
     @GetMapping("/reportes/medios-pago")
-    public ResponseEntity<Resource> mediosPago(@RequestParam List<Integer> payment, @RequesParam String first,
-            @RequesParam String last) {
+    public ResponseEntity<Resource> mediosPago(@RequestParam List<Integer> payment, @RequestParam String first,
+            @RequestParam String last) {
         try {
             List<ReporteMediosPagosDTO> result = pagosService.findMedioPago(payment, first, last);
             List<ReporteMediosPagosDTO> saldoFavor = saldoFavorLogService.findByMedioPago(payment, first, last);

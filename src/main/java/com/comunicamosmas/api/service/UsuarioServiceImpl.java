@@ -1,20 +1,21 @@
 package com.comunicamosmas.api.service;
-
-import com.comunicamosmas.api.domain.Admin;
-import com.comunicamosmas.api.domain.Usuario;
-import com.comunicamosmas.api.repository.IAdminDao;
+ 
+import com.comunicamosmas.api.domain.Usuario; 
 import com.comunicamosmas.api.repository.IUsuarioDao;
+import com.comunicamosmas.api.repository.UserRepository;
 import com.comunicamosmas.api.service.dto.ValorStringDTO;
 import com.comunicamosmas.api.service.dto.userLoginDTO;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
- 
+
+import tech.jhipster.security.RandomUtil;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.List; 
 import java.util.Optional;
-
+ 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
@@ -30,7 +31,13 @@ public class UsuarioServiceImpl implements IUsuarioService {
     IUsuarioDao usuarioDao;
 
     @Autowired
+    UserRepository userRepository;
+
+    @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    ISendWSService sendWSService;
 
     @PersistenceContext
     private EntityManager em;
@@ -185,4 +192,47 @@ public class UsuarioServiceImpl implements IUsuarioService {
             throw new  ExceptionNullSql(new Date(), "Error insertando datos ", e.getMessage());
         }
     }
+
+    @Transactional
+    public void initResetPassword(String login) {
+        // TODO Auto-generated method stub
+     try {
+        usuarioDao.findByNick(login)
+        .map(user -> {
+        String code = RandomUtil.generateResetKey();
+        String sub = code.substring(16); 
+        user.setPushover(sub);
+        sendWSService.sendMsmPriority(sub, user.getTelefono());
+        return user;
+    }); 
+     
+     } catch (Exception e) {
+        // TODO: handle exception
+        e.printStackTrace();
+     }
+
+    }
+
+    @Override
+    public boolean finishResetPassword(String code , String newPassword) {
+        // TODO Auto-generated method stub
+        Optional<Usuario> usuario =  usuarioDao.findOneByPushover(code).map(user->{
+            user.setPasswordDos(passwordEncoder.encode(newPassword));
+            user.setPushover("");
+            return user;
+        });
+        
+        if(!usuario.isEmpty())
+        {
+            this.usuarioDao.save(usuario.get());
+            return true;
+
+        }else{
+
+            return false;
+        }
+    }
+
+
+     
 }

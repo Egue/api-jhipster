@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -18,18 +21,36 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.comunicamosmas.api.domain.EmailCampaign;
-import com.comunicamosmas.api.domain.EmailCampaignDetalle;
 import com.comunicamosmas.api.service.IEmailCampaignDetalleService;
+import com.comunicamosmas.api.service.IEmailCampaignService;
+import com.comunicamosmas.api.service.IFacturasServices;
 import com.comunicamosmas.api.service.dto.EmailCampaignDetalleDTO;
+import com.comunicamosmas.api.serviceMongo.IFacturasEmitidasService;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
-
-@CrossOrigin("*")
+ 
 @RestController
 @RequestMapping("/api/controlmas")
 public class EmailCampaignDetalleController {
 
-	@Autowired
-	IEmailCampaignDetalleService emailCampaignDetalleService;
+	private final IEmailCampaignDetalleService emailCampaignDetalleService;
+
+	private final IFacturasServices facturasServices;
+
+	private final IFacturasEmitidasService facturasEmitidasService;
+
+	private final IEmailCampaignService emailCampaignService;
+
+	public EmailCampaignDetalleController(IEmailCampaignDetalleService emailCampaignDetalleService , IFacturasServices facturasServices , 
+	IEmailCampaignService emailCampaignService , IFacturasEmitidasService facturasEmitidasService)
+	{
+		this.emailCampaignDetalleService = emailCampaignDetalleService;
+
+		this.facturasServices = facturasServices;
+
+		this.emailCampaignService = emailCampaignService;
+
+		this.facturasEmitidasService = facturasEmitidasService;
+	}
 
 	@GetMapping("/emailCampaignDetalle/generate/{idEmailCampaign}")
 	public ResponseEntity<?> generate(@PathVariable Integer idEmailCampaign) {
@@ -47,6 +68,8 @@ public class EmailCampaignDetalleController {
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
+
+	 
 
 	/** GET BUSCAR POR IDEMAILCAMPAIGN */
 	@GetMapping("/emailCampaignDetalle/emailCampaign/{id}")
@@ -80,10 +103,22 @@ public class EmailCampaignDetalleController {
 		Map<String, Object> response = new HashMap<>();
 
 		try {
- 
-			String result = emailCampaignDetalleService.sendMailUnitario(detalle);
 
-			response.put("response", result);
+			EmailCampaign campaign = emailCampaignService.findById(detalle.getIdCampaign());
+
+			if(campaign.getEstado().equals("PortalWeb"))
+			{
+				facturasEmitidasService.sendFactura(detalle , campaign);
+				
+			}else{ 
+				
+				String result = emailCampaignDetalleService.sendMailUnitario(detalle);
+
+				response.put("response", result);
+
+			}
+ 
+			
 
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 
@@ -125,6 +160,28 @@ public class EmailCampaignDetalleController {
 			response.put("response", e.getMessage());
 
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	
+	@GetMapping("/emailCampaingDetalle/findlistbyidcliente")
+	public ResponseEntity<?> findListByIdCliente(@RequestParam("cliente") Long idCliente , @RequestParam("init") int page , @RequestParam("size") int size)
+	{
+		try {
+			
+			PageRequest pageable =  PageRequest.of(page, size);
+
+			List<EmailCampaignDetalleDTO> list = facturasServices.findListFacturaByIdCliente(idCliente, pageable);
+
+
+			return ResponseEntity.status(HttpStatus.OK).body(list);
+		} catch (Exception e) {
+			// TODO: handle exception
+			Map<String, Object> response = new HashMap<>();
+
+			response.put("response", e.getMessage());
+
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 		}
 	}
 

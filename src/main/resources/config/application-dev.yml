@@ -41,6 +41,9 @@ spring:
         prepStmtCacheSize: 250
         prepStmtCacheSqlLimit: 2048
         useServerPrepStmts: true
+  data:
+    mongodb:
+      uri: mongodb://root:mongo12FbKill@localhost:27017/inconnection?minPoolSize=5&maxPoolSize=20&maxIdleTimeMS=30000
   jpa:
   hibernate:
     use-new-id-generator-mappings: true
@@ -66,6 +69,10 @@ spring:
     locator:
       discovery:
         enabled: true
+  #cache Redis
+  redis:
+    host: localhost
+    port: 6379
 
 server:
   port: 8080

@@ -15,4 +15,6 @@ public interface IFinancieroNcService {
 
     //buscar por id
     public FinancieroNc findById(Long id);
+
+    public List<FinancieroNc> findByIdDeuda(Long idDeuda);
 }

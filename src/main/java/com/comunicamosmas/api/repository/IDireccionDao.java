@@ -19,7 +19,7 @@ public interface IDireccionDao extends JpaRepository<Direccion, Long> {
     public Optional<List<Object[]>> findByIdCliente(@Param("idCliente") Long idCliente);
 
     @Query(value="select d.barrio ,ld.departamento , lm.municipio, \n"+
-    "CONCAT(d.a_tipo, ' ' , d.a_numero , ' ' , d.a_letra, ' ',d.b_tipo, ' ' , d.b_numero, ' ',d.a_letra , ' ', d.numero) as direccion, \n"+
+    "CONCAT(d.a_tipo, ' ' , d.a_numero , ' ' , d.a_letra, ' ',d.b_tipo, ' ' , d.b_numero, ' ',d.b_letra , ' ', d.numero) as direccion, \n"+
     "CONCAT(d2.a_tipo, ' ' , d2.a_numero , ' ' , d2.a_letra, ' ',d2.b_tipo, ' ' , d2.b_numero, ' ',d2.a_letra , ' ', d2.numero  ,' / ',d2.barrio , ' / ', lm2.municipio ,' / ' ,ld2.departamento ) as facturacion from contratos co \n"+
     "inner join direcciones d on d.id_direccion =co.id_direccion_servicio \n"+
     "inner join direcciones d2 on d2.id_direccion =co.id_direccion_factura \n"+

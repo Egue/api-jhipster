@@ -2,16 +2,14 @@ package com.comunicamosmas.api.cron;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired; 
 
-import com.comunicamosmas.api.domain.EmailCampaign;
-import com.comunicamosmas.api.domain.EmailCampaignDetalle;
+import com.comunicamosmas.api.domain.EmailCampaign; 
 import com.comunicamosmas.api.service.IEmailCampaignDetalleService;
 import com.comunicamosmas.api.service.IEmailCampaignService;
 import com.comunicamosmas.api.service.dto.EmailCampaignDetalleDTO;
 
-@Component
+ 
 public class MailCampanaSend {
     
 @Autowired

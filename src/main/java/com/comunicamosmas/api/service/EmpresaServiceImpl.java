@@ -5,7 +5,7 @@ import com.comunicamosmas.api.repository.IEmpresaDao;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,6 +19,7 @@ public class EmpresaServiceImpl implements IEmpresaService {
     }
 
     @Override
+    @Cacheable("company_findAll")
     public List<Empresa> findAll() {
         // TODO Auto-generated method stub
         return (List<Empresa>) empresaDao.findAll();
