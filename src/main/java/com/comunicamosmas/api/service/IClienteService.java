@@ -35,5 +35,7 @@ public interface IClienteService {
 
     public Page<ClientePortalWebDTO> pageClienteSyncronicePortalWeb(Pageable page);
 
+    public void updatedClientPortalWebSincronice(Long idCliente);
+
     public void clientesDeclineClausura();
 }

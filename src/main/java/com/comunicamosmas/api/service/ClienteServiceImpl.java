@@ -22,8 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.data.domain.Pageable; 
 import org.springframework.stereotype.Service;
 
 import org.apache.poi.ss.usermodel.*;
@@ -344,6 +343,17 @@ public class ClienteServiceImpl implements IClienteService {
         dto.setNombre_servicio((String) obj[5]);
 
         return dto;
+    }
+
+    @Override
+    public void updatedClientPortalWebSincronice(Long idCliente) {
+        // TODO Auto-generated method stub
+        this.clienteDao.findById(idCliente).map(exist->{
+
+            exist.setPortalweb("Sincronizado");
+            this.clienteDao.save(exist);
+            return exist;
+        });
     }
 
      
