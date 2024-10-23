@@ -4,7 +4,8 @@ import java.util.List;
 
 import com.comunicamosmas.api.service.dto.AdminPortalWebDTO;
 import com.comunicamosmas.api.service.dto.AdminUserDTO;
-import com.comunicamosmas.api.service.dto.ClientePortalWebDTO;
+import com.comunicamosmas.api.service.dto.ClientePortalWebDTO; 
+import com.comunicamosmas.api.service.dto.PortalWebSaveContrato;
 
 public interface IPortalWebService {
     
@@ -17,5 +18,7 @@ public interface IPortalWebService {
     public void activate(String token);
 
     public ClientePortalWebDTO findByDocumento(String documento , String token);
+
+    public void sincroniceContratos(PortalWebSaveContrato datos , String token);
 
 }

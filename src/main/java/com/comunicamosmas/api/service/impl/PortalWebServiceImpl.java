@@ -2,21 +2,26 @@ package com.comunicamosmas.api.service.impl;
  
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConversionException;  
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.comunicamosmas.api.domain.Cliente;
+import com.comunicamosmas.api.repository.IClienteDao;
 import com.comunicamosmas.api.service.IPortalWebService;
 import com.comunicamosmas.api.service.dto.AdminPortalWebDTO;
 import com.comunicamosmas.api.service.dto.AdminUserDTO;
 import com.comunicamosmas.api.service.dto.ClientePortalWebDTO;
+import com.comunicamosmas.api.service.dto.PortalWebSaveContrato; 
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql; 
 
 @Service
@@ -28,12 +33,15 @@ public class PortalWebServiceImpl implements IPortalWebService{
 
     private final HttpHeaders headers;
 
-    PortalWebServiceImpl()
+    private final IClienteDao clienteDao;
+
+    public PortalWebServiceImpl(IClienteDao clienteDao)
     {
-        //this.url = "http://192.168.24.138:8089/api/";
-        this.url = "http://portalweb-api.server.cableytv.com/api/";
+        //this.url = "http://192.168.24.113:8089/api/";
+        this.url = "https://portalweb-api.server.cableytv.com/api/";
         this.restTemplate = new RestTemplate();
         this.headers = new HttpHeaders();
+        this.clienteDao = clienteDao;
     }
 
     @Override
@@ -50,6 +58,17 @@ public class PortalWebServiceImpl implements IPortalWebService{
 
             ResponseEntity<String> response = restTemplate.exchange(edpoint, HttpMethod.POST, cliente, String.class);
             //System.out.println(clientePortalWebDTO);
+            if(response.getStatusCode().equals(HttpStatus.OK))
+            {
+                //update sincronizado
+                  clienteDao
+                            .findById(clientePortalWebDTO.getIdCliente())
+                            .ifPresent(present ->{
+                                present.setPortalweb("Sincronizado");
+
+                                clienteDao.save(present);
+                            });
+            }
 
         } catch(HttpMessageConversionException e){
 
@@ -171,6 +190,30 @@ public class PortalWebServiceImpl implements IPortalWebService{
             this.cliente = cliente;
         }
         
+    }
+
+    @Override
+    public void sincroniceContratos(PortalWebSaveContrato datos , String token) {
+        // TODO Auto-generated method stub
+        try {
+            String endpoint = url + "portal/contratos";
+
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            headers.set("Authorization" , token);
+
+            HttpEntity<PortalWebSaveContrato> cliente = new HttpEntity<>(datos , headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(endpoint, HttpMethod.POST, cliente, String.class);
+
+        } catch(HttpMessageConversionException e){
+
+            throw new ExceptionNullSql(new Date(), "Error enviando a Portal Web", e.getMessage());
+
+        } catch (Exception e) {
+
+            throw new ExceptionNullSql(new Date(), "Error Inesperado con Portal Web", e.getMessage() );
+        }
     }
     
 }

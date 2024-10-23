@@ -15,4 +15,6 @@ public interface IClausulaPermanenciaService {
 
     //buscar por id
     public ClausulaPermanencia findById(Long id);
+
+    public ClausulaPermanencia findByIdContrato(Long idContrato);
 }

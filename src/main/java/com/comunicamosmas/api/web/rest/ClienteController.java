@@ -1,8 +1,11 @@
 package com.comunicamosmas.api.web.rest;
 
 import com.comunicamosmas.api.domain.Cliente;
+import com.comunicamosmas.api.security.AuthoritiesConstants;
 import com.comunicamosmas.api.service.IClienteService; 
 import com.comunicamosmas.api.service.dto.ClienteDTO;
+import com.comunicamosmas.api.service.dto.ClientePortalWebDTO;
+import com.comunicamosmas.api.service.dto.ClientesDeclineClausuraDTO;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
  
 
@@ -11,8 +14,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@CrossOrigin("*")
+
 @RestController
 @RequestMapping("/api/controlmas")
 public class ClienteController {
@@ -97,8 +105,8 @@ public class ClienteController {
             List<ClienteDTO> findByDocumento = clienteService.validExisteCliente(cliente.getDocumento().toString());
 
             if (!findByDocumento.isEmpty()) {
-                throw new ExceptionNullSql(new Date(), "Documento ya existe",
-                        "el documento " + cliente.getDocumento() + " ya registrado");
+                throw new ExceptionNullSql(new Date(), "Documento existente :",
+                        " Documento " + cliente.getDocumento() + " ya registrado");
             } else {
                 clienteService.save(cliente);
             }
@@ -117,5 +125,26 @@ public class ClienteController {
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/clientes/Page")
+    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    public ResponseEntity<?> clientesPage()
+    {
+        try {
+            PageRequest page = PageRequest.of(0, 10);
+
+            Page<ClientePortalWebDTO> clients = clienteService.pageClienteSyncronicePortalWeb(page);
+
+            return ResponseEntity.status(HttpStatus.OK).body(clients);
+
+        } catch (Exception e) {
+            // TODO: handle exception
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+   
+    
 
 }

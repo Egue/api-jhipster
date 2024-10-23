@@ -31,9 +31,7 @@ spring:
     serialization:
       indent-output: true
   datasource:
-    url:
-    username: 
-    password: 
+    
     driver-class-name: com.mysql.jdbc.Driver
     hikari:
       poolName: Hikari
@@ -43,12 +41,15 @@ spring:
         prepStmtCacheSize: 250
         prepStmtCacheSqlLimit: 2048
         useServerPrepStmts: true
+  data:
+    mongodb:
+      uri: mongodb://root:mongo12FbKill@localhost:27017/inconnection?minPoolSize=5&maxPoolSize=20&maxIdleTimeMS=30000
   jpa:
   hibernate:
     use-new-id-generator-mappings: true
   liquibase:
     # Remove 'faker' if you do not want the sample data to be loaded automatically
-    contexts: dev, faker
+    contexts: dev
     enabled: false
   mail:
     host: localhost
@@ -68,6 +69,10 @@ spring:
     locator:
       discovery:
         enabled: true
+  #cache Redis
+  redis:
+    host: localhost
+    port: 6379
 
 server:
   port: 8080
@@ -86,7 +91,7 @@ jhipster:
   # CORS is only enabled by default with the "dev" profile
   cors:
     # Allow Ionic for JHipster by default (* no longer allowed in Spring Boot 2.4+)
-    allowed-origins: 'http://localhost:4200,http://10.111.39.2'
+    allowed-origins: 'http://localhost:4200,http://10.111.39.2,http://gestion.cableytv.com:8060'
     #allowed-origins: 'http://190.121.145.227:9050'
     allowed-methods: '*'
     allowed-headers: '*'

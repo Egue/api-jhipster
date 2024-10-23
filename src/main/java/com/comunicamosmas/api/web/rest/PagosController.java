@@ -35,7 +35,7 @@ public class PagosController {
 
     @PostMapping("/pagos/test")
     @PreAuthorize("hasAuthority(\""+ AuthoritiesConstants.ADMIN + "\")")
-    public ResponseEntity<?> test(@RequestParam Long idContrato , @RequesParam int valor , @RequesParam String comentario)
+    public ResponseEntity<?> test(@RequestParam Long idContrato , @RequestParam int valor , @RequestParam String comentario)
     {
         Map<String, Object> response = new HashMap<>();
         

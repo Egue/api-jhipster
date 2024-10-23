@@ -1,13 +1,9 @@
 package com.comunicamosmas.api.web.rest;
 
-import java.io.ByteArrayOutputStream;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
+import java.io.ByteArrayOutputStream; 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Map; 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -34,11 +30,12 @@ import com.comunicamosmas.api.service.dto.ReciboCajaDTO;
 import com.comunicamosmas.api.service.dto.ReporteHanRetirosDTO;
 import com.comunicamosmas.api.service.dto.ReporteMediosPagosDTO;
 import com.comunicamosmas.api.service.dto.ReporteOrdenConVisitaFallidaDTO;
-import com.comunicamosmas.api.service.dto.SaldoFavorDTO;
+import com.comunicamosmas.api.service.dto.ReporteSiustOneThreeDTO; 
 import com.comunicamosmas.api.service.dto.SoporteTicketDTO;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
-
+ 
 import io.jsonwebtoken.io.IOException;
+//import io.jsonwebtoken.lang.Arrays;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -114,7 +111,7 @@ public class ReportesController {
 
             for (CarteraDTO registro : result) {
                 Row row = sheet.createRow(rowNum++);
-                String origen = registro.getFf_grupocontra().equals("B") ? "*" : "";
+                String origen = registro.getFf_grupocontra().equals("B") ? "*" : null;
                 row.createCell(0).setCellValue(registro.getFf_iddelcontrato() + origen);
                 row.createCell(1).setCellValue(registro.getFf_fisico());
                 row.createCell(2).setCellValue(registro.getZona_nombre());
@@ -145,7 +142,7 @@ public class ReportesController {
                 row.createCell(24).setCellValue(registro.getVendedor());
                 row.createCell(25).setCellValue(registro.getMail());
                 row.createCell(26).setCellValue(registro.getEstacion());
-
+                origen = null;
             }
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -331,13 +328,13 @@ public class ReportesController {
     /* Reporte de pagos por medio_pago independiente de la empresa , fecha */
 
     @GetMapping("/reportes/medios-pago")
-    public ResponseEntity<Resource> mediosPago(@RequestParam List<Integer> payment, @RequesParam String first,
-            @RequesParam String last) {
+    public ResponseEntity<Resource> mediosPago(@RequestParam List<Integer> payment, @RequestParam String first,
+            @RequestParam String last) {
         try {
             List<ReporteMediosPagosDTO> result = pagosService.findMedioPago(payment, first, last);
             List<ReporteMediosPagosDTO> saldoFavor = saldoFavorLogService.findByMedioPago(payment, first, last);
             List<ReporteMediosPagosDTO> union = new ArrayList<>(result);
-            result.addAll(saldoFavor);
+            union.addAll(saldoFavor);
 
             Workbook workbook = new XSSFWorkbook();
             Sheet sheet = workbook.createSheet("MedioPago");
@@ -390,5 +387,74 @@ public class ReportesController {
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ByteArrayResource(e.getMessage().getBytes()));
         }
+    }
+
+    /**
+     * REPORTE SIUST 1.3.FORMATO T.1.3. LÍNEAS O ACCESOS Y VALORES FACTURADOS O COBRADOS DE
+        SERVICIOS FIJOS INDIVIDUALES Y EMPAQUETADOS
+        //@param(List<Integer> servicios)
+        //@param(Integer firts , Integer end)
+     */
+    @GetMapping("/reportes/siust13")
+    public ResponseEntity<Resource> reporteSiustOneThree(@RequestParam("servicios") List<Integer> servicios, @RequestParam("firts") Integer firts , @RequestParam("end") Integer end)
+    {
+        try {
+                //List<String> serviciosList = Arrays.asList(servicios.split(","));
+                List<ReporteSiustOneThreeDTO> result = pagosService.reporteOneToThree(servicios, firts, end);
+                Workbook workbook = new XSSFWorkbook();
+                Sheet sheet = workbook.createSheet("SIUST13");
+                // Crear encabezados
+                Row headerRow = sheet.createRow(0);
+                headerRow.createCell(0).setCellValue("Servicio");
+                headerRow.createCell(1).setCellValue("Tipo Cliente");
+                headerRow.createCell(2).setCellValue("Deuda");
+                headerRow.createCell(3).setCellValue("Contrato");
+                headerRow.createCell(4).setCellValue("Factura");
+                headerRow.createCell(5).setCellValue("Base");
+                headerRow.createCell(6).setCellValue("IVA");
+                headerRow.createCell(7).setCellValue("# Tarifa");
+                headerRow.createCell(8).setCellValue("Estrato");
+                headerRow.createCell(9).setCellValue("Velocidad");
+                headerRow.createCell(10).setCellValue("Tecnologia");
+                headerRow.createCell(11).setCellValue("Concepto");
+                headerRow.createCell(12).setCellValue("NC Base");
+                headerRow.createCell(13).setCellValue("NC IVA");
+                int rowNum = 1;
+                 for(ReporteSiustOneThreeDTO rs : result)
+                 {
+                        Row row = sheet.createRow(rowNum++);
+                        row.createCell(0).setCellValue(rs.getServicio());
+                        row.createCell(1).setCellValue(rs.getTipoCliente());
+                        row.createCell(2).setCellValue(rs.getDeuda());
+                        row.createCell(3).setCellValue(rs.getContrato());
+                        row.createCell(4).setCellValue(rs.getFactura());
+                        row.createCell(5).setCellValue(rs.getBase());
+                        row.createCell(6).setCellValue(rs.getIva());
+                        row.createCell(7).setCellValue(rs.getTarifa());
+                        row.createCell(8).setCellValue(rs.getEstrato());
+                        row.createCell(9).setCellValue(rs.getVelocidad());
+                        row.createCell(10).setCellValue(rs.getTecnologia());
+                        row.createCell(11).setCellValue(rs.getConcepto());
+                        row.createCell(12).setCellValue(rs.getNcBase());
+                        row.createCell(13).setCellValue(rs.getNcIva());
+                 }
+
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                workbook.write(byteArrayOutputStream);
+                workbook.close();
+    
+                ByteArrayResource resource = new ByteArrayResource(byteArrayOutputStream.toByteArray());
+    
+                return ResponseEntity.ok()
+                        .header("Content-Disposition", "attachment; filename=registros.xlsx")
+                        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                        .body(resource);
+    
+            } catch (IOException e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ByteArrayResource(e.getMessage().getBytes()));
+            } catch (Exception e) {
+    
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ByteArrayResource(e.getMessage().getBytes()));
+            }
     }
 }

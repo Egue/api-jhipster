@@ -8,7 +8,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-@Table(name = "tipos_tecnologia")
+@Table(name = "tarifas_instalacion")
 @Entity
 public class TarifaInstalacion implements Serializable {
 
@@ -16,10 +16,13 @@ public class TarifaInstalacion implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_tecnologia")
+    @Column(name = "id_tarifa")
     private Long id;
 
-    private Long Servicio;
+    @Column(name = "id_servicio")
+    private Long idServicio;
+
+    private Long valor;
 
     private String nombre;
 
@@ -33,12 +36,20 @@ public class TarifaInstalacion implements Serializable {
         this.id = id;
     }
 
-    public Long getServicio() {
-        return Servicio;
+    public Long getIdServicio() {
+        return idServicio;
     }
 
-    public void setServicio(Long servicio) {
-        Servicio = servicio;
+    public void setIdServicio(Long idServicio) {
+        this.idServicio = idServicio;
+    }
+
+    public Long getValor() {
+        return valor;
+    }
+
+    public void setValor(Long valor) {
+        this.valor = valor;
     }
 
     public String getNombre() {

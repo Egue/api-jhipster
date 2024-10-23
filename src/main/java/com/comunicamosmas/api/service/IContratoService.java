@@ -4,10 +4,10 @@ import com.comunicamosmas.api.domain.Contrato;
 import com.comunicamosmas.api.service.dto.ArrayListDTO;
 import com.comunicamosmas.api.service.dto.CarteraDTO;
 import com.comunicamosmas.api.service.dto.ContratoInfoFacturaDTO;
+import com.comunicamosmas.api.service.dto.ContratosFirmasDTO;
 import com.comunicamosmas.api.service.dto.DatosClienteDTO;
 import com.comunicamosmas.api.service.dto.ListContratoDTO; 
-import java.util.List;
-import java.util.Optional;
+import java.util.List; 
 
 public interface IContratoService {
     //listar todos
@@ -35,5 +35,8 @@ public interface IContratoService {
     public List<CarteraDTO> carteraByServicio(ArrayListDTO datos);
 
     public void updateSaldoFavor(Contrato contrato , Float valor);
+
+    /**Generate Link */
+    public ContratosFirmasDTO.Datos generateLink(Long idContrato , String token);
  
 }

@@ -2,6 +2,7 @@ package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.Empresa;
 import java.util.List;
+import java.util.Optional;
 
 public interface IEmpresaService {
     //listar todos
@@ -19,4 +20,8 @@ public interface IEmpresaService {
     public List<Empresa> findByLikeNombreComercial(String empresa);
     
     public Empresa findByIdContrato(Long idContrato);
+
+    public Optional<List<Empresa>> findAllByStatus();
+
+    public List<Empresa> findFilter(Long idUSer);
 }

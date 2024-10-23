@@ -5,7 +5,10 @@ import com.comunicamosmas.api.service.IEmpresaService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.health.HealthProperties.Status;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -14,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin("*")
@@ -41,6 +45,35 @@ public class EmpresaController {
             response.put("response", e.getMessage());
 
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/empresa")
+    public ResponseEntity<?> find(@RequestParam("idUser") Long idUser)
+    {
+        try {
+            if(idUser != null && idUser < 1)
+            {
+                throw new IllegalArgumentException("El id user debe ser mayor de 0");
+            }
+            List<Empresa> empresa  = empresaService.findFilter(idUser);
+            return ResponseEntity.status(HttpStatus.OK).body(empresa);
+        } catch (Exception e) {
+            // TODO: handle exception
+            Map<String, Object> response = new HashMap<>();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @GetMapping("/empresa/listbystatus")
+    public ResponseEntity<?> listByStatus(){
+        try {
+            Optional<List<Empresa>> list = empresaService.findAllByStatus();
+            
+            return ResponseEntity.status(HttpStatus.OK).body(list);
+        } catch (Exception e) {
+            // TODO: handle exception
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(e.getMessage());
         }
     }
 

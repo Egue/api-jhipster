@@ -1,39 +1,53 @@
 package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.Admin;
+import com.comunicamosmas.api.domain.FinancieroNc;
 import com.comunicamosmas.api.repository.IAdminDao;
+import com.comunicamosmas.api.repository.IFinancieroNcDao;
+
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class FinancieroNcServiceImpl implements IAdminService {
+public class FinancieroNcServiceImpl implements IFinancieroNcService {
 
-    @Autowired
-    IAdminDao adminDao;
+    private final IFinancieroNcDao financieroNcDao;
 
-    @Override
-    public List<Admin> findAll() {
-        // TODO Auto-generated method stub
-        return (List<Admin>) adminDao.findAll();
+    public FinancieroNcServiceImpl(IFinancieroNcDao financieroNcDao)
+    {
+        this.financieroNcDao = financieroNcDao;
     }
 
     @Override
-    public Admin save(Admin admin) {
+    public List<FinancieroNc> findAll() {
         // TODO Auto-generated method stub
-        adminDao.save(admin);
-        return null;
+        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
+    }
+
+    @Override
+    public FinancieroNc save(FinancieroNc financieroNc) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'save'");
     }
 
     @Override
     public Long deleteById(Long id) {
         // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException("Unimplemented method 'deleteById'");
     }
 
     @Override
-    public Admin findById(Long id) {
+    public FinancieroNc findById(Long id) {
         // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException("Unimplemented method 'findById'");
     }
+
+    @Override
+    public List<FinancieroNc> findByIdDeuda(Long idDeuda) {
+        // TODO Auto-generated method stub
+        return financieroNcDao.findByIdDeuda(idDeuda);
+    }
+
+    
 }

@@ -100,4 +100,29 @@ public interface IPagoDao extends CrudRepository<Pago, Long> {
 				"\tWHERE pa.id_medio_pago IN :medio AND pa.fechaf BETWEEN :inicio AND :fin ;" , nativeQuery=true)
 	public Optional<List<Object[]>> pagosByMedioPago(@Param("medio") List<Integer> medio , @Param("inicio") String inicio, @Param("fin") String fin);
 
+	/*Reporte SIUST 1.3 */
+	@Query(value="SELECT se.nombre, cl.tipo_cliente , de.id_deuda, 	co.id_contrato, de.factura, de.valor_base, de.valor_iva, co.id_tarifa_promo, \n"+
+	" co.estrato, ta.velocidad, ta.id_tecnologia, \n"+
+	"CASE \n"+ 
+		"WHEN de.instalacion = 1 THEN 'Instalacion' \n"+
+		"WHEN de.reconexion = 1 THEN 'Reconexion' \n"+
+		"WHEN de.materiales = 1 THEN 'Materiales' \n"+
+		"WHEN de.traslado = 1 THEN 'Traslado' \n"+
+		"WHEN de.otros = 1 THEN 'otros' \n"+
+		"ELSE 'Mensualidad' \n"+
+		"END as concepto, \n"+
+		"nc.valor_base nc_base, \n"+
+		"nc.valor_iva nc_iva \n"+
+	 "FROM deudas  de \n"+
+	 "INNER JOIN contratos co ON co.id_contrato = de.id_contrato \n"+
+	 "INNER JOIN tarifas ta ON ta.id_tarifa = co.id_tarifa \n"+
+	 "INNER JOIN servicios se ON se.id_servicio = co.id_servicio \n"+
+	 "INNER JOIN clientes cl ON cl.id_cliente = de.id_cliente \n"+
+	 "LEFT JOIN financiero_nc nc ON nc.id_deuda = de.id_deuda \n"+
+	 "WHERE  \n"+
+	 "de.facturado_fecha  BETWEEN  :inicio \n"+ 
+	 "AND :fin and de.id_servicio IN :servicio \n"+
+	 "AND de.refiere = 'A' AND de.fac_electronica = 1 " , nativeQuery = true)
+	public Optional<List<Object[]>> reporteSIUSTOneToThree(@Param("servicio")List<Integer> servicios , @Param("inicio") Integer firts , @Param("fin") Integer end);
+
 }

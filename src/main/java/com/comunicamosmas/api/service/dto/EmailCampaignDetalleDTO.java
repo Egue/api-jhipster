@@ -1,6 +1,18 @@
 package com.comunicamosmas.api.service.dto;
 
-public class EmailCampaignDetalleDTO {
+import java.io.Serializable;
+ 
+
+ 
+
+public class EmailCampaignDetalleDTO implements Serializable{
+ 
+
+
+	public EmailCampaignDetalleDTO() {
+	}
+
+	private static final long serialVersionUID = 71231313L;
 
 	private Integer id;
 	
@@ -26,13 +38,33 @@ public class EmailCampaignDetalleDTO {
 
 	private String nameDocument;
 
-	
-	
+	private String fecha_limite;
 
-	public EmailCampaignDetalleDTO() {
-		 
-	}
+	private String fecha_corte;
+
+	
+	
  
+
+	public String getFecha_limite() {
+		return fecha_limite;
+	}
+
+
+	public void setFecha_limite(String fecha_limite) {
+		this.fecha_limite = fecha_limite;
+	}
+
+
+	public String getFecha_corte() {
+		return fecha_corte;
+	}
+
+
+	public void setFecha_corte(String fecha_corte) {
+		this.fecha_corte = fecha_corte;
+	}
+
 
 	public Integer getId() {
 		return id;
@@ -155,9 +187,7 @@ public class EmailCampaignDetalleDTO {
 	
 	
 	
-	
-	
- 
-	
-	
 }
+	 
+	
+
