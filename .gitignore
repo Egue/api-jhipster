@@ -162,3 +162,4 @@ Desktop.ini
 /.nyc_output/
 /src/main/resources/config/application-dev copy.yml
 airflow/sincronice_portalweb.py
+airflow/reporte_clausuras.py
