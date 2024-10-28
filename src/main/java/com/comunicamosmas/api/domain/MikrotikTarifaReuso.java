@@ -37,6 +37,16 @@ public class MikrotikTarifaReuso implements Serializable {
 
     private Long reuso;
 
+    private String priority;
+
+    public String getPriority() {
+        return priority;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
+    }
+
     @Column(name = "id_estacion")
     private Long idEstacion;
 
