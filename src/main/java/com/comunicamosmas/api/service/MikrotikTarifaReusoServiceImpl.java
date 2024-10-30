@@ -3,6 +3,8 @@ package com.comunicamosmas.api.service;
 import com.comunicamosmas.api.domain.MikrotikTarifaReuso;
 import com.comunicamosmas.api.repository.IMikrotikTarifaReusoDao;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,5 +57,24 @@ public class MikrotikTarifaReusoServiceImpl implements IMikrotikTarifaReusoServi
     public List<MikrotikTarifaReuso> findByidTipoAndIdEstacionAndName(Long tipo, Long idEstacion, String name) {
         // TODO Auto-generated method stub
         return (List<MikrotikTarifaReuso>) mikrotikTarifaReusoDao.findByidTipoAndIdEstacionAndName(tipo, idEstacion, name);
+    }
+
+    @Override
+    public MikrotikTarifaReuso updated(MikrotikTarifaReuso tarifaReuso) {
+        // TODO Auto-generated method stub
+        Optional<MikrotikTarifaReuso> reuso = mikrotikTarifaReusoDao
+                .findById(tarifaReuso.getId()).map(exist -> {
+                    exist.setBajada(tarifaReuso.getBajada());
+                    exist.setComment(tarifaReuso.getComment());
+                    exist.setIdEstacion(tarifaReuso.getIdEstacion());
+                    exist.setNombrePadre(tarifaReuso.getNombrePadre());
+                    exist.setPriority(tarifaReuso.getPriority());
+                    exist.setReuso(tarifaReuso.getReuso());
+                    exist.setSubida(tarifaReuso.getSubida());
+                    exist.setTipo(tarifaReuso.getTipo());
+                    mikrotikTarifaReusoDao.save(exist);
+                    return exist;
+                });
+        return reuso.get();
     }
 }
