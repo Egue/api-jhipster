@@ -39,7 +39,7 @@ public interface IDeudaDao extends CrudRepository<Deuda, Long> {
 	 * @param mesServicio mes servicio de lo facturado
 	 * @param idEmpresa id de la empresa que facturo
 	 * */
-	
+	 
 	@Query(value="select deudas.* , servicios.nombre, \n"
 			+ "res.rango_inicio , \n"
 			+ "res.rango_final, res.prefijo, res.num_resolucion, \n"
