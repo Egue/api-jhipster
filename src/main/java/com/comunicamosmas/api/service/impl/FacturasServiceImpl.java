@@ -1,5 +1,6 @@
 package com.comunicamosmas.api.service.impl;
  
+import java.text.NumberFormat;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -54,6 +55,8 @@ public class FacturasServiceImpl implements IFacturasServices{
     private final DeudasMapper deudasMapper;
 
     private final IContratoDao contratoDao;
+
+    NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("es", "CO")); 
 
     public FacturasServiceImpl(IContratoDao contratoDao, IDeudaDao deudaDao , IClienteDao clienteDao , IEmailCampaignDetalleDao emailCampaignDetalleDao, 
     IEmpresaDao empresaDao ,IEmailCampanignDao emailCampanignDao ,   IContratoService contratoService , DeudasMapper deudasMapper ,IContratoComboService contratoComboService)
@@ -285,12 +288,12 @@ public class FacturasServiceImpl implements IFacturasServices{
          Double totalIva = listDeudas.stream().mapToDouble(deuda->deuda.getIva()).sum();
          Double parcial = listDeudas.stream().mapToDouble(deuda->deuda.getParcial()).sum();
          Double totalMes = listDeudas.stream().mapToDouble(deuda->deuda.getTotal()).sum();
-        infoDacDto.setIva(totalIva);
-        infoDacDto.setSubTotal(totalBase);
-        infoDacDto.setPagosaCuenta(parcial);
-        infoDacDto.setTotalMes(totalBase + totalIva);
-        infoDacDto.setSaldoAnterior(String.format("%.2f", saldoAnterior));
-        infoDacDto.setTotal(String.format("%.2f", (totalMes + saldoAnterior - parcial)));
+        infoDacDto.setIva(formatter.format(totalIva).toString());
+        infoDacDto.setSubTotal(formatter.format(totalBase).toString());
+        infoDacDto.setPagosaCuenta(formatter.format(parcial).toString());
+        infoDacDto.setTotalMes(formatter.format(totalBase + totalIva).toString());
+        infoDacDto.setSaldoAnterior(formatter.format(saldoAnterior).toString());
+        infoDacDto.setTotal(formatter.format(totalMes + saldoAnterior - parcial).toString());
         return infoDacDto;
     }
 

@@ -8,12 +8,12 @@ public class InfoFacturaDTO {
     private Factura factura;
     private Empresa empresa;
     private List<Deudas> deudas;
-    private Double subTotal;
-    private Double iva;
-    private Double totalMes;
+    private String subTotal;
+    private String iva;
+    private String totalMes;
     private String saldoAnterior;
-    private Double pagosaCuenta;
-    private String Total;
+    private String pagosaCuenta;
+    private String total;
 
     
 
@@ -49,19 +49,19 @@ public class InfoFacturaDTO {
         this.deudas = deudas;
     }
 
-    public Double getSubTotal() {
+    public String getSubTotal() {
         return subTotal;
     }
 
-    public void setSubTotal(Double subTotal) {
+    public void setSubTotal(String subTotal) {
         this.subTotal = subTotal;
     }
 
-    public Double getIva() {
+    public String getIva() {
         return iva;
     }
 
-    public void setIva(Double iva) {
+    public void setIva(String iva) {
         this.iva = iva;
     }
 
@@ -73,20 +73,28 @@ public class InfoFacturaDTO {
         this.saldoAnterior = saldoAnterior;
     }
 
-    public Double getPagosaCuenta() {
+    public String getPagosaCuenta() {
         return pagosaCuenta;
     }
 
-    public void setPagosaCuenta(Double pagosaCuenta) {
+    public void setPagosaCuenta(String pagosaCuenta) {
         this.pagosaCuenta = pagosaCuenta;
     }
 
     public String getTotal() {
-        return Total;
+        return total;
     }
 
     public void setTotal(String total) {
-        Total = total;
+        this.total = total;
+    }
+
+    public String getTotalMes() {
+        return totalMes;
+    }
+
+    public void setTotalMes(String totalMes) {
+        this.totalMes = totalMes;
     }
 
     public static class Factura{
@@ -292,13 +300,15 @@ public class InfoFacturaDTO {
         private String rangofinal;
         private String vigencia;
         private String fecha;
+        private String prefijo;
+
         public String getFecha() {
             return fecha;
         }
         public void setFecha(String fecha) {
             this.fecha = fecha;
         }
-        private String prefijo;
+       
         public String getResolucion() {
             return resolucion;
         }
@@ -333,11 +343,5 @@ public class InfoFacturaDTO {
         
     }
 
-    public Double getTotalMes() {
-        return totalMes;
-    }
-
-    public void setTotalMes(Double totalMes) {
-        this.totalMes = totalMes;
-    }
+    
 }

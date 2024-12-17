@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factura de Venta</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;/*
+            padding-bottom: -10;
+            padding-top: -30pt;
+            padding-left: 9pt;*/
+            padding: 0;
+            margin: 0;
+        }
+
+        .invoice-container {
+            /*max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;*/
+            padding: 15 25 0 26;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header img {
+            max-width: 100px;
+        }
+
+        .company-info {
+            text-align: center;
+        }
+
+        .company-info h1 {
+            margin: 5px 0;
+            font-size: 24px;
+        }
+
+        .company-info p {
+            margin: 2px 0;
+            color: #555;
+        }
+
+        .client-info, .details-table {
+            margin: 20px 0;
+        }
+
+        .client-info {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .client-info div {
+            width: 48%;
+        }
+
+        .details-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .details-table th, .details-table td {
+            border: 1px solid #ddd;
+            padding: 0px; 
+            text-align: left;
+        }
+
+        .details-table th {
+            background-color: #f4f4f9;
+        }
+
+        .totals {
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        .totals p {
+            margin: 5px 0;
+        }
+
+        .cufe-section {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cufe {
+            width: 100%;
+            padding: 0px;
+            border: 1px solid #ddd;
+            background: #f9f9f9;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: x-small;
+        }
+
+        .qr-code {
+            text-align: center;
+        }
+
+        .qr-code img {
+            max-width: 100px;
+        }
+        #watermark { z-index: -5; position: fixed; padding: 0; margin: 0; }
+
+        @page{
+            padding: 0;
+            margin: 0;
+        }
+        div.saltopagina{display:block; page-break-before:always; } 
+        .text-center{
+            text-align: center;
+        }
+    </style>
+    
+</head>
+<body>
+    <div id="watermark">
+        <img src="{{fondo_a}}" height="100%" width="100%">
+  </div>
+  
+    <div class="invoice-container">
+        <header>
+            <div class="company-info">
+                <!--<h1>{{empresa.nombre}}</h1>
+                <p>NIT: {{empresa.nit}}-{{empresa.indicativo}}</p>
+                <p>{{empresa.direccion}} | {{empresa.telefono}}</p>
+                <p>{{empresa.url}}</p>
+                <p>Responsable de  IVA</p>
+                <p>Actividad Económica 6120 - 6110</p>-->
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="width: 28%;"></td>
+                        <td style="width: 52%; text-align: center;"><h1>{{empresa.nombre}}</h1></td>
+                        <td style="width: 20%;"></td>
+                    </tr>
+                    <tr>
+                        <td ></td>
+                        <td class="text-center"><p>NIT: {{empresa.nit}} - {{empresa.indicativo}}</p></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td ></td>
+                        <td class="text-center"><p>{{empresa.direccion}} | {{empresa.telefono}}</p></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td ></td>
+                        <td class="text-center"><p>Responsable de IVA</p></td>
+                        <td class="text-center">Factura electrónica</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td class="text-center"><p>Actividad Económica 6120 - 6110</p></td>
+                        <td class="text-center">{{factura.resolucion.prefijo}} {{factura.numero}}</td>
+                    </tr>
+                </table>
+            </div>
+        </header>
+
+        <div class="details-table" style="font-size: x-small;">
+            <table >
+                <tbody>
+                    <tr >
+                        <td>Señor(es): {{cliente.nombres}}</td>
+                        <td>Fecha de Emisión</td>
+                        <td>{{factura.emision}}</td>
+                    </tr>
+                    <tr >
+                        <td>NIT/CC: {{cliente.documento}}</td>
+                        <td>Periodo Facturado</td>
+                        <td></td>
+                    </tr>
+                    <tr >
+                        <td>Teléfonos: {{cliente.telefonos}}</td>
+                        <td>Fecha Limite</td>
+                        <td>{{factura.fechaLimite}}</td>
+                    </tr>
+                    <tr>
+                        <td>Dirección: {{cliente.direccion}}</td>
+                        <td>Fecha Corte</td>
+                        <td>{{factura.fechaCorte}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="details-table" style="font-size: x-small;">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 80%;">Descripción</th>
+                        <th>Valor</th>
+                         
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for deuda in deudas %}
+                    <tr>
+                        <td>{{deuda.servicio}} / {{deuda.type}} / {{deuda.direccion}}</td>
+                        <td style="text-align: right;">$ {{deuda.base}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <table style="font-size: x-small; width: 100%;">
+            <tr>
+                <td style="text-align: right; width: 80%;">BASE IMPUESTO:</td>
+                <td style="text-align: right;">{{subTotal}}</td>
+            </tr>
+            <tr>
+                <td style="text-align: right; width: 80%;">IVA: </td>
+                <td style="text-align: right;">{{iva}}</td>
+            </tr>
+            <tr>
+                <td style="text-align: right; width: 80%;">TOTAL FACTURADO MES:</td>
+                <td style="text-align: right;">{{totalMes}}</td>
+            </tr>
+            <tr>
+                <td style="text-align: right; width: 80%;">PAGOS A CUENTAS:</td>
+                <td style="text-align: right;">{{pagosaCuenta}}</td>
+            </tr>
+            <tr>
+                <td style="text-align: right; width: 80%;">SALDO ANTERIOR:</td>
+                <td style="text-align: right;">{{saldoAnterior}}</td>
+            </tr>
+            <tr>
+                <td style="text-align: right; width: 80%;">TOTAL A PAGAR CON SALDO ANTERIOR:</td>
+                <td style="text-align: right;">{{total}}</td>
+            </tr>
+        </table>
+        <div style="width: 100%; text-align: center;">
+            <div class="cufe">
+                {% if factura.origen == 'A' %}
+                CUFE: {{factura.serializable.cufe}}
+                {% else %}
+                
+                {% endif %}
+            </div>
+        </div>
+        <div style="width: 100%;  margin: 0px; text-align: center; align-items: center;">
+            <p style="margin: 0px;">MEDIOS DE PAGOS</p>
+            <table style="text-align: center; align-items: center; width: 100%;">
+                <tr>
+                    <td>
+                        <img src="{{giros}}" alt="" width="80px">
+                        <p style="font-size: x-small; margin: 0px;">Convenio: CABLEYTV</p>
+                    </td>
+                    <td style="text-align: center; font-size: xx-small;">
+                        Formas de pagos:
+                        Contado
+                    </td>
+                    <td>
+                        <img src="{{pse}}" width="80px"  alt="">
+                        <p style="font-size: x-small; margin: 0px;">pagos.internetinalambrico.com.co</p>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div style="font-size: x-small;">
+            <table>
+                <tr>
+                    <td style="text-align: justify;">
+                        A esta factura de venta aplica las normas relativas a la letra de cambio (artículo 5 ley 1231 de 2008)
+                    resolución y/o autorización de facturación electronica No.{{factura.resolucion.resolucion}} aprobado en {{factura.resolucion.fecha}} prefijo
+                    {{factura.resolucion.prefijo}} desde el número {{factura.resolucion.rangoinicial}} al {{factura.resolucion.rangofinal}} con vigencia de {{factura.resolucion.vigencia}} meses. estimado cliente, en amparo de la ley habeas data 1266/2008, le
+                    informamos que en la eventualidad de tener pagos atrasados en el servicio contratado,se generará el reporte
+                    negativo en las centrales de riesgo de información financiera. sí su factura tiene saldos anteriores el servicio
+                    será cortado el 1° día del siguiente mes la autoridad de inspección, vigilancia y control en materia de
+                    protección de los derechos de los usuarios es la superintendencia de industria y comercio: dirección: cra 13
+                    no. 27 - 00 piso 5, bogotá - línea telefónica nacional: (57) 01 8000 910165 - correo electrónico:
+                    info@sic.gov.co
+                    </td>
+                    <td>
+                        <div class="qr-code">
+                             
+                            {% if factura.origen == 'A' %}
+                            <img src="{{factura.serializable.url_qr}}" width="140px" alt="QR Code">
+                            {% else %}
+                            <img src="{{b}}" width="140px" alt="QR Code">
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="details-table" style="font-size: x-small; padding: 0px; margin: 0px;">
+            <table>
+                <tr>
+                    <td style="width: 60%;"> 
+                        <p>{{cliente.nombres}}</p>
+                        <p>{{cliente.direccion}}</p>
+                        <p>{{cliente.telefonos}}</p>
+                    </td>
+                    <td style="text-align: center;">
+                        <p>Total a pagar</p>
+                    </td>
+                    <td style="text-align: right;font-weight:bold;">{{total}}</td>
+                </tr>
+            </table>
+        </div>
+         
+         
+    </div>
+
+    {% if factura.origen == 'A' %}
+    <div class="saltopagina">
+        <div id="watermark">
+            <img src="{{fondo_b}}" height="100%" width="100%">
+      </div>
+    </div>
+    {% endif %}
+</body>
+</html>
