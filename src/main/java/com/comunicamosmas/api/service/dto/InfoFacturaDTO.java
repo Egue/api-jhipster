@@ -103,6 +103,7 @@ public class InfoFacturaDTO {
         private String emision;
         private String fechaCorte;
         private String fechaLimite;
+        private String periodo;
         private String serializable;        
         private Resolucion resolucion;
 
@@ -150,6 +151,12 @@ public class InfoFacturaDTO {
         }
         public void setOrigen(String origen) {
             this.origen = origen;
+        }
+        public String getPeriodo() {
+            return periodo;
+        }
+        public void setPeriodo(String periodo) {
+            this.periodo = periodo;
         }
 
         

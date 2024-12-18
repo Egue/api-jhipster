@@ -163,3 +163,4 @@ Desktop.ini
 /src/main/resources/config/application-dev copy.yml
 airflow/sincronice_portalweb.py
 airflow/reporte_clausuras.py
+src/main/resources/config/application-dev.yml

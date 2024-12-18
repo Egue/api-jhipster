@@ -56,10 +56,13 @@ public class FacturasServiceImpl implements IFacturasServices{
 
     private final IContratoDao contratoDao;
 
+    private final IFunctionGenerateService generateService;
+
     NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("es", "CO")); 
 
     public FacturasServiceImpl(IContratoDao contratoDao, IDeudaDao deudaDao , IClienteDao clienteDao , IEmailCampaignDetalleDao emailCampaignDetalleDao, 
-    IEmpresaDao empresaDao ,IEmailCampanignDao emailCampanignDao ,   IContratoService contratoService , DeudasMapper deudasMapper ,IContratoComboService contratoComboService)
+    IEmpresaDao empresaDao ,IEmailCampanignDao emailCampanignDao ,   IContratoService contratoService , DeudasMapper deudasMapper ,IContratoComboService contratoComboService ,
+    IFunctionGenerateService generateService)
     {
         this.deudaDao = deudaDao;
 
@@ -79,6 +82,8 @@ public class FacturasServiceImpl implements IFacturasServices{
         this.contratoComboService = contratoComboService;
 
         this.contratoDao = contratoDao;
+
+        this.generateService = generateService;
     }
 
     @Override
@@ -206,6 +211,7 @@ public class FacturasServiceImpl implements IFacturasServices{
         final StringBuilder mesServicio = new StringBuilder();
         final StringBuilder idContrato = new StringBuilder();
         final StringBuilder serializable = new StringBuilder();
+        final StringBuilder periodoFacturado = new StringBuilder();
         //list Deudas de la factura
         Optional<List<Object[]>> object = emailCampanignDao.findById(factura.getIdCampaign())
         .map(exist -> {
@@ -224,7 +230,7 @@ public class FacturasServiceImpl implements IFacturasServices{
         //recuperar las deudas de la factura
         List<InfoFacturaDTO.Deudas> listDeudas = object.map( (List<Object[]> list) -> 
             list.stream()
-                .map((Object[] resp) -> deudasMapper.map(resp, idContrato, serializable, fact, resolucion))
+                .map((Object[] resp) -> deudasMapper.map(resp, idContrato, serializable, fact, resolucion , periodoFacturado))
                 .collect(Collectors.toList()) //
         ).orElse(List.of());
         //recuperar info de contrato
@@ -281,6 +287,7 @@ public class FacturasServiceImpl implements IFacturasServices{
         fact.setFechaLimite(factura.getFecha_limite());
         fact.setResolucion(resolucion);
         fact.setSerializable(serializable.toString());
+        fact.setPeriodo(this.generateService.GenerateMensualidad(Integer.parseInt(periodoFacturado.toString())));
         //add factura
         infoDacDto.setFactura(fact);
          //sumar base , sumar iva

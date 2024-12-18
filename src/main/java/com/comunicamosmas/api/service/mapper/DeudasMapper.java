@@ -12,7 +12,8 @@ public class DeudasMapper {
     @Autowired
     private IFunctionGenerateService generateService;
     
-    public InfoFacturaDTO.Deudas map(Object[] resp , StringBuilder idContrato , StringBuilder serializable , InfoFacturaDTO.Factura fact , InfoFacturaDTO.Resolucion resolucion)
+    public InfoFacturaDTO.Deudas map(Object[] resp , StringBuilder idContrato , StringBuilder serializable , InfoFacturaDTO.Factura fact , 
+    InfoFacturaDTO.Resolucion resolucion , StringBuilder periodoFacturado)
     {
         InfoFacturaDTO.Deudas deuda = new InfoFacturaDTO.Deudas();
             deuda.setBase((Double) resp[0]);
@@ -36,6 +37,7 @@ public class DeudasMapper {
             {
                 idContrato.append(resp[20]);
                 serializable.append((resp[21]));
+                periodoFacturado.append((resp)[10]);
             }
             
             return deuda;
