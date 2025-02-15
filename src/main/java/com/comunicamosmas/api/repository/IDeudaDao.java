@@ -2,6 +2,9 @@ package com.comunicamosmas.api.repository;
 
 import com.comunicamosmas.api.domain.Deuda;
 
+import liquibase.pro.packaged.d;
+import liquibase.pro.packaged.em;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -83,5 +86,50 @@ public interface IDeudaDao extends CrudRepository<Deuda, Long> {
 
 	@Query(value="SELECT * FROM deudas d WHERE d.id_cliente = :idCliente AND d.estado IN (1,3) AND d.factura > 0" , nativeQuery=true)
     public Optional<List<Deuda>> findActiveDebtsWithInvoiceByClientId(@Param("idCliente") Long idCliente);
+
+	@Query(value="SELECT \n"
++"concat(em.razon_social , ' ', em.nombre_comercial) as empresa, \n"
++"ser.nombre, \n"
++"d.id_deuda, \n"
++" d.factura \n"
++"d.refiere, \n"
++"CASE  \n"
++"	when d.estado = '1' THEN 'Pendiente' \n"
+  +"  when d.estado = '2' THEN 'Pagado' \n"
++" when d.estado = '3' THEN 'Parcial' \n"
++" END as estado, \n"
++" CASE \n"
++"	WHEN cli.tipo_cliente = 'J' THEN CONCAT(cli.razon_social , '/' , cli.documento , '-' , cli.dv) ELSE CONCAT(cli.apellido_paterno, ' ', cli.apellido_materno, ' ', cli.nombre_primer, ' ', cli.nombre_segundo , '/', cli.documento , '-',cli.dv) end as name_cliente, \n"
++" co.id_contrato , \n"
++" concat(dir.barrio , '/',dir.tipo,'/',dir.a_tipo,' ',dir.a_numero,' ',dir.a_letra,' ',dir.b_tipo, ' ',dir.b_tipo,' ',b_numero,' ',dir.b_letra,' ',dir.numero) as direccion, \n"
++" cli.mail, \n"
++" cli.celular_a, \n"
++" cli.celular_b, \n"
++" d.valor_base , \n"
++" d.valor_iva, \n"
++" d.valor_reteiva, \n"
++" d.valor_refuente, \n"
++" d.valor_reteica, \n"
++" d.valor_bomberil, \n"
++" d.valor_otrosimp, \n"
++" d.valor_parcial, \n"
++" d.valor_total, \n"
++" d.instalacion, \n"
++" d.reconexion, \n"
++" d.materiales, \n"
++" d.traslado, \n"
++" d.otros, \n"
++" d.concepto_aux, \n"
++" d.facturado_fecha, \n"
++" d.fac_electronica, \n"
++" d.facturado_hora \n"
++" FROM deudas d \n"
++" inner join clientes cli on cli.id_cliente = d.id_cliente \n"
++" inner join contratos co on co.id_contrato = d.id_contrato \n"
++" inner join direcciones dir on dir.id_direccion = co.id_direccion_servicio \n"
+ +" inner join servicios ser on ser.id_servicio = d.id_servicio \n"
+ +" inner join empresas em on em.id_empresa = d.id_empresa \n"
++" WHERE d.id_servicio in(:servicios) and d.facturado_fecha between :inicio and :fin")
+public Optional<List<Object[]>> invoiceByServiceAndDate(@Param("servicios")List<Integer> servicios , @Param("inicio") Integer inicio , @Param("final") Integer fin);
 
 }
