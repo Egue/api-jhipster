@@ -300,7 +300,7 @@ public class MikrotikServiceImp implements IMikrotikService {
                         namePadre +
                         "' target=" +
                         ip +
-                        "/32";
+                        "/32 priority=" + plan.getPriority();
                 //se crea en la Rb
                 this.apiMikrotikService.sendCommando(command, estacion);
 

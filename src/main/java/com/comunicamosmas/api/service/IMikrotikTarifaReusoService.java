@@ -6,6 +6,8 @@ import java.util.List;
 public interface IMikrotikTarifaReusoService {
     public void save(MikrotikTarifaReuso mikrotikTarifaReuso);
 
+    public MikrotikTarifaReuso updated(MikrotikTarifaReuso tarifaReuso);
+
     public MikrotikTarifaReuso findById(Long id);
 
     public List<MikrotikTarifaReuso> findAll();
