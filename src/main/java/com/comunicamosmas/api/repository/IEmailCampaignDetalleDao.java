@@ -83,6 +83,7 @@ public interface IEmailCampaignDetalleDao extends CrudRepository<EmailCampaignDe
 	nativeQuery = true)
 	public Page<Object[]> findListByIdClienteAndService(@Param("idCliente") Long idCliente , Pageable page);
 
-
+	@Query(value = "SELECT * FROM email_campaign_detalle WHERE id_email_campaign = :idCampaign", nativeQuery = true)
+    List<EmailCampaignDetalle> findDetallesByIdCampaign(@Param("idCampaign") int idCampaign);
 
 }

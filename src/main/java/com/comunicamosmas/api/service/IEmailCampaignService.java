@@ -3,6 +3,7 @@ package com.comunicamosmas.api.service;
 import java.util.List;
 
 import com.comunicamosmas.api.domain.EmailCampaign;
+import com.comunicamosmas.api.domain.EmailCampaignDetalle;
 import com.comunicamosmas.api.service.dto.EmailCampanignDTO;
 
 public interface IEmailCampaignService {
@@ -22,5 +23,7 @@ public interface IEmailCampaignService {
 	public EmailCampaign findEmailCampaignLimitOne();
 
 	public List<EmailCampanignDTO> filterEmailCampaign(Long idEmpresa , String fecha);
+
+	public List<EmailCampaignDetalle> findByMesAndAnio(int mes, int anio);
 	 
 }

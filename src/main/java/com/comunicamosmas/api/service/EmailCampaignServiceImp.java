@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.comunicamosmas.api.domain.EmailCampaign;
+import com.comunicamosmas.api.domain.EmailCampaignDetalle;
 import com.comunicamosmas.api.repository.IEmailCampanignDao;
+import com.comunicamosmas.api.repository.IEmailCampaignDetalleDao;
 import com.comunicamosmas.api.service.dto.EmailCampanignDTO;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 
@@ -17,6 +19,9 @@ public class EmailCampaignServiceImp implements IEmailCampaignService{
 
 	@Autowired
 	IEmailCampanignDao emailCampaignDao;
+
+	@Autowired
+	IEmailCampaignDetalleDao emailCampaignDetalleDao;
 	
 	@Override
 	public void save(EmailCampaign emailCampaign) {
@@ -129,6 +134,24 @@ public class EmailCampaignServiceImp implements IEmailCampaignService{
 		 }
 		 
 		 return email;
+	}
+
+	
+	@Override
+	public List<EmailCampaignDetalle> findByMesAndAnio(int mes, int anio) {
+	    // Obtener las campañas por mes y año
+	    List<EmailCampaign> campaigns = emailCampaignDao.findByMesAndAnio(mes, anio);
+
+	    // Lista para almacenar los detalles de las campañas
+	    List<EmailCampaignDetalle> detalles = new ArrayList<>();
+
+	    // Iterar sobre las campañas y obtener sus detalles
+	    for (EmailCampaign campaign : campaigns) {
+	        List<EmailCampaignDetalle> detallesCampaña = emailCampaignDetalleDao.findDetallesByIdCampaign(campaign.getId());
+	        detalles.addAll(detallesCampaña);
+	    }
+
+	    return detalles;
 	}
 
 }

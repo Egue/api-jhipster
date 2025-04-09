@@ -1,5 +1,5 @@
 package com.comunicamosmas.api.web.rest;
- 
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -20,12 +20,15 @@ import com.comunicamosmas.api.service.IPagoLineaVersionDosService;
 import com.comunicamosmas.api.service.IPaymentOnlineService;
 import com.comunicamosmas.api.service.dto.ClientePortalWebDTO;
 import com.comunicamosmas.api.service.dto.EmailCampaignDetalleDTO;
+import com.comunicamosmas.api.serviceMongo.IFacturasEmitidasService;
 import com.comunicamosmas.api.domain.EmailCampaign;
+import com.comunicamosmas.api.domain.EmailCampaignDetalle;
 import com.comunicamosmas.api.service.IEmailCampaignService;
 import com.comunicamosmas.api.service.IEmailCampaignDetalleService;
-import com.comunicamosmas.api.service.IFacturasEmitidasService;
-import com.comunicamosmas.api.service.INuevoServicio;
- 
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/controlmas")
@@ -47,44 +50,44 @@ public class ScheduledController {
 
     private final IFacturasEmitidasService facturasEmitidasService;
 
-    private final INuevoServicio nuevoServicio;
+    public ScheduledController(IApiRestService apiRestService, IPaymentOnlineService paymentOnlineService,
+            ISystemConfigDao systemConfigDao, IPagoLineaVersionDosService pagoLineaVersionDosService,
+            IClienteService clienteService, IEmailCampaignService emailCampaignService,
+            IEmailCampaignDetalleService emailCampaignDetalleService,
+            IFacturasEmitidasService facturasEmitidasService) {
 
-    public ScheduledController(IApiRestService apiRestService, 
-                               IPaymentOnlineService paymentOnlineService, 
-                               ISystemConfigDao systemConfigDao, 
-                               IPagoLineaVersionDosService pagoLineaVersionDosService,
-                               IClienteService clienteService, 
-                               IEmailCampaignService emailCampaignService, 
-                               IEmailCampaignDetalleService emailCampaignDetalleService, 
-                               IFacturasEmitidasService facturasEmitidasService,
-                               INuevoServicio nuevoServicio) {
         this.apiRestService = apiRestService;
+
         this.paymentOnlineService = paymentOnlineService;
+
         this.systemConfigDao = systemConfigDao;
+
         this.pagoLineaVersionDosService = pagoLineaVersionDosService;
+
         this.clienteService = clienteService;
+
         this.emailCampaignService = emailCampaignService;
+
         this.emailCampaignDetalleService = emailCampaignDetalleService;
+
         this.facturasEmitidasService = facturasEmitidasService;
-        this.nuevoServicio = nuevoServicio;
+
     }
 
     @RequestMapping("/scheduled/supergiros")
-    public ResponseEntity<?> supergiros(@RequestParam("token")String token)
-    {
+    public ResponseEntity<?> supergiros(@RequestParam("token") String token) {
         try {
 
-            if(valitateToken(token)){
-                
+            if (valitateToken(token)) {
+
                 apiRestService.pagosSupergiros();
-                
+
                 return ResponseEntity.status(HttpStatus.OK).build();
-            }else{
+            } else {
 
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorization");
             }
 
-            
         } catch (Exception e) {
             // TODO: handle exception
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -92,20 +95,19 @@ public class ScheduledController {
     }
 
     @RequestMapping("/scheduled/pse")
-    public ResponseEntity<?> downloadPaymentOnline(@RequestParam("token") String token)
-    {
+    public ResponseEntity<?> downloadPaymentOnline(@RequestParam("token") String token) {
         try {
 
-            if(valitateToken(token)){
-                
+            if (valitateToken(token)) {
+
                 paymentOnlineService.downloadPaymentOnline();
-                
+
                 return ResponseEntity.status(HttpStatus.OK).build();
-            }else{
+            } else {
 
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorization");
             }
-   
+
         } catch (Exception e) {
             // TODO: handle exception
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -113,20 +115,19 @@ public class ScheduledController {
     }
 
     @RequestMapping("/scheduled/pseordenes")
-    public ResponseEntity<?>reconexionAndAnulationCortePse(@RequestParam("token") String token)
-    {
+    public ResponseEntity<?> reconexionAndAnulationCortePse(@RequestParam("token") String token) {
         try {
 
-            if(valitateToken(token)){
-                
+            if (valitateToken(token)) {
+
                 pagoLineaVersionDosService.iterarReconexionesAndCorte();
-                
+
                 return ResponseEntity.status(HttpStatus.OK).build();
-            }else{
+            } else {
 
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorization");
             }
-   
+
         } catch (Exception e) {
             // TODO: handle exception
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -134,17 +135,16 @@ public class ScheduledController {
     }
 
     @GetMapping("/scheduled/reporte-clausuras")
-    public ResponseEntity<?> reporteClausuras(@RequestParam("token") String token)
-    {
+    public ResponseEntity<?> reporteClausuras(@RequestParam("token") String token) {
         try {
-            if(valitateToken(token)){
-                
-                //send reporte
+            if (valitateToken(token)) {
+
+                // send reporte
 
                 clienteService.clientesDeclineClausura();
-                
+
                 return ResponseEntity.status(HttpStatus.OK).build();
-            }else{
+            } else {
 
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorization");
             }
@@ -154,19 +154,17 @@ public class ScheduledController {
         }
     }
 
-    /*Sincronizate clientes to portalWeb */
+    /* Sincronizate clientes to portalWeb */
     @GetMapping("/scheduled/sincroniceportalweb")
-    public ResponseEntity<?> sincronicePortalWeb(@RequestParam("token") String token)
-    {
+    public ResponseEntity<?> sincronicePortalWeb(@RequestParam("token") String token) {
         try {
-            if(valitateToken(token))
-            {
+            if (valitateToken(token)) {
                 PageRequest page = PageRequest.of(0, 10);
 
                 Page<ClientePortalWebDTO> clients = clienteService.pageClienteSyncronicePortalWeb(page);
 
                 return ResponseEntity.status(HttpStatus.OK).body(clients.getContent());
-            }else{
+            } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorization");
             }
 
@@ -178,15 +176,14 @@ public class ScheduledController {
     }
 
     @PutMapping("/scheduled/sincroniceportalweb/{id}")
-    public ResponseEntity<?> updateClienteSicronicePortalweb(@RequestParam("token")String token, @PathVariable long id)
-    {
+    public ResponseEntity<?> updateClienteSicronicePortalweb(@RequestParam("token") String token,
+            @PathVariable long id) {
         try {
-            if(valitateToken(token))
-            {
+            if (valitateToken(token)) {
                 clienteService.updatedClientPortalWebSincronice(id);
 
                 return ResponseEntity.ok().build();
-            }else{
+            } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorization");
             }
 
@@ -196,21 +193,21 @@ public class ScheduledController {
         }
     }
 
-    /*SantinyOficial */
+    /* Enpoint para enviar facturas por Airflow BySantiny */
     @RequestMapping("/scheduled/send-facturas")
-    public ResponseEntity<?> sendFacturasAutomatizadas(@RequestParam("token") String token, @RequestBody EmailCampaignDetalleDTO detalle) {
+    public ResponseEntity<?> sendFacturasAutomatizadas(@RequestParam("token") String token) {
         try {
             if (valitateToken(token)) {
-                EmailCampaign campaign = emailCampaignService.findById(detalle.getIdCampaign());
+                // Obtener la fecha actual
+                LocalDate fechaActual = LocalDate.now();
+                int mesActual = fechaActual.getMonthValue();
+                int anioActual = fechaActual.getYear();
 
-                if (campaign.getEstado().equals("PortalWeb")) {
-                    facturasEmitidasService.sendFactura(detalle, campaign);
-                } else {
-                    String result = emailCampaignDetalleService.sendMailUnitario(detalle);
-                    return ResponseEntity.status(HttpStatus.OK).body("Facturas enviadas: " + result);
-                }
+                // Obtener los detalles de las campañas del mes presente
+                List<EmailCampaignDetalle> detalles = emailCampaignService.findByMesAndAnio(mesActual, anioActual);
 
-                return ResponseEntity.status(HttpStatus.OK).body("Facturas enviadas correctamente.");
+                // Devolver los detalles
+                return ResponseEntity.status(HttpStatus.OK).body(detalles);
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
             }
@@ -219,16 +216,14 @@ public class ScheduledController {
         }
     }
 
-    private boolean valitateToken(String token)
-    {
+    private boolean valitateToken(String token) {
         SystemConfig system = systemConfigDao.findByOrigen("token_scheduled");
-        if(system.getComando().equals(token))
-        {
+        if (system.getComando().equals(token)) {
             return true;
-        }else{
+        } else {
 
             return false;
         }
     }
-    
+
 }
