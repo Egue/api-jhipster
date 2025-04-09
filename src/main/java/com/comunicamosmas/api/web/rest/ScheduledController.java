@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +19,12 @@ import com.comunicamosmas.api.service.IClienteService;
 import com.comunicamosmas.api.service.IPagoLineaVersionDosService;
 import com.comunicamosmas.api.service.IPaymentOnlineService;
 import com.comunicamosmas.api.service.dto.ClientePortalWebDTO;
+import com.comunicamosmas.api.service.dto.EmailCampaignDetalleDTO;
+import com.comunicamosmas.api.domain.EmailCampaign;
+import com.comunicamosmas.api.service.IEmailCampaignService;
+import com.comunicamosmas.api.service.IEmailCampaignDetalleService;
+import com.comunicamosmas.api.service.IFacturasEmitidasService;
+import com.comunicamosmas.api.service.INuevoServicio;
  
 
 @RestController
@@ -34,19 +41,32 @@ public class ScheduledController {
 
     private final IClienteService clienteService;
 
-    public ScheduledController(IApiRestService apiRestService , IPaymentOnlineService paymentOnlineService , ISystemConfigDao systemConfigDao, IPagoLineaVersionDosService pagoLineaVersionDosService,
-    IClienteService clienteService){
+    private final IEmailCampaignService emailCampaignService;
 
+    private final IEmailCampaignDetalleService emailCampaignDetalleService;
+
+    private final IFacturasEmitidasService facturasEmitidasService;
+
+    private final INuevoServicio nuevoServicio;
+
+    public ScheduledController(IApiRestService apiRestService, 
+                               IPaymentOnlineService paymentOnlineService, 
+                               ISystemConfigDao systemConfigDao, 
+                               IPagoLineaVersionDosService pagoLineaVersionDosService,
+                               IClienteService clienteService, 
+                               IEmailCampaignService emailCampaignService, 
+                               IEmailCampaignDetalleService emailCampaignDetalleService, 
+                               IFacturasEmitidasService facturasEmitidasService,
+                               INuevoServicio nuevoServicio) {
         this.apiRestService = apiRestService;
-
         this.paymentOnlineService = paymentOnlineService;
-
         this.systemConfigDao = systemConfigDao;
-
         this.pagoLineaVersionDosService = pagoLineaVersionDosService;
-
         this.clienteService = clienteService;
-
+        this.emailCampaignService = emailCampaignService;
+        this.emailCampaignDetalleService = emailCampaignDetalleService;
+        this.facturasEmitidasService = facturasEmitidasService;
+        this.nuevoServicio = nuevoServicio;
     }
 
     @RequestMapping("/scheduled/supergiros")
@@ -172,6 +192,29 @@ public class ScheduledController {
 
         } catch (Exception e) {
             // TODO: handle exception
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    /*SantinyOficial */
+    @RequestMapping("/scheduled/send-facturas")
+    public ResponseEntity<?> sendFacturasAutomatizadas(@RequestParam("token") String token, @RequestBody EmailCampaignDetalleDTO detalle) {
+        try {
+            if (valitateToken(token)) {
+                EmailCampaign campaign = emailCampaignService.findById(detalle.getIdCampaign());
+
+                if (campaign.getEstado().equals("PortalWeb")) {
+                    facturasEmitidasService.sendFactura(detalle, campaign);
+                } else {
+                    String result = emailCampaignDetalleService.sendMailUnitario(detalle);
+                    return ResponseEntity.status(HttpStatus.OK).body("Facturas enviadas: " + result);
+                }
+
+                return ResponseEntity.status(HttpStatus.OK).body("Facturas enviadas correctamente.");
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+            }
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
