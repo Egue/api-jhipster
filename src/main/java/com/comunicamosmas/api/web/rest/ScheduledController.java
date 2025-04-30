@@ -1,6 +1,5 @@
 package com.comunicamosmas.api.web.rest;
-
-import org.mapstruct.ap.shaded.freemarker.core.ReturnInstruction.Return;
+ 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -19,8 +18,7 @@ import com.comunicamosmas.api.service.IClienteService;
 import com.comunicamosmas.api.service.IPagoLineaVersionDosService;
 import com.comunicamosmas.api.service.IPaymentOnlineService;
 import com.comunicamosmas.api.service.dto.ClientePortalWebDTO;
-
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+ 
 
 @RestController
 @RequestMapping("/api/controlmas")

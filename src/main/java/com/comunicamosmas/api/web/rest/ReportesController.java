@@ -106,12 +106,13 @@ public class ReportesController {
             headerRow.createCell(24).setCellValue("Vendedor");
             headerRow.createCell(25).setCellValue("Correo");
             headerRow.createCell(26).setCellValue("Estación");
+            headerRow.createCell(27).setCellValue("Origen");
 
             int rowNum = 1;
 
             for (CarteraDTO registro : result) {
                 Row row = sheet.createRow(rowNum++);
-                String origen = registro.getFf_grupocontra().equals("B") ? "*" : null;
+                String origen = registro.getFf_grupocontra().equals("B") ? "*" : "";
                 row.createCell(0).setCellValue(registro.getFf_iddelcontrato() + origen);
                 row.createCell(1).setCellValue(registro.getFf_fisico());
                 row.createCell(2).setCellValue(registro.getZona_nombre());
@@ -142,6 +143,7 @@ public class ReportesController {
                 row.createCell(24).setCellValue(registro.getVendedor());
                 row.createCell(25).setCellValue(registro.getMail());
                 row.createCell(26).setCellValue(registro.getEstacion());
+                row.createCell(27).setCellValue(registro.getFf_grupocontra());
                 origen = null;
             }
 
