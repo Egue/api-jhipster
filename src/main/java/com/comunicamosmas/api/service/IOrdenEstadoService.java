@@ -2,6 +2,7 @@ package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.OrdenEstado;
 import java.util.List;
+import java.util.Optional;
 
 public interface IOrdenEstadoService {
     //listar todos
@@ -17,4 +18,6 @@ public interface IOrdenEstadoService {
     public OrdenEstado findById(Long id);
     
     public List<OrdenEstado>findAllByEstadoAndCliente(String rol);
+
+    public Optional<List<OrdenEstado>> find(Long client, Long estacion , Long reservada);
 }

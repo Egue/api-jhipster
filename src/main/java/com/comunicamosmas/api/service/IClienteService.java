@@ -1,6 +1,7 @@
 package com.comunicamosmas.api.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -38,4 +39,6 @@ public interface IClienteService {
     public void updatedClientPortalWebSincronice(Long idCliente);
 
     public void clientesDeclineClausura();
+
+    public Page<Cliente> ClienteQuery(String query);
 }

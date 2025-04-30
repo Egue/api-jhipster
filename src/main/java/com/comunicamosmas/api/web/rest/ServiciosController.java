@@ -60,7 +60,7 @@ public class ServiciosController {
          }
     }
 
-    @GetMapping("/servicios")
+    /*@GetMapping("/servicios")
     public ResponseEntity<?> findByEmpresa(@RequestParam("idEmpresa") Long idEmpresa)
     {
         try {
@@ -75,6 +75,17 @@ public class ServiciosController {
         } catch (Exception e) {
             // TODO: handle exception
 
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }*/
+
+    @GetMapping("/servicios")
+    public ResponseEntity<?> servicios(@RequestParam(defaultValue = "0")  Long estado){
+        try {
+            Optional<List<Servicio>> list = servicioService.findByEstado(estado);
+            return ResponseEntity.status(HttpStatus.OK).body(list);
+        } catch (Exception e) {
+            // TODO: handle exception
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }

@@ -55,6 +55,39 @@ public class MenuController {
         }
     }
 
+    @PostMapping("/menu")
+    public ResponseEntity<?> saveMenu(@RequestBody MenuDTO menuDTO) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            if (menuDTO.getTitle() != null) {
+                Menu menu = new Menu();
+                menu.setTitle(menuDTO.getTitle());
+                menu.setIcon(menuDTO.getIcon());
+                menu.setParent(0L);
+                menuService.save(menu);
+            } else {
+
+                throw new ExceptionNullSql(new Date(), "Post null", "servicios null");
+            }
+
+            response.put("response", "creado");
+
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
+
+        } catch (ExceptionNullSql e) {
+
+            response.put("error", e.getMessage());
+
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            response.put("error", e.getMessage());
+
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
+        }
+
+    }
+
     @GetMapping("/relations/{role}")
     public ResponseEntity<?> relations(@PathVariable String role) {
         Map<String, Object> response = new HashMap<>();

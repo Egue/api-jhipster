@@ -38,7 +38,7 @@ public class PortalWebServiceImpl implements IPortalWebService{
     public PortalWebServiceImpl(IClienteDao clienteDao)
     {
         //this.url = "http://192.168.24.113:8089/api/";
-        this.url = "https://portalweb-api.server.cableytv.com/api/";
+        this.url = "https://portalweb-api.server.internetinalambrico.com.co/api/";
         this.restTemplate = new RestTemplate();
         this.headers = new HttpHeaders();
         this.clienteDao = clienteDao;

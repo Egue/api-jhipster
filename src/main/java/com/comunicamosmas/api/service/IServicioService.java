@@ -20,5 +20,7 @@ public interface IServicioService {
     public List<Servicio> findByName(String name);
 
     public Optional<List<Servicio>> findByIdEmpresa(Long idEmpresa);
+
+    public Optional<List<Servicio>> findByEstado(Long estado);
      
 }
