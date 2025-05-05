@@ -2,10 +2,14 @@ package com.comunicamosmas.api.repository;
  
 import com.comunicamosmas.api.domain.Orden; 
 import com.comunicamosmas.api.service.dto.OrdenForInstalacionFindByIdOrdenDTO;
-import com.comunicamosmas.api.service.dto.OrdenInstalacionDTO; 
+import com.comunicamosmas.api.service.dto.OrdenInstalacionDTO;
+import com.comunicamosmas.api.service.dto.OrderDetalleDTO;
+
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -204,6 +208,77 @@ public interface IOrdenDao extends CrudRepository<Orden, Long> {
     @Query(value="SELECT ord.numero_a , ord.numero_b FROM ordenes ord \n" 
     +"WHERE ord.refiere = :origen AND ord.id_empresa = :idEmpresa ORDER BY ord.numero_b DESC LIMIT 0, 1" , nativeQuery = true)
     public Optional<List<Object[]>> findNumeroOrden(@Param("origen") String origen , @Param("idEmpresa") Long idEmpresa);
+
+
+    @Query(value = """
+    SELECT ord.id_orden,  
+           es.nombre, 
+           ord.causa_solicitud, 
+           ord.id_contrato,  
+           ord.fechaf_registra, 
+           ord.refiere,  
+           cli.tipo_cliente, 
+           CASE  
+               WHEN cli.tipo_cliente = 'J' THEN CONCAT(cli.razon_social) 
+               WHEN cli.tipo_cliente = 'N' THEN CONCAT(cli.nombre_primer, cli.nombre_segundo, ' / ', cli.apellido_paterno, cli.apellido_materno) 
+           END as cliente, 
+           cli.documento, 
+           dir.barrio,
+           CONCAT(dir.tipo, ' ', dir.a_tipo, ' ', dir.a_numero, ' ', dir.a_letra, ' ', dir.b_tipo, ' ', dir.b_numero, ' ', dir.b_letra, ' ', dir.numero, '/', dir.nota) as direccion,
+           cli.celular_b,
+           cli.celular_a,
+           tip.nombre as nombre_tecnologia, 
+           ord.nota, 
+           CASE 
+               WHEN ord.estado = 0 THEN 'Sin asignar' 
+               WHEN ord.estado = 1 THEN 'Asignada' 
+               WHEN ord.estado = 2 THEN 'En proceso' 
+               WHEN ord.estado = 3 THEN 'Ejecutada' 
+               WHEN ord.estado = 4 THEN 'Anulada' 
+           END as estado, 
+           ord.nota_final, 
+           ord.anulada, 
+           GROUP_CONCAT(ov.detalle SEPARATOR ',') as visitaFallida 
+    FROM ordenes ord  
+    INNER JOIN contratos co ON co.id_contrato = ord.id_contrato
+    INNER JOIN clientes cli ON cli.id_cliente = co.id_cliente
+    INNER JOIN ordenes_estados es ON es.id_estado = ord.tipo_orden 
+    LEFT JOIN ordenes_visitas ov ON ov.id_orden = ord.id_orden                         
+    LEFT JOIN direcciones dir ON dir.id_direccion = co.id_direccion_servicio
+    LEFT JOIN tipos_tecnologia tip ON tip.id_tecnologia = co.id_tecnologia
+    WHERE ord.fechaf_registra BETWEEN :fechaInicio AND :fechaFinal
+    AND ord.tipo_orden = :idTipo 
+    AND ord.id_servicio = :idServicio 
+    AND ord.estado IN (:estado) 
+    AND ord.abierta = :abierta 
+    AND ord.anulada = :anulada
+    GROUP BY ord.id_orden
+    /*#{#pageable}*/""",
+    countQuery = """
+    SELECT COUNT(DISTINCT ord.id_orden)             
+    FROM ordenes ord  
+    INNER JOIN contratos co ON co.id_contrato = ord.id_contrato
+    INNER JOIN clientes cli ON cli.id_cliente = co.id_cliente
+    INNER JOIN ordenes_estados es ON es.id_estado = ord.tipo_orden 
+    LEFT JOIN ordenes_visitas ov ON ov.id_orden = ord.id_orden                         
+    LEFT JOIN direcciones dir ON dir.id_direccion = co.id_direccion_servicio
+    LEFT JOIN tipos_tecnologia tip ON tip.id_tecnologia = co.id_tecnologia
+    WHERE ord.fechaf_registra BETWEEN :fechaInicio AND :fechaFinal
+    AND ord.tipo_orden = :idTipo 
+    AND ord.id_servicio = :idServicio 
+    AND ord.estado IN (:estado) 
+    AND ord.anulada = :anulada 
+    AND ord.abierta = :abierta""",
+    nativeQuery = true)
+Page<Object[]> findOrdenesDetalladas(
+    @Param("abierta") Long abierta,
+    @Param("anulada") Long anulada,
+    @Param("estado") List<Integer> estado,
+    @Param("idServicio") Long idServicio,
+    @Param("idTipo") Long idTipo,
+    @Param("fechaInicio") Long fechaInicio,
+    @Param("fechaFinal") Long fechaFinal,
+    Pageable pageable);
 
     
 }
