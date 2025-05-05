@@ -1,9 +1,7 @@
 package com.comunicamosmas.api.repository;
 
 import com.comunicamosmas.api.domain.Deuda;
-
-import liquibase.pro.packaged.d;
-import liquibase.pro.packaged.em;
+ 
 
 import java.util.List;
 import java.util.Optional;
@@ -129,7 +127,7 @@ public interface IDeudaDao extends CrudRepository<Deuda, Long> {
 +" inner join direcciones dir on dir.id_direccion = co.id_direccion_servicio \n"
  +" inner join servicios ser on ser.id_servicio = d.id_servicio \n"
  +" inner join empresas em on em.id_empresa = d.id_empresa \n"
-+" WHERE d.id_servicio in(:servicios) and d.facturado_fecha between :inicio and :fin")
++" WHERE d.id_servicio in(:servicios) and d.facturado_fecha between :inicio and :final" , nativeQuery = true)
 public Optional<List<Object[]>> invoiceByServiceAndDate(@Param("servicios")List<Integer> servicios , @Param("inicio") Integer inicio , @Param("final") Integer fin);
 
 }
