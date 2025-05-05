@@ -14,4 +14,6 @@ public interface IServicioDao extends CrudRepository<Servicio, Long> {
 
     @Query(value="SELECT * FROM servicios sr WHERE sr.id_empresa = :idEmpresa" , nativeQuery = true)
     public Optional<List<Servicio>> findByIdEmpresa(@Param("idEmpresa") Long idEmpresa);
+
+    public Optional<List<Servicio>> findByEstado(Long estado);
 }

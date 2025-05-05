@@ -1,9 +1,6 @@
 package com.comunicamosmas.api.repository;
 
-import com.comunicamosmas.api.domain.Cliente;
-import com.comunicamosmas.api.service.dto.ClientePortalWebDTO;
-
-import liquibase.pro.packaged.co;
+import com.comunicamosmas.api.domain.Cliente; 
 
 import java.util.List;
 import java.util.Optional;
@@ -56,6 +53,17 @@ public interface IClienteDao extends CrudRepository<Cliente, Long> {
     " INNER JOIN servicios se on se.id_servicio = co.id_servicio "+
 	"WHERE co.estado = 1 AND co.id_servicio IN (1,2,3,4,5,6,7,8,9) AND co.marca BETWEEN  CURRENT_TIMESTAMP - INTERVAL 11 MONTH AND CURRENT_TIMESTAMP - INTERVAL 10 MONTH", nativeQuery = true)
     public List<Object[]> findClientesDeclineClausura();
+
+
+    @Query("SELECT c FROM Cliente c WHERE " +
+           "(LOWER(c.razonSocial) LIKE LOWER(CONCAT('%', :razonSocial, '%')) OR :razonSocial IS NULL) OR " +
+           "(LOWER(c.nombrePrimer) LIKE LOWER(CONCAT('%', :nombrePrimer, '%')) OR :nombrePrimer IS NULL) OR " +
+           "(c.documento = :documento OR :documento IS NULL)")
+    Page<Cliente> findByRazonSocialOrNombrePrimerOrDocumento(
+            @Param("razonSocial") String razonSocial,
+            @Param("nombrePrimer") String nombrePrimer,
+            @Param("documento") Long documento,
+            Pageable pageable);
 
      
 
