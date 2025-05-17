@@ -238,7 +238,8 @@ public interface IOrdenDao extends CrudRepository<Orden, Long> {
            END as estado, 
            ord.nota_final, 
            ord.anulada, 
-           GROUP_CONCAT(ov.detalle SEPARATOR ',') as visitaFallida 
+           GROUP_CONCAT(ov.detalle SEPARATOR ',') as visitaFallida ,
+            ord.id_usuario_ejecuta
     FROM ordenes ord  
     INNER JOIN contratos co ON co.id_contrato = ord.id_contrato
     INNER JOIN clientes cli ON cli.id_cliente = co.id_cliente
@@ -279,6 +280,12 @@ Page<Object[]> findOrdenesDetalladas(
     @Param("fechaInicio") Long fechaInicio,
     @Param("fechaFinal") Long fechaFinal,
     Pageable pageable);
+
+    @Query(value = """
+    SELECT * from ordenes ord
+    inner join usuarios usr on usr.id_usuario = ord.id_usuario_asigna
+    WHERE ord.abierta = 1 and ord.anulada = 0 AND ord.estado IN(0,1,2) """, nativeQuery = true)
+    public List<Orden> findAllOrdenesActivesByAsignation();
 
     
 }

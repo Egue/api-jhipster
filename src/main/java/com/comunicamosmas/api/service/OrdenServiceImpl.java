@@ -581,6 +581,7 @@ public class OrdenServiceImpl implements IOrdenService {
         dto.setNotaFinal((String) row[16]);
         dto.setAnulada((String) row[17].toString());
         dto.setVisitasFallidas((String) row[18]);
+		dto.setUserEjecuta((Integer) row[19]);
         return dto;
 
     }

@@ -239,8 +239,18 @@ public class OrdenesController {
 
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
-
-
     }
+
+    /*@GetMapping("/ordenes/withasignation")
+    public ResponseEntity<?> ordenesWithAsignation(
+        @RequestParam(defaultValue = "1") Long abierta,
+        @RequestParam(defaultValue = "1,2,3") List<Integer> estado,
+        @RequestParam() Long idServicio ,
+        @RequestParam() Long idTipo ,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size)
+    {
+         
+    }*/
 
 }
