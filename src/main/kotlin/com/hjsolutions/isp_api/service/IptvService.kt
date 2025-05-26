@@ -1,6 +1,7 @@
 package com.hjsolutions.isp_api.service
 
 import org.springframework.stereotype.Service
+import org.bson.types.ObjectId
 import com.hjsolutions.isp_api.domain.Iptv
 import com.hjsolutions.isp_api.repository.IptvRepository
 import com.hjsolutions.isp_api.service.dto.IptvDTO 
@@ -20,6 +21,15 @@ class IptvService(private val iptvRepository: IptvRepository) {
             url = iptv.url
         )
         return iptvRepository.save(iptvEntity)    
+    }
+
+    fun deleteById(id: ObjectId): Boolean {
+        return try {
+            iptvRepository.deleteById(id)
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
 
     fun findAll(): List<Iptv> {

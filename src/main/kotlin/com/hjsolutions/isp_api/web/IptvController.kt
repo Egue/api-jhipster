@@ -7,8 +7,10 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.server.ResponseStatusException
 import org.springframework.http.ResponseEntity
 import org.springframework.http.HttpStatus
+import org.bson.types.ObjectId
 import com.hjsolutions.isp_api.service.dto.IptvDTO
 import com.hjsolutions.isp_api.domain.Iptv
 import com.hjsolutions.isp_api.service.IptvService
@@ -46,6 +48,18 @@ class IptvController(
 
     @DeleteMapping("/iptv/{id}")
     fun deleteIptv(@PathVariable id: String): ResponseEntity<String> {
-        return ResponseEntity.ok("IPTV with ID $id deleted")
+        return try {
+            // Validar que el id es un ObjectId válido
+            val objectId = ObjectId(id)
+            // Verificar si el documento existe
+            val deleted = iptvService.deleteById(objectId)
+            if (deleted) {
+                ResponseEntity.ok("IPTV with ID $id deleted")
+            } else {
+                throw ResponseStatusException(HttpStatus.NOT_FOUND, "IPTV with ID $id not found")
+            }
+        } catch (e: IllegalArgumentException) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid ID format: $id")
+        }
     }
 }

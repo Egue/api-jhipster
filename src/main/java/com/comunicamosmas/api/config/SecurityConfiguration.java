@@ -88,6 +88,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             //.antMatchers("/api/register").permitAll()
             //.antMatchers("/api/activate").permitAll()
             .antMatchers("/api/controlmas/usuarios/reset/**").permitAll()
+            .antMatchers("/api/kt/iptv").permitAll()
             //.antMatchers("/api/account/reset-password/finish").permitAll()
             .antMatchers("/api/controlmas/seguimiento/render/img/**").permitAll()
             .antMatchers("/api/controlmas/scheduled/**").permitAll()
