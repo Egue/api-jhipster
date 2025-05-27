@@ -9,8 +9,12 @@ import com.hjsolutions.agente_inventory.api.domain.Disk
 import com.hjsolutions.agente_inventory.api.domain.Network
 import com.hjsolutions.agente_inventory.api.domain.Os
 import com.hjsolutions.agente_inventory.api.domain.Manufacturer
+import com.hjsolutions.agente_inventory.service.HttpClient
 import java.net.InetAddress
 import oshi.hardware.ComputerSystem
+import okhttp3.*
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 
 @Service
 class AgenteService {
@@ -27,7 +31,7 @@ class AgenteService {
         var memory = si.hardware.memory
         var computerSystem = si.hardware.computerSystem
 
-        var invetory : Inventory = Inventory(
+        var inventory : Inventory = Inventory(
             hostname = InetAddress.getLocalHost().hostName,
             os = Os(
                 family = os.family,
@@ -65,7 +69,9 @@ class AgenteService {
         )
         )
 
-        return invetory;
+        reportSyncronice(inventory)
+
+        return inventory;
     } 
 
     fun getChassisType(computerSystem : ComputerSystem): String {
@@ -84,5 +90,15 @@ class AgenteService {
             return "Server"
         }
         return "Other"
+    }
+
+    fun reportSyncronice(inventory : Inventory){
+
+        val httpClient = HttpClient();
+        val mapper = jacksonObjectMapper()
+        val jsonBody = mapper.writeValueAsString(inventory)
+        var url : String = "http://131.221.41.20:8061/api/kt/inventory"
+        val postResponse = httpClient.post(url, jsonBody)
+ 
     }
 }

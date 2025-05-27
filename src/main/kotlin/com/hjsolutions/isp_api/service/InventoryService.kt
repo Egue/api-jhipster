@@ -29,5 +29,19 @@ class InventoryService(
 
         return inventoryRepository.save(entity)
     }
+
+    fun updated(inventoryDTO: InventoryDTO): Inventory {
+
+        val findInventory: Inventory? = inventoryRepository.findByHostname(inventoryDTO.hostname)
+
+        findInventory?.let {
+            it.serialNumber = inventoryDTO.serialNumber
+            it.location = inventoryDTO.location
+            it.asignedTo = inventoryDTO.asignedTo
+            it.serialNumber = inventoryDTO.serialNumber 
+
+            return inventoryRepository.save(it)
+        } ?: throw Exception("Inventory with hostname ${inventoryDTO.hostname} does not exist")
+    }
  
 }
