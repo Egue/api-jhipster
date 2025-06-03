@@ -31,9 +31,9 @@ spring:
     serialization:
       indent-output: true
   datasource:
-    url: jdbc:mysql://192.168.24.207:33311/controlmas?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
-    username: root 
-    password: mysql1234
+    url: jdbc:mysql://192.168.88.61:3306/controlmas?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+    username: cablemag_v1
+    password: AkPNNd))dSsfWAq32
     driver-class-name: com.mysql.jdbc.Driver
     hikari:
       poolName: Hikari

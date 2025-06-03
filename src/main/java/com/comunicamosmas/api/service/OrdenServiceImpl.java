@@ -84,7 +84,16 @@ public class OrdenServiceImpl implements IOrdenService {
 	@Override
 	public List<OrdenInstalacionDTO> getListFindBetwee(String valor1, String valor2) {
 		// TODO Auto-generated method stub
-		return (List<OrdenInstalacionDTO>) ordenDao.getListFindBetwee(valor1, valor2);
+		Optional<List<Object[]>> ordenes =  ordenDao.getListFindBetwee(valor1, valor2);
+
+		return ordenes.map(resp -> {
+			List<OrdenInstalacionDTO> list = new ArrayList<>();
+			for (Object[] rs : resp) {
+				OrdenInstalacionDTO obj = this.mapToOrdenInstalacionDTO(rs);
+				list.add(obj);
+			}
+			return list;
+		}).orElse(new ArrayList<>());
 	}
 
 	@Override
@@ -581,8 +590,20 @@ public class OrdenServiceImpl implements IOrdenService {
         dto.setNotaFinal((String) row[16]);
         dto.setAnulada((String) row[17].toString());
         dto.setVisitasFallidas((String) row[18]);
+		dto.setUserEjecuta((Integer) row[19]);
         return dto;
 
     }
+
+	private OrdenInstalacionDTO mapToOrdenInstalacionDTO(Object[] row) {
+		OrdenInstalacionDTO dto = new OrdenInstalacionDTO();
+		 dto.setIdOrden((Integer) row[0]);
+		 dto.setIdContrato((Integer)	 row[1]);
+		 dto.setNombreCliente((String) row[2]);
+		 dto.setDocumento((String) row[3].toString());
+		 dto.setTipoTecnologia((String) row[4]);
+
+		return dto;
+	}
 
 }

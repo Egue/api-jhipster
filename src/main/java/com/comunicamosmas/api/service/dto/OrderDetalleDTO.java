@@ -21,9 +21,19 @@ public class OrderDetalleDTO {
     private String notaFinal;
     private String anulada;
     private String visitasFallidas;
+    private Integer userEjecuta;
 
      
      
+    public void setFechafRegistro(String fechafRegistro) {
+        this.fechafRegistro = fechafRegistro;
+    }
+    public Integer getUserEjecuta() {
+        return userEjecuta;
+    }
+    public void setUserEjecuta(Integer userEjecuta) {
+        this.userEjecuta = userEjecuta;
+    }
     public String getIdOrden() {
         return idOrden;
     }

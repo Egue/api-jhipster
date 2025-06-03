@@ -1,6 +1,5 @@
 package com.comunicamosmas.api.web.rest;
-
-import org.springframework.web.bind.annotation.CrossOrigin;
+ 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,10 +29,8 @@ import com.comunicamosmas.api.service.dto.ValorStringDTO;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 
 import io.jsonwebtoken.io.IOException; 
-import tech.jhipster.config.JHipsterProperties.Http;
  
-
-@CrossOrigin("*")
+ 
 @RestController
 @RequestMapping("/api/controlmas")
 public class SystemController {
@@ -169,5 +166,8 @@ public class SystemController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
+ 
+    
+
     
 }

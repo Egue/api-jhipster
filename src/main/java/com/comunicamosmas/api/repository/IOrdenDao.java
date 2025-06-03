@@ -59,22 +59,25 @@ public interface IOrdenDao extends CrudRepository<Orden, Long> {
     public String findTelefonoByIdOrden(@Param("idOrden")Long idOrde);
 
     @Query(
-        value = "SELECT o.id_orden as idOrden, o.id_contrato as idContrato , concat(c.apellido_paterno , ' ', c.nombre_primer , ' ', c.nombre_segundo) as nombreCliente,\n" +
-        "	c.documento , \n" +
-        "    e.nombre_comercial as nombreComercial,\n" +
-        "    s.nombre ,  tt.nombre as tipoTecnologia\n" +
-        " FROM ordenes o\n" +
-        "inner join clientes c on c.id_cliente = o.id_cliente\n" +
-        "inner join empresas e on e.id_empresa = o.id_empresa\n" +
-        "inner join contratos co on co.id_contrato = o.id_contrato\n" +
-        "inner join servicios s on s.id_servicio = o.id_servicio\n" +
-        "inner join tarifas t on t.id_tarifa = co.id_tarifa_promo\n" +
-        "inner join tipos_tecnologia tt on tt.id_tecnologia = t.id_tecnologia\n" +
-        "WHERE tt.servicio = 1 AND o.tipo_orden = 1 AND o.estado IN (0,1,2,3) and o.anulada = 0 AND o.winmax=0 AND o.id_usuario_ejecuta > 0" +
-        " AND o.fechaf_registra BETWEEN :valor1 AND :valor2",
+        value = """
+        SELECT o.id_orden as idOrden,
+        o.id_contrato as idContrato , 
+        case when c.tipo_cliente = 'N' then concat(c.nombre_primer,' ', c.nombre_segundo,' ', c.apellido_paterno)
+        when c.tipo_cliente = 'J' then concat(c.razon_social) end as nombreCliente,
+        c.documento , 
+        s.nombre ,  tt.nombre as tipoTecnologia
+         FROM ordenes o
+        inner join clientes c on c.id_cliente = o.id_cliente
+        inner join empresas e on e.id_empresa = o.id_empresa
+        inner join contratos co on co.id_contrato = o.id_contrato
+        inner join servicios s on s.id_servicio = o.id_servicio
+        inner join tarifas t on t.id_tarifa = co.id_tarifa_promo
+        inner join tipos_tecnologia tt on tt.id_tecnologia = t.id_tecnologia
+        WHERE tt.servicio = 1 AND o.tipo_orden = 1 AND o.estado IN (0,1,2,3) and o.anulada = 0 AND o.winmax=0 AND o.id_usuario_ejecuta > 0
+        AND o.fechaf_registra BETWEEN :valor1 AND :valor2 """,
         nativeQuery = true
     )
-    public List<OrdenInstalacionDTO> getListFindBetwee(@Param("valor1")String valor1, @Param("valor2")String valor2);
+    public Optional<List<Object[]>> getListFindBetwee(@Param("valor1")String valor1, @Param("valor2")String valor2);
     
     //ordenes buscar por tipo
     @Query(value="SELECT id_orden, id_contrato FROM ordenes where tipo_orden = :tipoOrden" , nativeQuery = true)
@@ -238,7 +241,8 @@ public interface IOrdenDao extends CrudRepository<Orden, Long> {
            END as estado, 
            ord.nota_final, 
            ord.anulada, 
-           GROUP_CONCAT(ov.detalle SEPARATOR ',') as visitaFallida 
+           GROUP_CONCAT(ov.detalle SEPARATOR ',') as visitaFallida ,
+            ord.id_usuario_ejecuta
     FROM ordenes ord  
     INNER JOIN contratos co ON co.id_contrato = ord.id_contrato
     INNER JOIN clientes cli ON cli.id_cliente = co.id_cliente
@@ -279,6 +283,12 @@ Page<Object[]> findOrdenesDetalladas(
     @Param("fechaInicio") Long fechaInicio,
     @Param("fechaFinal") Long fechaFinal,
     Pageable pageable);
+
+    @Query(value = """
+    SELECT * from ordenes ord
+    inner join usuarios usr on usr.id_usuario = ord.id_usuario_asigna
+    WHERE ord.abierta = 1 and ord.anulada = 0 AND ord.estado IN(0,1,2) """, nativeQuery = true)
+    public List<Orden> findAllOrdenesActivesByAsignation();
 
     
 }
