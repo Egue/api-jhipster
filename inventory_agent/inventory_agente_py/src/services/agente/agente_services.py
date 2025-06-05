@@ -37,7 +37,7 @@ def get_system_info():
             for interface , addrs in psutil.net_if_addrs().items()
             for addr in addrs if addr.family in (socket.AF_INET , psutil.AF_LINK)
         ],
-        "manufacture": {
+        "manufacturer": {
             "name": "uknow",
             "model":"unknow",
             "serialNumber":"unknow",
