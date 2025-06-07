@@ -119,13 +119,7 @@ class ServicioRBService(
         var contrato:Contrato = orden.let{ord -> 
             contratoService.findById(ord.idContrato)
         }
-        var cliente:Cliente = contrato.let{cont -> 
-            clienteService.findById(cont.idCliente)
-        }   
-
-        var tarifa:Tarifa = contrato.let{cont -> 
-            tarifaService.findById(cont.idTarifaPromo)
-        }
+        
         orden.logApi = "Eliminando secret para el cliente ${cliente.id} - ${cliente.documento} - ${cliente.nombrePrimer} ${cliente.nombreSegundo} ${cliente.apellidoPaterno} ${cliente.apellidoMaterno} en la estacion ${estacion.nombre} con tarifa ${tarifa.nombre}"
          
         var profile:String = get_profile(estacion, tarifa.codigoMikrotik , orden)
