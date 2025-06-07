@@ -4,13 +4,13 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.http.ResponseEntity
-import com.hjsolutions.isp_api.service.ServicioService
-
+import com.hjsolutions.isp_api.service.ServicioOLTService 
 @RestController
 @RequestMapping("/api/kt/servicio")
 class ServicioController(
-    private val servicioService:ServicioService
+    private val servicioService:ServicioOLTService
 ){
 
     /*cortar servicios */
@@ -27,6 +27,15 @@ class ServicioController(
 
         //find estacion
         var response = servicioService.get_unconfigured_onus(idEstacion)
+
+        return ResponseEntity.ok(response)
+    }
+
+    @PostMapping("/rb/create_secret")
+    fun configureOnu(@RequestParam("id_estacion") idEstacion:Long, @RequestParam("id_orden") idOnu:Long , @RequestParam("id_ap") idAp:Long): ResponseEntity<?> {
+
+        //find estacion
+        
 
         return ResponseEntity.ok(response)
     }

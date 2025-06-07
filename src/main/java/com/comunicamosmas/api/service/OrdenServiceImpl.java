@@ -601,7 +601,8 @@ public class OrdenServiceImpl implements IOrdenService {
 		 dto.setIdContrato((Integer)	 row[1]);
 		 dto.setNombreCliente((String) row[2]);
 		 dto.setDocumento((String) row[3].toString());
-		 dto.setTipoTecnologia((String) row[4]);
+		 dto.setTipoTecnologia((String) row[5]);
+		 dto.setNombre((String) row[4]);
 
 		return dto;
 	}

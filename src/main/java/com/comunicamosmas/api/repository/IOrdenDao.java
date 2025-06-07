@@ -60,12 +60,14 @@ public interface IOrdenDao extends CrudRepository<Orden, Long> {
 
     @Query(
         value = """
-        SELECT o.id_orden as idOrden,
+        SELECT 
+        o.id_orden as idOrden,
         o.id_contrato as idContrato , 
         case when c.tipo_cliente = 'N' then concat(c.nombre_primer,' ', c.nombre_segundo,' ', c.apellido_paterno)
         when c.tipo_cliente = 'J' then concat(c.razon_social) end as nombreCliente,
         c.documento , 
-        s.nombre ,  tt.nombre as tipoTecnologia
+        s.nombre ,  
+        tt.nombre as tipoTecnologia
          FROM ordenes o
         inner join clientes c on c.id_cliente = o.id_cliente
         inner join empresas e on e.id_empresa = o.id_empresa

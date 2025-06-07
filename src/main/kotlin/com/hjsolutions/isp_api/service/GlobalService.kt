@@ -7,10 +7,33 @@ import java.awt.Image
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-
+import org.springframework.beans.factory.annotation.Autowired
+import com.comunicamosmas.api.repository.UserRepository
+import com.comunicamosmas.api.security.SecurityUtils
 @Service
 class GlobalService( 
 ) {
+
+    @Autowired
+    private lateinit var userRepository: UserRepository
+
+    val llave_internet_comentarios = "#$\"R)=k)C@$=HPOI"
+
+    fun getCurrentUser(): String {
+
+        return SecurityUtils.getCurrentUserLogin().orElseThrow {
+            RuntimeException("No user is currently logged in")
+        }
+    }
+
+    fun getCurrentUserID(): Long {
+        // This method should return the current user's username or ID
+        // For now, we will return a placeholder value
+        val login = getCurrentUser()
+        return userRepository.findOneByLogin(login)
+            .map { it.id }
+            .orElseThrow { RuntimeException("User not found") }
+    }
 
     fun resizeImage(image: MultipartFile, width: Int, height: Int): ByteArrayInputStream  {
         // Implement image resizing logic here
@@ -27,5 +50,25 @@ class GlobalService(
         ImageIO.write(outputImage, "png", baos)
 
      return ByteArrayInputStream(baos.toByteArray())
+    }
+
+    fun get_letters_random(length: Int): String {
+        val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+        return (1..length)
+            .map { chars.random() }
+            .joinToString("")
+    }
+
+    fun get_letters_random_numbers(length: Int): String {
+        val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
+        return (1..length)
+            .map { chars.random() }
+            .joinToString("")
+    }
+
+    fun getMD5Hash(input: String): String {
+        val md = java.security.MessageDigest.getInstance("MD5")
+        val digest = md.digest(input.toByteArray())
+        return digest.joinToString("") { "%02x".format(it) }
     }
 }
