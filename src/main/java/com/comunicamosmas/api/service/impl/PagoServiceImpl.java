@@ -28,6 +28,7 @@ import com.comunicamosmas.api.service.IPagoLineaVersionDosService;
 import com.comunicamosmas.api.service.IPagoRetencionService;
 import com.comunicamosmas.api.service.IPagoService;
 import com.comunicamosmas.api.service.dto.DeudasForFacturaDTO;
+import com.comunicamosmas.api.service.dto.InfoPagosDTO;
 import com.comunicamosmas.api.service.dto.PagosEstadoCuentaDTO;
 import com.comunicamosmas.api.service.dto.PaymentOnlineDTO;  
 
@@ -524,6 +525,27 @@ public class PagoServiceImpl implements IPagoService {
         }
          
 
+    }
+
+    @Override
+    public List<InfoPagosDTO> infoRc(Long idContrato, Long rc) {
+        // TODO Auto-generated method stub
+        return  pagoDao.pagoInfo(idContrato, rc).get().stream().map(this::mapToInfoPagos).collect(Collectors.toList());
+ 
+    }
+
+    private InfoPagosDTO mapToInfoPagos(Object[] item)
+    {
+        InfoPagosDTO infoPago = new InfoPagosDTO();
+
+        infoPago.setIdReciboPago((Integer) item[0]);
+        infoPago.setValor((Float) item[1]);
+        infoPago.setFecha((String) item[2].toString());
+        infoPago.setToken((String) item[3]);
+        infoPago.setCajero((String) item[4]);
+        infoPago.setTipoPago((String) item[5]);
+
+        return infoPago;
     }
 
 }

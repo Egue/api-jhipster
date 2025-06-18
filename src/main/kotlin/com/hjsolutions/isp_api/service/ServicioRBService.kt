@@ -31,13 +31,14 @@ class ServicioRBService(
 ) {
 
     
+    
 
-    fun getSecretRB(user: String, pass: String, ip: String, port: Long, idOnu: Long): String {
+    /*fun getSecretRB(user: String, pass: String, ip: String, port: Long, idOnu: Long): String {
         // Simulate fetching a secret from RB
         val comando = "/interface/winbox-interfaces/secret/get?id=${idOnu}"
 
         return mikrotikClient.get_mikrotik_String(user, pass, ip, port, comando)
-    }
+    }*/
 
     // Create a secret in RB for a given station, order, and AP
 
@@ -83,8 +84,10 @@ class ServicioRBService(
             val current = LocalDateTime.now()
             val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")
             val formatted = current.format(formatter)
-            var response = mikrotikClient.get_mikrotik_String(user, pass, ip, port, comando)
-            orden.logApi += " - Secret creado: ${secretName} con password ${secretPass} y profile ${profile}"
+            mikrotikClient.getApiConnection(user, pass, ip, port)
+            orden.logApi += " - Conectando a la estacion ${estacion.nombre}"
+            var response = mikrotikClient.get_mikrotik_String(comando)
+            orden.logApi += " - Secret creado: ${secretName} con  profile ${profile}"
             orden.logApi += " - Respuesta de Mikrotik: ${response}"
             contrato.idEstacion = idEstacion
             contrato.idApMaster = idAp
@@ -97,46 +100,102 @@ class ServicioRBService(
             winmaxPass.idEstacion = idEstacion
             winmaxPass.comentario = comment
             winmaxService.save(winmaxPass)
-            orden.logApi += " - WinmaxPass creado:  con usuario ${secretName} y pass ${secretPass}"
+            orden.logApi += " - WinmaxPass creado:  con usuario ${secretName}"
             orden.winmax = 1L
             orden.winmaxIdUsuario = globalService.getCurrentUserID()
             orden.apiAutomatica = 1L
             orden.winmaxMarca = formatted
             ordenService.save(orden)
-
+            mikrotikClient.closeConnection()
            return  response
         } catch (e: Exception) {
             orden.logApi += " - Error al crear el secret: ${e.message}"
             ordenService.save(orden)
+            mikrotikClient.closeConnection()
             throw Exception("Error al crear el secret: ${e.message}")
         }
     }
 
+    // Eliminate a secret in RB for a given station and order 
+
     fun eliminate_secretRB(idEstacion:Long , idOrden:Long): Boolean {
         val estacion: Estacion = estacionService.findById(idEstacion)
         var orden:Orden = ordenService.findById(idOrden)
-
         var contrato:Contrato = orden.let{ord -> 
             contratoService.findById(ord.idContrato)
         }
-        
-        orden.logApi = "Eliminando secret para el cliente ${cliente.id} - ${cliente.documento} - ${cliente.nombrePrimer} ${cliente.nombreSegundo} ${cliente.apellidoPaterno} ${cliente.apellidoMaterno} en la estacion ${estacion.nombre} con tarifa ${tarifa.nombre}"
+        var winmaxPass:WinmaxPass? = orden.let{ord ->
+            winmaxService.findByIdContrato(ord.idContrato)
+        }
+        if(winmaxPass == null){
+            orden.logApi += " - No se ha encontrado el WinmaxPass para la orden ${orden.id}"
+            ordenService.save(orden)
+            throw Exception("No se ha encontrado el WinmaxPass para la orden ${orden.id}")
+        }
          
-        var profile:String = get_profile(estacion, tarifa.codigoMikrotik , orden)
-        orden.logApi += " - Perfil encontrado: ${profile}"
-        val user = estacion.apiUser
-        val pass = estacion.apiPass
-
-        return true
-    }
-
-    fun get_profile(estacion:Estacion , profile:String , orden:Orden):String{
-        var comando:String = "ppp/profile/print where name=\"${profile}\""
+        var id = get_secret_RB(estacion, winmaxPass.usuario, orden)
+        orden.logApi += " - Secret encontrado: ${id} para el usuario ${winmaxPass.usuario}"
+        //eliminar el secret en RB
+        var commando:String = "/ppp/secret/remove id=${id}"
         var user = estacion.apiUser
         var pass = estacion.apiPass
         var ip = estacion.apiIp
         var port = estacion.apiPort ?: 8728 // Default port for Mikrotik API
-        var response = mikrotikClient.get_mikrotik_list(user, pass, ip, port, comando)
+        var commando_eliminate_active:String = "/ppp/active/remove id=${id}"
+        try{
+            mikrotikClient.getApiConnection(user, pass, ip, port)
+            orden.logApi += " - Conectando a la estacion ${estacion.nombre}"
+             mikrotikClient.get_mikrotik_list(commando)
+            orden.logApi += " - Secret eliminado: ${winmaxPass.usuario} en la estacion ${estacion.nombre}"
+            mikrotikClient.get_mikrotik_list(commando_eliminate_active)
+            orden.logApi += " - Secret activo eliminado: ${winmaxPass.usuario} en la estacion ${estacion.nombre}"
+            //actualizar contrato
+            globalService.changeStatusContrato(contrato, 4L)
+            contrato.estado = 4L
+            contratoService.save(contrato)
+            orden.logApi += " - Contrato actualizado a estado 4 (Eliminado) para la orden ${orden.id}"
+            orden.logApi += " - Actualizando orden ${orden.id}"
+            orden.winmax = 1L
+            orden.winmaxIdUsuario = globalService.getCurrentUserID()
+            orden.winmaxMarca = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm"))
+            ordenService.save(orden)
+
+            return true
+
+        }catch(e:Exception){
+            orden.logApi += " - Error al eliminar el secret ${winmaxPass.usuario} en la estacion ${estacion.nombre}: ${e.message}"
+            ordenService.save(orden)
+            throw Exception("Error al eliminar el secret ${winmaxPass.usuario} en la estacion ${estacion.nombre}: ${e.message}")
+        }
+          
+    }
+
+    fun get_secret_RB(estacion:Estacion , secret:String , orden:Orden): String {
+
+        var comando:String = "/ppp/secret/print where name=\"${secret}\""
+        try {
+            var response = mikrotikClient.get_mikrotik_String(comando)
+            if(response.equals("No data found")){
+                orden.logApi += " - No se ha encontrado el secret ${secret} en la estacion ${estacion.nombre}"
+                ordenService.save(orden)
+                throw Exception("No se ha encontrado el secret ${secret} en la estacion ${estacion.nombre}")
+            }
+
+            return response
+        }
+        catch(e:Exception){
+            orden.logApi += " - Error al obtener el secret ${secret} en la estacion ${estacion.nombre}: ${e.message}"
+            ordenService.save(orden) 
+            
+        }
+
+         throw Exception("Error al obtener el secret ${secret} en la estacion ${estacion.nombre}")
+
+    }
+
+    fun get_profile(estacion:Estacion , profile:String , orden:Orden):String{
+        var comando:String = "ppp/profile/print where name=\"${profile}\""
+        var response = mikrotikClient.get_mikrotik_list(comando)
         if(response.isEmpty()){
             orden.logApi += " - No se ha encontrado el perfil ${profile} en la estacion ${estacion.nombre}"
             ordenService.save(orden)

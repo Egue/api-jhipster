@@ -26,8 +26,7 @@ import com.comunicamosmas.api.service.IDeudaService;
 import com.comunicamosmas.api.service.dto.EmailCampaignDetalleDTO;
 import com.comunicamosmas.api.service.dto.EstadoCuentaDeudasDTO;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
-
-@CrossOrigin("*")
+ 
 @RestController
 @RequestMapping("/api/controlmas")
 public class DeudasController {

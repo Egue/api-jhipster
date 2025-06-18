@@ -6,11 +6,13 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.http.ResponseEntity
-import com.hjsolutions.isp_api.service.ServicioOLTService 
+import com.hjsolutions.isp_api.service.ServicioOLTService
+import com.hjsolutions.isp_api.service.ServicioRBService 
 @RestController
 @RequestMapping("/api/kt/servicio")
 class ServicioController(
-    private val servicioService:ServicioOLTService
+    private val servicioService:ServicioOLTService,
+    private val servicioRB:ServicioRBService
 ){
 
     /*cortar servicios */
@@ -32,12 +34,16 @@ class ServicioController(
     }
 
     @PostMapping("/rb/create_secret")
-    fun configureOnu(@RequestParam("id_estacion") idEstacion:Long, @RequestParam("id_orden") idOnu:Long , @RequestParam("id_ap") idAp:Long): ResponseEntity<?> {
+    fun configureOnu(
+        @RequestParam("id_estacion") idEstacion:Long, 
+        @RequestParam("id_orden") idOrden:Long , 
+        @RequestParam("id_ap") idAp:Long): ResponseEntity<String> {
 
         //find estacion
-        
+       var response:String = servicioRB.createSecretRB(idEstacion, idOrden, idAp)
 
         return ResponseEntity.ok(response)
+ 
     }
 
 }

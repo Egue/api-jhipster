@@ -13,30 +13,46 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface IContratoDao extends CrudRepository<Contrato, Long> {
-    @Query(
-        value = "SELECT \n" +
-        "mun.municipio as nombreMunicipio,\n" +
-        "ser.nombre as nombreServicio,\n" +
-        "co.id_contrato as idContrato,\n" +
-        "dir.barrio,\n" +
-        "concat(dir.tipo,' / ',dir.a_tipo,' ',dir.a_numero,' ',dir.a_letra,' ',dir.b_tipo,' ',dir.b_numero,' ',dir.b_letra,' ',dir.numero,' / ',dir.nota) as direccion,\n" +
-        "CASE  \n" +
-        "	WHEN co.estado =  0 THEN 'Creado'\n" +
-        "    WHEN co.estado = 1 THEN 'Activo'\n" +
-        "    WHEN co.estado = 2 THEN 'Cortado'\n" +
-        "    WHEN co.estado = 3 THEN 'Anulado'\n" +
-        "    WHEN co.estado = 4 THEN 'Retirado'\n" +
-        "    WHEN co.estado = 5 THEN 'Suspendido'\n" +
-        "END as estado\n" +
-        " FROM clientes\n" +
-        "\n" +
-        "INNER JOIN contratos co ON co.id_cliente = clientes.id_cliente\n" +
-        "INNER JOIN direcciones dir ON dir.id_direccion = co.id_direccion_servicio\n" +
-        "INNER JOIN servicios ser ON ser.id_servicio = co.id_servicio\n" +
-        "INNER JOIN lista_municipios mun ON mun.id_municipio = dir.municipio\n" +
-        "WHERE clientes.id_cliente = :idCliente",
-        nativeQuery = true )
-	
+    @Query( value = """
+		SELECT  
+        mun.municipio as nombreMunicipio,
+        ser.nombre as nombreServicio,
+        co.id_contrato as idContrato,
+        dir.barrio,
+        concat(dir.tipo,' / ',dir.a_tipo,' ',dir.a_numero,' ',dir.a_letra,' ',dir.b_tipo,' ',dir.b_numero,' ',dir.b_letra,' ',dir.numero,' / ',dir.nota) as direccion,
+        CASE
+        	WHEN co.estado =  0 THEN 'Creado'
+            WHEN co.estado = 1 THEN 'Activo'
+            WHEN co.estado = 2 THEN 'Cortado'
+            WHEN co.estado = 3 THEN 'Anulado'
+            WHEN co.estado = 4 THEN 'Retirado'
+            WHEN co.estado = 5 THEN 'Suspendido'
+        END as estado,
+		SUM(deudasb.valor_total) AS total_debe,
+		SUM(deudasb.valor_parcial) AS total_abonos
+        FROM clientes
+        INNER JOIN contratos co ON co.id_cliente = clientes.id_cliente
+        INNER JOIN direcciones dir ON dir.id_direccion = co.id_direccion_servicio
+        INNER JOIN servicios ser ON ser.id_servicio = co.id_servicio
+        INNER JOIN lista_municipios mun ON mun.id_municipio = dir.municipio
+		INNER JOIN deudas deudasb ON deudasb.id_contrato = co.id_contrato
+        WHERE clientes.id_cliente = :idCliente
+		GROUP BY 
+    mun.municipio,
+    ser.nombre,
+    co.id_contrato,
+    dir.barrio,
+    dir.tipo,
+    dir.a_tipo,
+    dir.a_numero,
+    dir.a_letra,
+    dir.b_tipo,
+    dir.b_numero,
+    dir.b_letra,
+    dir.numero,
+    dir.nota,
+    co.estado
+		""",        nativeQuery = true )	
     public List<Object[]> findByIdCliente(@Param("idCliente") Long idCliente);
     
     /**
@@ -70,6 +86,27 @@ public interface IContratoDao extends CrudRepository<Contrato, Long> {
     		+ "left join estaciones es on es.id_estacion = co.id_estacion\n"
     		+ "where co.id_contrato = :idContrato" , nativeQuery=true)
     public List<Object[]> datosClienteByIdContrato(@Param(value="idContrato") Long idContrato);
+
+	@Query(value = """
+			select 
+			co.id_contrato,
+			cli.tipo_cliente,
+			CASE 
+				when cli.tipo_cliente = "N" THEN concat(cli.nombre_primer ,' ', cli.apellido_paterno ) ELSE cli.razon_social
+				end as name_cliente,
+			s.nombre as name_servicio,
+			concat(di.barrio, ' / ', di.tipo , ' ', di.a_tipo , di.a_numero , di.a_letra , ' ', di.b_tipo , di.b_numero, di.b_letra
+			, ' ' , di.numero , ' / ', di.nota ) as direccion,
+			sum(d.valor_parcial) as parcial,
+			sum(d.valor_total) as total
+			from contratos co 
+			inner join clientes cli on cli.id_cliente = co.id_cliente
+			inner join deudas d on d.id_contrato = co.id_contrato
+			inner join servicios s on s.id_servicio = co.id_servicio
+			inner join direcciones di on di.id_direccion = co.id_direccion_servicio
+			where co.id_contrato in (:list) GROUP BY co.id_contrato
+			""", nativeQuery = true)
+	public List<Object[]> findClienteByListContrato(@Param("list") List<Long> contratos);
     
     /**
      * utilizado para informacion de factura encabezado*/

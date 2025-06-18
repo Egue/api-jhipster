@@ -10,14 +10,32 @@ import com.comunicamosmas.api.domain.Orden
 @Service
 class MikrotikClient() {
 
-    fun get_mikrotik_String(user:String , pass:String , ip:String , port:Long , comando:String): String {
+    private var apiConnection: ApiConnection? = null
+
+      
+
+    fun getApiConnection(user:String , pass:String , ip:String, port:Long) {
+        // Create a connection to the Mikrotik API
+        try {
+        this.apiConnection =  ApiConnection.connect(SocketFactory.getDefault() , ip , port.toInt() , 2000)
+        this.apiConnection?.login(user, pass)
+        } catch (e: ApiConnectionException) {
+            e.printStackTrace()
+            throw RuntimeException("Error connecting to Mikrotik: ${e.message}")
+        } catch (e: MikrotikApiException) {
+            e.printStackTrace()
+            throw RuntimeException("Error logging in to Mikrotik: ${e.message}")
+        }
+        //return apiConnection
+    }
+
+    fun get_mikrotik_String(comando:String): String {
         // Simulate fetching a string from Mikrotik
        try {
-        var apiConnection:ApiConnection = ApiConnection.connect(SocketFactory.getDefault() , ip, port.toInt() , 2000)
-        apiConnection.login(user, pass) 
-        val response:List<Map<String,String>> = apiConnection.execute(comando)
+
+        val response: List<Map<String, String>> = this.apiConnection?.execute(comando)
+            ?: throw IllegalStateException("API connection is not initialized")
         
-        apiConnection.close()
         if (response.isEmpty()) {
             return "No data found"
         }
@@ -36,14 +54,14 @@ class MikrotikClient() {
  
     }
 
-    fun get_mikrotik_list(user:String , pass:String , ip:String , port:Long , comando:String): List<Map<String,String>> {
+    fun get_mikrotik_list(comando:String): List<Map<String,String>> {
         // Simulate fetching a list from Mikrotik
         try {
-            var apiConnection:ApiConnection = ApiConnection.connect(SocketFactory.getDefault() , ip, port.toInt() , 2000)
-            apiConnection.login(user, pass) 
-            val response:List<Map<String,String>> = apiConnection.execute(comando)         
+             
+            var response:List<Map<String,String>> = this.apiConnection?.execute(comando)   
+                ?:
+                    throw IllegalStateException("API connection is not initialized")
             
-            apiConnection.close()
             return response
         } catch (e: ApiConnectionException) {
             e.printStackTrace()
@@ -54,6 +72,12 @@ class MikrotikClient() {
             throw RuntimeException("Error executing command on Mikrotik: ${e.message}")
             //return ""
         }
+    }
+
+    fun closeConnection() {
+        // Close the API connection
+        this.apiConnection?.close()
+        this.apiConnection = null
     }
 
      
