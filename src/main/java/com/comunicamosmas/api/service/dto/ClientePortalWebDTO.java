@@ -21,7 +21,7 @@ public class ClientePortalWebDTO {
 
     private String apellidosRep;
 
-    private String idDocumento;
+    private Integer idDocumento;
 
     private Long documento;
 
@@ -132,11 +132,11 @@ public class ClientePortalWebDTO {
         this.apellidosRep = apellidosRep;
     }
 
-    public String getIdDocumento() {
+    public Integer getIdDocumento() {
         return idDocumento;
     }
 
-    public void setIdDocumento(String idDocumento) {
+    public void setIdDocumento(Integer idDocumento) {
         this.idDocumento = idDocumento;
     }
 
