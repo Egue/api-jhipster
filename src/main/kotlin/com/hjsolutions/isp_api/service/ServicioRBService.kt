@@ -84,7 +84,7 @@ class ServicioRBService(
             val current = LocalDateTime.now()
             val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm")
             val formatted = current.format(formatter)
-            mikrotikClient.getApiConnection(user, pass, ip, port)
+            mikrotikClient.getApiConnection(user, pass, ip, port.toInt())
             orden.logApi += " - Conectando a la estacion ${estacion.nombre}"
             var response = mikrotikClient.get_mikrotik_String(comando)
             orden.logApi += " - Secret creado: ${secretName} con  profile ${profile}"
@@ -143,7 +143,7 @@ class ServicioRBService(
         var port = estacion.apiPort ?: 8728 // Default port for Mikrotik API
         var commando_eliminate_active:String = "/ppp/active/remove id=${id}"
         try{
-            mikrotikClient.getApiConnection(user, pass, ip, port)
+            mikrotikClient.getApiConnection(user, pass, ip, port.toInt())
             orden.logApi += " - Conectando a la estacion ${estacion.nombre}"
              mikrotikClient.get_mikrotik_list(commando)
             orden.logApi += " - Secret eliminado: ${winmaxPass.usuario} en la estacion ${estacion.nombre}"

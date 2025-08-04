@@ -3,16 +3,24 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.GetMapping
 import com.comunicamosmas.api.repository.IClienteDao
 import com.hjsolutions.isp_api.service.MigrationDBService
+import com.hjsolutions.isp_api.service.dto.ListString
 import com.hjsolutions.isp_api.domain.Barrios
+import com.hjsolutions.isp_api.domain.EquiposAsignados
 import com.hjsolutions.isp_api.domain.Perfiles
+import com.hjsolutions.isp_api.service.dto.PppSecreDTO
+import org.springframework.http.HttpHeaders
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.http.ResponseEntity
-import org.springframework.http.HttpStatus 
+import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import java.io.InputStream
-import java.io.InputStreamReader 
+import java.io.InputStreamReader
+import javax.print.attribute.standard.Media
+
 @RestController
 @RequestMapping("/api/kt/migrationsCB")
 class MigrationDbController(private val migrationDBService:MigrationDBService){
@@ -23,7 +31,7 @@ class MigrationDbController(private val migrationDBService:MigrationDBService){
         migrationDBService.processCsv(file)
         ResponseEntity.ok(mapOf(
             "message" to "Archivo procesaod",
-            
+
         ))
         }
         catch(e:Exception) {
@@ -34,14 +42,56 @@ class MigrationDbController(private val migrationDBService:MigrationDBService){
         }
     }
 
-	@GetMapping("/suscripciones")
+	@PostMapping("/suscripciones")
 	fun migration_suscripciones(
-		@RequestParam("estado")estado:Array<String> , 
-		@RequestParam("codServicio") codServicio:Array<String>):ResponseEntity<Any>{
-		val servicios = codServicio.map { it.toInt() }
-		val list: List<Any> = migrationDBService.migration_suscripciones(estadoSuscripcion = estado.toList() , codServicio = servicios)
+		@RequestBody() listString : ListString
+	):ResponseEntity<Any>{
+		val list: List<Any> = migrationDBService.migration_suscripciones(estadoSuscripcion = listString.estado , codServicio = listString.codServicio)
 		return ResponseEntity.ok(list)
 	}
+
+	@GetMapping("/rbconexion")
+	fun rbvalidation():ResponseEntity<Any>{
+		val list : List<Any> = migrationDBService.validateByStation()
+
+		return ResponseEntity.ok(list)
+	}
+
+	@GetMapping("/testssh")
+	fun testSsh(@RequestParam("ap") ap:String):ResponseEntity<ByteArray>{
+		val response:List<PppSecreDTO> = migrationDBService.appConexion(ap)
+
+        val csvHeader = "ID,NAME,SERVICE,PASSWORD,PROFILE,REMOTEADDRESS,CALLERID,COMENTARIO"
+        val csvBody = response.map {rb ->
+            listOf(
+                rb.id ?: "",
+                rb.name ?: "",
+                rb.service ?: "",
+                rb.password ?: "",
+                rb.profile ?: "",
+                rb.remoteAddress ?: "" ,
+                rb.callerId ?: "",
+                rb.comentario ?: "").joinToString(",")
+        }.joinToString("\n")
+         val csvContent = "$csvHeader\n$csvBody"
+        val csvBytes = csvContent.toByteArray(Charsets.UTF_8)
+
+
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION , "attachment; filename=\"equipos_asignados.csv\"")
+            .contentType(MediaType.parseMediaType("text/csv"))
+            .body(csvBytes)
+	}
+
+    @GetMapping("/equipoAsignados", produces = ["text/csv"])
+    fun equiposAsignados(@RequestParam("codAp") codAp:String): ResponseEntity<ByteArray>{
+        val response : ByteArray = migrationDBService.getListByAp(codAp = codAp.toInt())
+
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION , "attachment; filename=\"equipos_asignados.csv\"")
+            .contentType(MediaType.parseMediaType("text/csv"))
+            .body(response)
+    }
 
     /***
     If @Oper='ECT'--(ESTADO CLIENTES TELEVISION)--Lista los estado de los clientes
@@ -70,10 +120,10 @@ Begin
 	Set @CantLevCableActual			=(Select Count(*) From SUSCRIPCIONES As SU Inner Join DETALLES_SUSCRIPCION As DS On DS.COD_SUSCRIPCION=SU.CODIGO Where DS.COD_SERVICIO IN (1,7)And ESTADO='V')
 	Set @CantLevCableAnterior		=(Select CANTIDAD_ANTERIOR From ESTADO_CLIENTES Where ESTADO='V' And COD_SERVICIO IN (1,7))
 	Set @CantProcInstalacionActual	=(Select Count(*) From SUSCRIPCIONES As SU Inner Join DETALLES_SUSCRIPCION As DS On DS.COD_SUSCRIPCION=SU.CODIGO Where DS.COD_SERVICIO IN (1,7) And ESTADO='I')
-	Set @CantProcInstalacionAnterior=(Select CANTIDAD_ANTERIOR From ESTADO_CLIENTES Where ESTADO='I' And COD_SERVICIO IN (1,7))	
+	Set @CantProcInstalacionAnterior=(Select CANTIDAD_ANTERIOR From ESTADO_CLIENTES Where ESTADO='I' And COD_SERVICIO IN (1,7))
 	Set @CantBloqueadoActual		=(Select Count(*) From SUSCRIPCIONES As SU Where CODIGO In (Select EA.COD_SUSCRIPCION From dbo.EQUIPOS_ASIGNADOS as EA Left Join CABLESOFT.dbo.PAQUETES_VENTA as PV on PV.CODIGO = EA.COD_PAQUETE_VENTA Left Join CABLESOFT.dbo.PERFILES as PF on PF.CODIGO = PV.COD_PERFIL Where PF.COD_SERVICIO IN (1,7) And ACTIVO='S' And PRINCIPAL='S') And ESTADO='B')
 	Set @CantBloqueadoAnterior		=(Select CANTIDAD_ANTERIOR From ESTADO_CLIENTES Where ESTADO='B' And COD_SERVICIo IN (1,7))
-     
+
 If @Oper='ECI'--(ESTADO CLIENTES)--Lista los estado de los clientes
 Begin
 	--Servicio 2: Internet
@@ -133,25 +183,25 @@ Begin
 	Set @CantProcInstalacionAnterior=(Select CANTIDAD_ANTERIOR From ESTADO_CLIENTES Where ESTADO='I' And COD_SERVICIO=0)
 	Set @CantBloqueadoActual		=(Select Count(*) From SUSCRIPCIONES As SU Where CODIGO In (Select EA.COD_SUSCRIPCION From dbo.EQUIPOS_ASIGNADOS as EA Left Join CABLESOFT.dbo.PAQUETES_VENTA as PV on PV.CODIGO = EA.COD_PAQUETE_VENTA Left Join CABLESOFT.dbo.PERFILES as PF on PF.CODIGO = PV.COD_PERFIL Where PF.COD_SERVICIO IN (1,7) And ACTIVO='S' And PRINCIPAL='S') And CODIGO In (Select EA.COD_SUSCRIPCION From dbo.EQUIPOS_ASIGNADOS as EA Left Join CABLESOFT.dbo.PAQUETES_VENTA as PV on PV.CODIGO = EA.COD_PAQUETE_VENTA Left Join CABLESOFT.dbo.PERFILES as PF on PF.CODIGO = PV.COD_PERFIL Where PF.COD_SERVICIO IN (2) And ACTIVO='S' And PRINCIPAL='S') And ESTADO='B')
 	Set @CantBloqueadoAnterior		=(Select CANTIDAD_ANTERIOR From ESTADO_CLIENTES Where ESTADO='B' And COD_SERVICIO=0)
-SELECT * FROM CABLEMAG.dbo.SUSCRIPCIONES s 
-WHERE CODIGO In (Select EA.COD_SUSCRIPCION From CABLEMAG.dbo.EQUIPOS_ASIGNADOS as EA 
-Left Join CABLESOFT.dbo.PAQUETES_VENTA as PV on PV.CODIGO = EA.COD_PAQUETE_VENTA 
-Left Join CABLESOFT.dbo.PERFILES as PF on PF.CODIGO = PV.COD_PERFIL 
+SELECT * FROM CABLEMAG.dbo.SUSCRIPCIONES s
+WHERE CODIGO In (Select EA.COD_SUSCRIPCION From CABLEMAG.dbo.EQUIPOS_ASIGNADOS as EA
+Left Join CABLESOFT.dbo.PAQUETES_VENTA as PV on PV.CODIGO = EA.COD_PAQUETE_VENTA
+Left Join CABLESOFT.dbo.PERFILES as PF on PF.CODIGO = PV.COD_PERFIL
 Where PF.COD_SERVICIO IN (1,7) And ACTIVO='S' And PRINCIPAL='S') and s.ESTADO in('N' , 'P' , 'C' , 'I' , 'T' , 'L')
-Select * From CABLEMAG.dbo.SUSCRIPCIONES As SU Where 
-CODIGO In (Select EA.COD_SUSCRIPCION From CABLEMAG.dbo.EQUIPOS_ASIGNADOS as EA 
-Left Join CABLESOFT.dbo.PAQUETES_VENTA as PV on PV.CODIGO = EA.COD_PAQUETE_VENTA 
-Left Join CABLESOFT.dbo.PERFILES as PF on PF.CODIGO = PV.COD_PERFIL 
+Select * From CABLEMAG.dbo.SUSCRIPCIONES As SU Where
+CODIGO In (Select EA.COD_SUSCRIPCION From CABLEMAG.dbo.EQUIPOS_ASIGNADOS as EA
+Left Join CABLESOFT.dbo.PAQUETES_VENTA as PV on PV.CODIGO = EA.COD_PAQUETE_VENTA
+Left Join CABLESOFT.dbo.PERFILES as PF on PF.CODIGO = PV.COD_PERFIL
 Where PF.COD_SERVICIO IN (2) And ACTIVO='S' And PRINCIPAL='S') And SU.ESTADO IN ('N' , 'P' , 'C' , 'I' , 'T' , 'L')
 
-Select Count(*) From .CABLEMAG.dbo.SUSCRIPCIONES As SU 
-Where CODIGO In (Select EA.COD_SUSCRIPCION From dbo.EQUIPOS_ASIGNADOS as EA 
-Left Join CABLESOFT.dbo.PAQUETES_VENTA as PV on PV.CODIGO = EA.COD_PAQUETE_VENTA 
-Left Join CABLESOFT.dbo.PERFILES as PF on PF.CODIGO = PV.COD_PERFIL 
-Where PF.COD_SERVICIO IN (1,7) And ACTIVO='S' And PRINCIPAL='S') 
-And CODIGO In (Select EA.COD_SUSCRIPCION From dbo.EQUIPOS_ASIGNADOS as EA 
-	Left Join CABLESOFT.dbo.PAQUETES_VENTA as PV on PV.CODIGO = EA.COD_PAQUETE_VENTA 
-	Left Join CABLESOFT.dbo.PERFILES as PF on PF.CODIGO = PV.COD_PERFIL 
+Select Count(*) From .CABLEMAG.dbo.SUSCRIPCIONES As SU
+Where CODIGO In (Select EA.COD_SUSCRIPCION From dbo.EQUIPOS_ASIGNADOS as EA
+Left Join CABLESOFT.dbo.PAQUETES_VENTA as PV on PV.CODIGO = EA.COD_PAQUETE_VENTA
+Left Join CABLESOFT.dbo.PERFILES as PF on PF.CODIGO = PV.COD_PERFIL
+Where PF.COD_SERVICIO IN (1,7) And ACTIVO='S' And PRINCIPAL='S')
+And CODIGO In (Select EA.COD_SUSCRIPCION From dbo.EQUIPOS_ASIGNADOS as EA
+	Left Join CABLESOFT.dbo.PAQUETES_VENTA as PV on PV.CODIGO = EA.COD_PAQUETE_VENTA
+	Left Join CABLESOFT.dbo.PERFILES as PF on PF.CODIGO = PV.COD_PERFIL
 	Where PF.COD_SERVICIO IN (2) And ACTIVO='S' And PRINCIPAL='S') And ESTADO='N'
 
 migracion de internet:
@@ -160,10 +210,10 @@ LEFT JOIN CABLEMAG.dbo.EQUIPOS_ASIGNADOS eac ON eac.COD_SUSCRIPCION = SU.CODIGO
 LEFT JOIN CABLESOFT.dbo.PAQUETES_VENTA pvc ON pvc.CODIGO  = eac.COD_PAQUETE_VENTA
 LEFT JOIN CABLESOFT.dbo.CONTENIDO_PAQUETE_VENTA cpv ON cpv.COD_PAQUETE = pvc.CODIGO
 LEFT JOIN CABLESOFT.dbo.PUNTOS_ACCESOS pa  ON pa.CODIGO = eac.COD_AP
-WHERE SU.CODIGO IN (select EA.COD_SUSCRIPCION FROM CABLEMAG.dbo.EQUIPOS_ASIGNADOS EA 
-Left Join CABLESOFT.dbo.PAQUETES_VENTA as PV on PV.CODIGO = EA.COD_PAQUETE_VENTA 
-Left Join CABLESOFT.dbo.PERFILES as PF on PF.CODIGO = PV.COD_PERFIL 
+WHERE SU.CODIGO IN (select EA.COD_SUSCRIPCION FROM CABLEMAG.dbo.EQUIPOS_ASIGNADOS EA
+Left Join CABLESOFT.dbo.PAQUETES_VENTA as PV on PV.CODIGO = EA.COD_PAQUETE_VENTA
+Left Join CABLESOFT.dbo.PERFILES as PF on PF.CODIGO = PV.COD_PERFIL
 Where PF.COD_SERVICIO IN (2) And EA.ACTIVO='S' And EA.PRINCIPAL='S') And SU.ESTADO IN ('N' , 'P' , 'C' , 'I' , 'T' , 'L')
-	 
+
 ***/
 }

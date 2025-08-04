@@ -2,26 +2,34 @@ package com.hjsolutions.isp_api.service
 
 import com.comunicamosmas.api.domain.Cliente
 import com.comunicamosmas.api.repository.IClienteDao
-import com.hjsolutions.isp_api.service.dto.ClienteCablemagDTO
+import com.hjsolutions.isp_api.domain.EquiposAsignados
+import com.hjsolutions.isp_api.domain.PuntosAccesos
 import com.hjsolutions.isp_api.repository.CablemagBarrioRepository
-import com.hjsolutions.isp_api.repository.CablemagPerfilesRepository
 import com.hjsolutions.isp_api.repository.CablemagEquiposAsignadosRepository
-import com.hjsolutions.isp_api.domain.Barrios
-import com.hjsolutions.isp_api.domain.Perfiles
+import com.hjsolutions.isp_api.repository.CablemagPerfilesRepository
+import com.hjsolutions.isp_api.repository.CablemagPuntosAccesoRepository
+import com.hjsolutions.isp_api.service.dto.ClienteCablemagDTO
+import com.hjsolutions.isp_api.service.dto.EquipoConSecretDTO
+import com.hjsolutions.isp_api.service.dto.ResultadoComparacion
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.stream.Collectors
+import org.springframework.data.mongodb.core.aggregation.Aggregation.*
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
-import org.springframework.data.mongodb.core.aggregation.Aggregation.*
-import org.springframework.data.mongodb.core.aggregation.AggregationResults
+import com.hj_solutions.isp_api.service.ShhClient
+import com.hjsolutions.isp_api.service.dto.PppSecreDTO
+import com.hjsolutions.isp_api.service.dto.parseMikrotik
+import java.nio.charset.StandardCharsets
 
 @Service
 class MigrationDBService(
-    private val clienteRepository: IClienteDao , 
-    private val repositoryBarrios: CablemagBarrioRepository , 
-    private val repositoryPerfiles : CablemagPerfilesRepository , 
-    private val repositoryEquiposAsignado : CablemagEquiposAsignadosRepository) {
+        private val clienteRepository: IClienteDao,
+        private val repositoryBarrios: CablemagBarrioRepository,
+        private val repositoryPerfiles: CablemagPerfilesRepository,
+        private val repositoryEquiposAsignado: CablemagEquiposAsignadosRepository,
+        private val repositoryPuntoAcceso: CablemagPuntosAccesoRepository
+) {
 
     fun processCsv(file: MultipartFile) {
         var list: List<ClienteCablemagDTO> =
@@ -151,7 +159,116 @@ class MigrationDBService(
     }
 
     /*migrations suscripciones */
-    fun migration_suscripciones(estadoSuscripcion:List<String> , codServicio:List<Int>): List<Any> {
-        return repositoryEquiposAsignado.findEquipoConPaquetesYPerfilesAnnotation(estadoSuscripcion , codServicio);
+    fun migration_suscripciones(
+            estadoSuscripcion: List<String>,
+            codServicio: List<Int>
+    ): List<Any> {
+        if (estadoSuscripcion.isEmpty() || codServicio.isEmpty()) {
+            throw IllegalArgumentException("estadoSuscripcion y codServicio no pueden ser vacíos")
+        }
+        return repositoryEquiposAsignado.findEquipoConPaquetesYPerfilesAnnotation(
+                estadoSuscripcion,
+                codServicio
+        )
+    }
+
+    fun validateByStation(): List<ResultadoComparacion> {
+        // consultar estaciones
+        val lisEstaciones = repositoryPuntoAcceso.findAll()
+        val listResultado = mutableListOf<ResultadoComparacion>()
+        lisEstaciones.forEach { estacion ->
+            // buscar lista de suscripciones por estacion
+            val equipoAsigando: List<EquiposAsignados> =
+                    repositoryEquiposAsignado.findByCodApAndPrincipalAndCodServicio(codAp = estacion.codigo)
+            // realizar la conexion
+            val clientMikrotik: MikrotikClient = MikrotikClient()
+            // extraer los profiles
+            val commando: String = "/ppp/secret/print"
+            try {
+
+                /*clientMikrotik.getApiConnection(
+                        estacion.usuarioTorre,
+                        estacion.claveTorre,
+                        estacion.ip,
+                        estacion.puerto.toInt()
+                )*/
+                val listSecrets: List<Map<String, String>> =
+                        clientMikrotik.executeCommand(user = estacion.usuarioTorre,
+                         pass = estacion.claveTorre,   ip = estacion.ip,      port = estacion.puerto.toInt(),  command = commando)
+                val rbNames =
+                        listSecrets.filter { it.containsKey("name") }.associateBy {
+                            it["name"].orEmpty()
+                        }
+                clientMikrotik.closeConnection()
+                // separar requipos con y sin perfil usando partition
+                val (conSecret, sinSecret) =
+                        equipoAsigando.partition { equipo ->
+                            equipo.usuario != null && rbNames.containsKey(equipo.usuario)
+                        }
+                // crear lista de equipos con perfil
+                val equiposConSecret =
+                        conSecret.map { equipo ->
+                            EquipoConSecretDTO(equipo, rbNames[equipo.usuario]!!)
+                        }
+
+                listResultado.add(ResultadoComparacion(equiposConSecret, sinSecret))
+            } catch (e: Exception) {
+                println("Error con estación ${estacion.codigo}: ${e.message}")
+                e.printStackTrace()
+            } finally {
+                clientMikrotik.closeConnection()
+            }
+        }
+
+        return listResultado
+    }
+
+    fun appConexion(ap:String):List<PppSecreDTO>{
+        val sshClient:ShhClient =  ShhClient()
+
+        val app:PuntosAccesos = repositoryPuntoAcceso.findOneByCodigo(ap.toInt())
+        var comando:String = "/ppp secret print terse"
+        try {
+            val response:String =  sshClient.execute(username = app.usuarioTorre, host = app.ip, port = app.puerto.toInt(), password = app.claveTorre, comando = comando)
+            val profiles:List<PppSecreDTO>  = parseMikrotik(response.trimIndent())
+            return profiles
+        }
+        catch(e : Exception) {
+            e.printStackTrace()
+        }
+        return TODO("Provide the return value")
+    }
+
+    fun getListByAp(codAp:Number): ByteArray{
+        val stado = mutableListOf<String>("N" ,"P" , "C", "T" , "L")
+        val resultado = repositoryEquiposAsignado.findByCodApAndSuscriptionStado(codAp = codAp , listEstado = stado )
+        val csvHeader = "NUMERO,FECHA_ASIGNACION,COD_SUSCRIPCION,COD_SERVICIO,IP_PUBLICA,USUARIO,CLAVE,SUSCRIPCION.IDENTIFICACION,SUSCRIPCION.DIR_INSTALACION,SUSCRIPCION.ESTADO"
+        val csvBody = resultado.map { equipo ->
+            listOf(
+                equipo.numero.toString(),
+                equipo.fechaAsignacion ?: "",
+                equipo.codSuscripcion.toString(),
+                equipo.codServicio.toString(),
+                equipo.ipPublica,
+                equipo.usuario,
+                equipo.clave,
+                equipo.suscripcion?.identificacion.toString(),
+                equipo.suscripcion?.dirInstalacion.toString(),
+                equipo.suscripcion?.estado.toString()
+
+            ).joinToString(","){ it.wrapCsv()}
+        }.joinToString("\n")
+
+
+        val csvContent = "$csvHeader\n$csvBody"
+
+        val csvBytes = csvContent.toByteArray(Charsets.UTF_8)
+
+        return csvBytes
+    }
+
+    fun String.wrapCsv(): String {
+        val cleaned = this.replace("\"", "\"\"")
+        return "\"$cleaned\""
     }
 }

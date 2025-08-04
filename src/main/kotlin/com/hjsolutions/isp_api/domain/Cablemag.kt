@@ -5,32 +5,75 @@ import org.springframework.data.mongodb.core.mapping.Field
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import liquibase.structure.core.Column
+import liquibase.pro.packaged.id
 import java.time.Instant
-@Document(collection = "suscripciones")
-data class Suscripciones(
+
+@Document(collection="puntos_accesos")
+data class PuntosAccesos(
     @Id
+    val id:ObjectId? = null,
+    @Field("CODIGO")
+    val codigo:Number = 0,
+    @Field("COD_MUNICIPIO")
+    val codMunicipio:Number = 0,
+    @Field("NOMBRE")
+    val nombre:String = "",
+    @Field("IP")
+    val ip:String = "",
+    @Field("ESTADO")
+    val estado:String = "",
+    @Field("PUERTO")
+    val puerto:Number = 0,
+    @Field("USUARIO_TORRE")
+    val usuarioTorre:String = "",
+    @Field("CLAVE_TORRE")
+    val claveTorre:String = "",
+    @Field("GESTION_USUARIOS")
+    val gestionUsuarios:String = "",
+    @Field("LOCAL_ADDRESS")
+    val localAddress:String = ""
+){}
+
+@Document(collection = "suscripciones")
+data class Suscripcion(
+    @Id
+    @Field("_id")
     val id: ObjectId? = null,
-    val CODIGO: Int,
-    val FECHA_CREACION: Instant,
-    val REFERENCIA: Long,
-    val IDENTIFICACION: Long,
-    val COD_MUNICIPIO_INSTALACION: Int,
-    val COD_BARRIO_INSTALACION: Int,
-    val DIR_INSTALACION: String,
-    val COD_MUNICIPIO_CORRESPONDENCIA: Int,
-    val COD_BARRIO_CORRESPONDENCIA: Int,
-    val DIR_CORRESPONDENCIA: String,
-    val TIPO_VIVIENDA: String,
-    val ESTRATO: Int,
-    val ESTADO: String,
-    val FECHA_ESTADO: Instant
-)
+    @Field("CODIGO")
+    val codigo: Int?= 0,
+    @Field("FECHA_CREACION")
+    val fechaCreacion: String? = "",
+    @Field("REFERENCIA")
+    val referencia: Number? = 0,
+    @Field("IDENTIFICACION")
+    val identificacion: Number? = 0,
+    @Field("COD_MUNICIPIO_INSTALACION")
+    val codMunicipioInstalacion : Int? = 0,
+    @Field("COD_BARRIO_INSTALACION")
+    val codBarrioInstalacion: Int? = 0,
+    @Field("DIR_INSTALACION")
+    val dirInstalacion: String? = "",
+    @Field("COD_MUNICIPIO_CORRESPONDENCIA")
+    val codMunicipioCorrespondencia: Int? = 0,
+    @Field("COD_BARRIO_CORRESPONDENCIA")
+    val codBarrioCorrespondencia: Int? = 0,
+    @Field("DIR_CORRESPONDENCIA")
+    val dirCorrespondencia: String? = "",
+    @Field("TIPO_VIVIENDA")
+    val tipoVivienda: String? = "",
+    @Field("ESTRATO")
+    val estrato: Int? = 0,
+    @Field("ESTADO")
+    val estado: String? = "",
+    @Field("FECHA_ESTADO")
+    val fechaEstado: String?  =""
+){}
 
 @Document(collection = "barrios")
-data class Barrios(       
+data class Barrios(
     @Id
     var id: ObjectId? = null,
-    var COD_MUNICIPIO: Number = 0, 
+    var COD_MUNICIPIO: Number = 0,
     var COD_PUNTO_ACCESO: Number = 0,
     var NOMBRE: String ="",
     var ESTADO: String =""
@@ -42,16 +85,73 @@ data class Barrios(
 data class PaquetesVenta(
     @Id
     var id:ObjectId? = null,
-    var CODIGO:Number  =0,
-    var COD_SERVICIO:Number = 0,
-    var COD_PERFIL : Number = 0,
-    var DESCRIPCION: String = "",
-    var PRECIO: Number = 0,
-    var IVA : Number = 0,
-    var ESTADO: String = "",
-    var VALOR_DERIVACION: Number = 0,
-    var COD_CONCEPTO: Number = 0,
-    var PREPAGO:Number = 0
+    @Field("CODIGO")
+    var codigp:Number?  =0,
+    @Field("COD_SERVICIO")
+    var codServicio:Number? = 0,
+    @Field("COD_PERFIL")
+    var codPerfil : Number? = 0,
+    @Field("DESCRIPCION")
+    var descripcion: String? = "",
+    @Field("PRECIO")
+    var precio: Number? = 0,
+    @Field("IVA")
+    var iva : Number? = 0,
+    @Field("ESTADO")
+    var estado: String? = "",
+    @Field("VALOR_DERIVACION")
+    var valorDerivacion: Number? = 0,
+    @Field("COD_CONCEPTO")
+    var codConcepto: Number? = 0,
+    @Field("PREPAGO")
+    var prepago:Number? = 0,
+    var contenido_paquete_venta:List<ContenidoVenta>? = emptyList()
+){}
+
+
+@Document(collection="contenido_paquete_venta")
+data class ContenidoVenta(
+    @Id
+    var id:ObjectId? = null,
+    @Field("CODIGO")
+    var codigo : Number = 0,
+    @Field("COD_SERVICIO")
+    var codServicio:Number = 0,
+    @Field("COD_PAQUETE_VENTA")
+    var codPaqueteVenta:Number = 0,
+    @Field("COD_PAQUETE")
+    var codPaquete:Number = 0,
+    @Field("COD_CANAL")
+    var codCanal:Number = 0,
+    @Field("COD_VELOCIDAD")
+    var codVelocidad:Number = 0,
+    var velocidad:Velocidades? = null
+){}
+
+@Document(collection="velocidades")
+data class Velocidades(
+    @Id
+    var id:ObjectId? = null,
+    @Field("CODIGO")
+    var codigo:Number  = 0,
+    @Field("NOMBRE")
+    var nombre:String = "",
+    @Field("PERFIL")
+    var perfil:String? = "",
+    @Field("TIMPO_LIMITE_INACTIVIDAD")
+    var tiempoLimiteInactividad:String ="",
+    @Field("TIEMPO_LIMITE_CONEXION")
+    var tiempoLimiteConexion:String = "",
+    @Field("ACTUALIZACION_AUTOMATICA")
+    var actualizacionAutomatica:String = "",
+    @Field("NUMERO_CLIENTES_COMPARTIR")
+    var numeroClientesCompartir:Number = 0,
+    @Field("VELOCIDA_LIMITE_SUBIDA")
+    var velocidadLimiteSubida:Number = 0,
+    @Field("VELOCIDAD_LIMITE_DESCARGA")
+    var velocidadLimiteDescarga:Number = 0 ,
+    @Field("ESTADO")
+    var estado:String = ""
 ){}
 
 @Document(collection="perfiles")
@@ -131,5 +231,7 @@ data class EquiposAsignados(
     @Field("DTO_ESPECIAL")
     var dtoEspecial:String  ="",
     @Field("CANT_IP")
-    var cantIp:String  =""
+    var cantIp:String  ="",
+    var suscripcion : Suscripcion?,
+    var paquete_venta: PaquetesVenta?
 ){}

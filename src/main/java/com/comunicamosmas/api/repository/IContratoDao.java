@@ -1,20 +1,19 @@
 package com.comunicamosmas.api.repository;
 
 import com.comunicamosmas.api.domain.Contrato;
-import com.comunicamosmas.api.service.dto.DatosClienteDTO;
-import com.comunicamosmas.api.service.dto.ListContratoDTO; 
 
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
-public interface IContratoDao extends CrudRepository<Contrato, Long> {
+@Repository
+public interface IContratoDao extends JpaRepository<Contrato, Long> {
     @Query( value = """
-		SELECT  
+		SELECT
         mun.municipio as nombreMunicipio,
         ser.nombre as nombreServicio,
         co.id_contrato as idContrato,
@@ -37,7 +36,7 @@ public interface IContratoDao extends CrudRepository<Contrato, Long> {
         INNER JOIN lista_municipios mun ON mun.id_municipio = dir.municipio
 		INNER JOIN deudas deudasb ON deudasb.id_contrato = co.id_contrato
         WHERE clientes.id_cliente = :idCliente
-		GROUP BY 
+		GROUP BY
     mun.municipio,
     ser.nombre,
     co.id_contrato,
@@ -52,9 +51,9 @@ public interface IContratoDao extends CrudRepository<Contrato, Long> {
     dir.numero,
     dir.nota,
     co.estado
-		""",        nativeQuery = true )	
+		""",        nativeQuery = true )
     public List<Object[]> findByIdCliente(@Param("idCliente") Long idCliente);
-    
+
     /**
      * consultar para cargar los datos de conctacto del cliente*/
     @Query(value="SELECT \n"
@@ -88,10 +87,10 @@ public interface IContratoDao extends CrudRepository<Contrato, Long> {
     public List<Object[]> datosClienteByIdContrato(@Param(value="idContrato") Long idContrato);
 
 	@Query(value = """
-			select 
+			select
 			co.id_contrato,
 			cli.tipo_cliente,
-			CASE 
+			CASE
 				when cli.tipo_cliente = "N" THEN concat(cli.nombre_primer ,' ', cli.apellido_paterno ) ELSE cli.razon_social
 				end as name_cliente,
 			s.nombre as name_servicio,
@@ -99,7 +98,7 @@ public interface IContratoDao extends CrudRepository<Contrato, Long> {
 			, ' ' , di.numero , ' / ', di.nota ) as direccion,
 			sum(d.valor_parcial) as parcial,
 			sum(d.valor_total) as total
-			from contratos co 
+			from contratos co
 			inner join clientes cli on cli.id_cliente = co.id_cliente
 			inner join deudas d on d.id_contrato = co.id_contrato
 			inner join servicios s on s.id_servicio = co.id_servicio
@@ -107,7 +106,7 @@ public interface IContratoDao extends CrudRepository<Contrato, Long> {
 			where co.id_contrato in (:list) GROUP BY co.id_contrato
 			""", nativeQuery = true)
 	public List<Object[]> findClienteByListContrato(@Param("list") List<Long> contratos);
-    
+
     /**
      * utilizado para informacion de factura encabezado*/
     @Query(value="SELECT  \n"
@@ -237,7 +236,7 @@ public interface IContratoDao extends CrudRepository<Contrato, Long> {
 	+ "	ON direcciones.municipio = lista_municipios.id_municipio\n"
 	+ "LEFT JOIN\n"
 	+ "  lista_departamentos\n"
-	+ "	ON direcciones.departamento = lista_departamentos.id_departamento  \n"                            
+	+ "	ON direcciones.departamento = lista_departamentos.id_departamento  \n"
 	+ "LEFT JOIN\n"
 	+ "	tarifas ta\n"
 	+ "	ON co.id_tarifa = ta.id_tarifa    \n"
@@ -247,7 +246,7 @@ public interface IContratoDao extends CrudRepository<Contrato, Long> {
 	+ "LEFT JOIN estaciones ON co.id_estacion = estaciones.id_estacion \n"
 	+ "LEFT JOIN\n"
 	+ "		usuarios usr\n"
-	+ "		ON co.id_vendedor = usr.id_usuario\n"	 
+	+ "		ON co.id_vendedor = usr.id_usuario\n"
 	+ "WHERE co.id_servicio IN (:servicios) \n"
 	+"AND co.grupo IN (:origen)\n"
 	+ "AND co.estado IN (:estados) \n"
@@ -255,5 +254,25 @@ public interface IContratoDao extends CrudRepository<Contrato, Long> {
 	+ "co.id_contrato" , nativeQuery=true)
 	public Optional<List<Object[]>> carteraByidServicio(@Param("servicios") List<Integer> servicios , @Param("estados") List<String> estados, @Param("origen") List<String> origen);
 
- 
+
+    @Query(value= """
+        SELECT
+            co.id_contrato,co.id_servicio, co.id_tecnologia,co.id_ciudad,co.id_empresa,
+            COUNT(DISTINCT de.mes_servicio) AS cantidad_meses_servicio
+        FROM contratos co
+        INNER JOIN deudas de ON de.id_contrato = co.id_contrato
+        WHERE
+            co.estado = 1
+            AND co.id_servicio = :service
+            AND de.estado IN (1,3)
+            AND de.instalacion = ''
+            AND de.reconexion = ''
+            AND de.materiales = ''
+            AND de.traslado = ''
+            AND de.otros = ''
+        GROUP BY co.id_contrato
+        """, nativeQuery = true)
+    public List<Object[]> listContratoByCorteMasivamente(@Param("service") Long service);
+
+
 }
