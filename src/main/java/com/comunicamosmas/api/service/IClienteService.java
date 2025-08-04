@@ -1,15 +1,13 @@
 package com.comunicamosmas.api.service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.List; 
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.comunicamosmas.api.domain.Cliente;
 import com.comunicamosmas.api.service.dto.ClienteDTO;
-import com.comunicamosmas.api.service.dto.ClientePortalWebDTO;
-import com.comunicamosmas.api.service.dto.ClientesDeclineClausuraDTO;
+import com.comunicamosmas.api.service.dto.ClientePortalWebDTO; 
 
 public interface IClienteService {
     //listar todos

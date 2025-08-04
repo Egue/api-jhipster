@@ -218,7 +218,7 @@ public class ClienteServiceImpl implements IClienteService {
         client.setNombreSegundo((String) obj.getNombreSegundo());
         client.setNombresRep((String) obj.getNombresRep());
         client.setApellidosRep((String) obj.getApellidosRep());
-        client.setIdDocumento((String) obj.getIdDocumento() );
+        client.setIdDocumento((Integer) obj.getIdDocumento() );
         client.setDocumento((Long) obj.getDocumento());
         client.setDv((Long) obj.getDv());
         client.setTelefono((Long) obj.getTelefono());

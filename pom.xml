@@ -97,6 +97,13 @@
 	</dependencyManagement>
 
 	<dependencies>
+	<!--SSH-->
+	<dependency>
+    <groupId>com.github.mwiede</groupId>
+    <artifactId>jsch</artifactId>
+    <version>0.2.26</version>
+</dependency>
+	<!---->
 <!--oktt-->
 <dependency>
     <groupId>com.squareup.okhttp3</groupId>
@@ -123,6 +130,13 @@
             <artifactId>kotlin-reflect</artifactId>
         </dependency>
 	<!--kotlin-->
+	<!-- OpenCSV -->	
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>5.9</version>
+		</dependency>
+
 	
 	<!--Cache redis-->
 	<dependency>

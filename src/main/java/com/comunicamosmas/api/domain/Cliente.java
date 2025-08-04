@@ -50,7 +50,7 @@ public class Cliente implements Serializable {
     private String apellidosRep;
 
     @Column(name = "id_documento")
-    private String idDocumento;
+    private Integer idDocumento;
 
     private Long documento;
 
@@ -194,11 +194,11 @@ public class Cliente implements Serializable {
         this.apellidosRep = apellidosRep;
     }
 
-    public String getIdDocumento() {
+    public Integer getIdDocumento() {
         return idDocumento;
     }
 
-    public void setIdDocumento(String idDocumento) {
+    public void setIdDocumento(Integer idDocumento) {
         this.idDocumento = idDocumento;
     }
 

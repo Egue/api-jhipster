@@ -7,13 +7,15 @@ public class ListContratoDTO {
 	private String barrio;
 	private String direccion;
 	private String estado;
+	private Double parcial;
+	private Double total;
 	
 	public ListContratoDTO() {
 		
 	}
 
 	public ListContratoDTO(String nombreMunicipio, String nombreServicio, Integer idContrato, String barrio,
-			String direccion, String estado) {
+			String direccion, String estado , Double parcial , Double total) {
 		 
 		this.nombreMunicipio = nombreMunicipio;
 		this.nombreServicio = nombreServicio;
@@ -21,6 +23,26 @@ public class ListContratoDTO {
 		this.barrio = barrio;
 		this.direccion = direccion;
 		this.estado = estado;
+		this.parcial = parcial;
+		this.total = total;
+	}
+
+	
+
+	public Double getParcial() {
+		return parcial;
+	}
+
+	public void setParcial(Double parcial) {
+		this.parcial = parcial;
+	}
+
+	public Double getTotal() {
+		return total;
+	}
+
+	public void setTotal(Double total) {
+		this.total = total;
 	}
 
 	public String getNombreMunicipio() {

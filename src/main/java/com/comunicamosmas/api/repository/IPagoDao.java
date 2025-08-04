@@ -19,6 +19,21 @@ public interface IPagoDao extends CrudRepository<Pago, Long> {
 			+ " FROM pagos where pagos.id_deuda = :idDeuda" , nativeQuery=true)
 	public List<Object[]> findByIdDeuda(@Param("idDeuda") Integer idDeuda);
 
+	@Query(value= """
+			SELECT 
+			p.id_recibo_caja,
+			p.valor_cobro,
+			p.marca,
+			p.turno,
+			mp.nombre,
+			concat(u.nombre, ' ',u.apellidos ) as cajero
+ 			FROM pagos p
+ 			INNER JOIN medios_pago mp on mp.id_medio_pago = p.id_medio_pago
+ 			INNER JOIN usuarios u on u.id_usuario = p.id_cajero
+ 			WHERE p.id_contrato = :idContrato AND p.id_recibo_caja = :rc
+			""", nativeQuery = true)
+	public Optional<List<Object[]>> pagoInfo(@Param("idContrato") Long idContrato , @Param("rc") Long rc);
+
 	@Query(value = "SELECT \n" + //
 			"\t\tpag.id_recibo_caja AS id_recibo_caja, \n" + //
 			"\t\tpag.marca AS marca,\n" + //

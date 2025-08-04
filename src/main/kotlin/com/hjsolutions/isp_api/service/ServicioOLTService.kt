@@ -12,7 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference
 
 @Service
-class ServicioService(
+class ServicioOLTService(
     private val contratoService: IContratoService,
     private val estacionService: IEstacionService,
     private val winmax:IWinmaxPassService,
