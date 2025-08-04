@@ -94,6 +94,9 @@ public class Estacion implements Serializable {
 
     private Long estado;
 
+    //mikrotik - olt
+    private String type;
+
     //private String marca;
 
     public Long getId() {
@@ -334,6 +337,15 @@ public class Estacion implements Serializable {
 
     public void setEstado(Long estado) {
         this.estado = estado;
+    }
+
+    public void setType(String type){
+        this.type = type;
+    }
+
+    public String getType()
+    {
+        return this.type;
     }
 
    /* public String getMarca() {
