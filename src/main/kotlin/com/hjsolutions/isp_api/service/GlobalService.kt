@@ -10,8 +10,12 @@ import java.io.ByteArrayOutputStream
 import org.springframework.beans.factory.annotation.Autowired
 import com.comunicamosmas.api.repository.UserRepository
 import com.comunicamosmas.api.security.SecurityUtils
+import com.comunicamosmas.api.domain.Contrato
+import com.comunicamosmas.api.repository.IContratoHistoricoEstadoDao
+import com.comunicamosmas.api.domain.ContratoHistoricoEstado
 @Service
 class GlobalService( 
+    private val contratoHistoricoEstadoDao: IContratoHistoricoEstadoDao,
 ) {
 
     @Autowired
@@ -70,5 +74,19 @@ class GlobalService(
         val md = java.security.MessageDigest.getInstance("MD5")
         val digest = md.digest(input.toByteArray())
         return digest.joinToString("") { "%02x".format(it) }
+    }
+
+    fun changeStatusContrato(contrato:Contrato , estado:Long){
+
+        var contratoHistorico = ContratoHistoricoEstado()
+        contratoHistorico.idContrato = contrato.id
+        contratoHistorico.idEstadoEstaba = contrato.estado
+        contratoHistorico.idEstadoEntra = estado
+        contratoHistorico.fechaf = java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd")).toLong()
+        contratoHistorico.idServicio = contrato.idServicio
+        contratoHistorico.idEmpresa = contrato.idEmpresa
+        contratoHistorico.idCiudad = contrato.idCiudad
+
+        contratoHistoricoEstadoDao.save(contratoHistorico)
     }
 }

@@ -96,7 +96,8 @@ public class ContratoServiceImpl implements IContratoService {
 			contratoDTO.setBarrio((String) row[3]);
 			contratoDTO.setDireccion((String) row[4]);
 			contratoDTO.setEstado((String) row[5]);
-
+			contratoDTO.setParcial((Double) row[7]);
+			contratoDTO.setTotal((Double) row[6]);
 			listContratoDTO.add(contratoDTO);
 		}
 		return listContratoDTO;
