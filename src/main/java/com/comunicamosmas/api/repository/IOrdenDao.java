@@ -302,5 +302,31 @@ Page<Object[]> findOrdenesDetalladas(
         """, nativeQuery = true)
     public List<Orden> findOrdenCorteAndReconexionExist(@Param("contratos") List<Long> contratos);
 
+    @Query(value = """
+        SELECT\s
+        o.id_orden ,
+        o.causa_solicitud,
+        case\s
+        	when cli.tipo_cliente = 'J' THEN concat(cli.razon_social ,' / ' , cli.documento)
+            when cli.tipo_cliente = 'N' THEN concat(cli.nombre_primer, ' ', cli.nombre_segundo , ' ', cli.apellido_paterno , ' / ', cli.documento)
+        end as cliente,
+        concat(di.tipo, ' / ', di.a_tipo, ' ', di.a_numero, di.a_letra , ' ', di.b_tipo, ' ',di.b_numero , di.b_letra, ' ',di.numero , ' / ', di.barrio) as direccion ,\s
+        o.fechaf_registra,
+        o.fechaf_asigna,
+        o.fechaf_asiste,
+        o.id_usuario_ejecuta,
+        o.nota,
+        o.id_contrato
+        FROM ordenes o
+         inner join clientes cli on cli.id_cliente = o.id_cliente
+         inner join direcciones di on di.id_direccion = o.id_direccion
+        inner join ordenes_estados oe on oe.id_estado = o.tipo_orden
+        where o.tipo_orden = :tipo and
+        o.id_servicio = :servicio and
+        o.anulada = '0' and
+        o.estado in (0,1,2);
+        """, nativeQuery = true)
+    public List<Object[]> findOrdenes(@Param("servicio") Long servicio, @Param("tipo") Long tipo);
+
 
 }

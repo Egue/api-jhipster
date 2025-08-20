@@ -5,6 +5,7 @@ import com.comunicamosmas.api.domain.Contrato;
 import java.util.List;
 import java.util.Optional;
 
+import liquibase.pro.packaged.P;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -273,6 +274,13 @@ public interface IContratoDao extends JpaRepository<Contrato, Long> {
         GROUP BY co.id_contrato
         """, nativeQuery = true)
     public List<Object[]> listContratoByCorteMasivamente(@Param("service") Long service);
+
+    @Query(value = """
+        select cli.celular_a , cli.celular_b from clientes cli
+                            inner join contratos co on co.id_cliente = cli.id_cliente
+                            where co.id_servicio = :service and co.estado = :estado
+        """, nativeQuery = true)
+    public List<Object[]> listNumberbyidService(@Param("service") Long service , @Param("estado") Long estado);
 
 
 }

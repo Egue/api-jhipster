@@ -1,6 +1,6 @@
 package com.comunicamosmas.api.service;
- 
-import com.comunicamosmas.api.domain.OrdenEstado; 
+
+import com.comunicamosmas.api.domain.OrdenEstado;
 import com.comunicamosmas.api.repository.IOrdenEstadoDao;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ public class OrdenEstadoServiceImpl implements IOrdenEstadoService {
 
 	@Autowired
 	IOrdenEstadoDao ordenEstadoDao;
-	
+
 	@Override
 	public List<OrdenEstado> findAll() {
 		// TODO Auto-generated method stub
@@ -55,24 +55,25 @@ public class OrdenEstadoServiceImpl implements IOrdenEstadoService {
 	}
 
 	@Override
-	public Optional<List<OrdenEstado>> find(Long client, Long estacion , Long reservada) {
+	public Optional<List<OrdenEstado>> find(String type , Long reservada, Long estado) {
 		// TODO Auto-generated method stub
 		//buscar por estado y estacion 0
-		 if(estacion == 1)
+		 if(type.equals("E"))
 		 {
-			return ordenEstadoDao.findByEstadoAndEstacion(1L, estacion);
-		 }else{
+			return ordenEstadoDao.findByEstadoAndEstacion(estado, 1L);
+		 }else if(type.equals("C")  && reservada == 0){
 			 //buscar por estado y reservada y estacion 0
-			 if(reservada == 1)
-			 {
-				 return ordenEstadoDao.findByEstadoAndReservadaAndEstacion(client , reservada , estacion);
-			 }
+
+				 return ordenEstadoDao.findByEstadoAndEstacion(estado , 0L);
+
 			 //buscar por estado y estacion 0
-			return ordenEstadoDao.findByEstadoAndEstacion(client , estacion);
+
 		 }
-			
-		 
+
+         return Optional.empty();
+
+
 	}
 
-     
+
 }

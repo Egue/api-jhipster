@@ -16,8 +16,8 @@ public interface IOrdenEstadoService {
 
     //buscar por id
     public OrdenEstado findById(Long id);
-    
+
     public List<OrdenEstado>findAllByEstadoAndCliente(String rol);
 
-    public Optional<List<OrdenEstado>> find(Long client, Long estacion , Long reservada);
+    public Optional<List<OrdenEstado>> find(String type, Long reservada , Long estado);
 }

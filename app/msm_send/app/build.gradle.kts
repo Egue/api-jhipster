@@ -56,4 +56,10 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation("androidx.compose.material:material-icons-extended-android:1.7.8")
+    implementation("androidx.navigation:navigation-compose:2.9.3")
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.6.4")
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
+    implementation("com.google.dagger:hilt-android-gradle-plugin:2.50")
 }
