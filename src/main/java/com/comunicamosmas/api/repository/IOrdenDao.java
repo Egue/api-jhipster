@@ -328,5 +328,25 @@ Page<Object[]> findOrdenesDetalladas(
         """, nativeQuery = true)
     public List<Object[]> findOrdenes(@Param("servicio") Long servicio, @Param("tipo") Long tipo);
 
+    @Query(value = """
+        SELECT numero_a FROM ordenes o  WHERE o.refiere = :refiere AND o.id_empresa = :empresa ORDER BY numero_a DESC LIMIT 0,1
+        """, nativeQuery = true)
+    public Long findLastRefiereA(@Param("refiere") String refiere , @Param("empresa") Long idEmpresa);
+
+    @Query(value = """
+        SELECT numero_b FROM ordenes o  WHERE o.refiere = :refiere AND o.id_empresa = :empresa ORDER BY numero_b DESC LIMIT 0,1
+        """, nativeQuery = true)
+    public Long findLastRefiereB(@Param("refiere") String refiere , @Param("empresa") Long idEmpresa);
+
+    @Query(value = """
+        SELECT 1 FROM ordenes o WHERE o.tipo_orden = :type and o.estado IN (0,1,2) and o.anulada =0 AND o.abierta = 1 and o.id_contrato = :idContrato LIMIT 1
+        """, nativeQuery = true)
+    public Integer existByAbierta(@Param("idContrato") Long idContrato, @Param("type") Long type);
+
+    @Query(value = """
+        SELECT 1 FROM ordenes o WHERE o.id_contrato = :idContrato AND o.tipo_orden IN (:type) AND o.abierta = 1 AND o.anulada = '0'
+        """, nativeQuery = true)
+    public Integer existOrdenByStatus(@Param("idContrato") Long idContrato , @Param("type") List<Integer> type);
+
 
 }

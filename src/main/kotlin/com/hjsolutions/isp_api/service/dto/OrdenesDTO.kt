@@ -14,3 +14,12 @@ data class OrdenesDTO(
     val nota:String,
     val contrato:Long
 ): Serializable {}
+
+data class createDTO(
+    var typeTransfer: Long = 0,
+    var idContrato:Long = 0,
+    var observation:String = "",
+    var userId:Long = 0,
+    var typeOrden : Long = 0,
+    var idEstacion:Long = 0
+): Serializable{}

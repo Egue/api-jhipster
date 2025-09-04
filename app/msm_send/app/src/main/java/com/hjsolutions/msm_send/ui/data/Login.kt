@@ -6,16 +6,16 @@ data class LoginRequest(
 )
 
 data class LoginResponse(
-    val id_token:String,
-    val usario:Usuario
+    val id_token:String?,
+    val usuario:Usuario?
 )
 
 data class Usuario(
-    val id:Number,
-    val login:String,
-    val firtsName:String,
-    val lastName: String,
-    val email: String,
-    val activated:Boolean,
-    val rol:String
+    val id:Number?,
+    val login:String?,
+    val firtsName:String?,
+    val lastName: String?,
+    val email: String?,
+    val activated:Boolean?,
+    val rol:String?
 )

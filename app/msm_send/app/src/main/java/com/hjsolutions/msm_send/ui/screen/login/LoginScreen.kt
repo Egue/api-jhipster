@@ -35,9 +35,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 
 @Composable
-fun LoginScreen(navController: NavController ,  viewModel: LoginViewModel = viewModel())
+fun LoginScreen(navController: NavController ,  loginViewModel: LoginViewModel)
 {
-    val state by viewModel.loginState.collectAsState()
+    val state by loginViewModel.loginState.collectAsState()
 
     Surface(modifier = Modifier.fillMaxSize(), color = Purple40) {
 
@@ -56,7 +56,7 @@ fun LoginScreen(navController: NavController ,  viewModel: LoginViewModel = view
             Text(text = "Mensajeria Automatizada" , color =  PurpleGrey80 )
 
             CardLoginScreen(onClickLogin = { username , password ->
-                viewModel.login(username , password)
+                loginViewModel.login(username , password)
             })
 
             when(state){

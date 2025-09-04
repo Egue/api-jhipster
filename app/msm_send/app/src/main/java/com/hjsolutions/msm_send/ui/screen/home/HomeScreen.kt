@@ -1,6 +1,7 @@
 package com.hjsolutions.msm_send.ui.screen.home
 
 import android.content.res.Resources.Theme
+import android.provider.Telephony.Sms
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clipScrollableContainer
 import androidx.compose.foundation.layout.Arrangement
@@ -31,13 +32,15 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hjsolutions.msm_send.ui.theme.Pink40
 import com.hjsolutions.msm_send.ui.theme.Pink80
 import com.hjsolutions.msm_send.ui.theme.Purple40
 import com.hjsolutions.msm_send.ui.theme.PurpleGrey80
+import com.hjsolutions.msm_send.ui.viewmodels.SmsViewModel
 
 @Composable
-fun HomeScreen(){
+fun HomeScreen(smsViewModel: SmsViewModel){
 
       Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
           Column(
@@ -65,19 +68,22 @@ fun HomeScreen(){
               Text("Obtén los números y mensajes desde la API")
 
               ButtonDownLoadFile(onClick = {
-                  println("ok")
+                  smsViewModel.downloadCampaigns()
               })
 
 
           }
 
           Spacer(modifier = Modifier.height(16.dp))
-          Row(
+          SmsCampaignScreen(smsViewModel = smsViewModel)
+
+
+          /*Row(
               modifier = Modifier.fillMaxWidth(),
               horizontalArrangement = Arrangement.SpaceBetween) {
               Text(text = "Mensajes" , fontWeight = FontWeight.Bold)
               Text(text = "3 pendientes" , fontWeight = FontWeight.Bold)
-          }
+          }*/
 
       }
 }

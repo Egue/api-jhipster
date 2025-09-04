@@ -24,9 +24,10 @@ import com.hjsolutions.msm_send.ui.componets.TopBarHome
 import com.hjsolutions.msm_send.ui.screen.home.HomeScreen
 import com.hjsolutions.msm_send.ui.theme.Purple40
 import com.hjsolutions.msm_send.ui.theme.Purple80
+import com.hjsolutions.msm_send.ui.viewmodels.SmsViewModel
 
 @Composable
-fun MainApp(){
+fun MainApp(smsViewModel : SmsViewModel){
     val navController = rememberNavController()
 
     val bottomNavItem = listOf(
@@ -35,6 +36,7 @@ fun MainApp(){
         BottomNavItem("Historial" , Icons.Default.History , "historial")
     )
     Scaffold(
+        contentColor = Color.White,
         topBar = {
             TopBarHome()
         },
@@ -57,8 +59,9 @@ fun MainApp(){
             }
         },
         content = {innerPaddin ->
+
             NavHost(navController = navController, startDestination = "home", modifier = Modifier.padding(innerPaddin)){
-                composable("home") { HomeScreen() }
+                composable("home") { HomeScreen(smsViewModel = smsViewModel) }
             }
         }
     )

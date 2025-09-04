@@ -4,17 +4,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.compose.rememberNavController
+import androidx.activity.viewModels
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.hjsolutions.msm_send.ui.navigation.NavGraph
-import com.hjsolutions.msm_send.ui.screen.home.HomeScreen
+import com.hjsolutions.msm_send.ui.screen.login.LoginViewModel
 import com.hjsolutions.msm_send.ui.theme.Msm_sendTheme
+import com.hjsolutions.msm_send.ui.viewmodels.SmsViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,7 +24,9 @@ class MainActivity : ComponentActivity() {
                     )
                 }*/
                 //HomeScreen()
-                NavGraph( )
+                val loginViewModel : LoginViewModel by viewModels()
+                val smsViewModel : SmsViewModel by viewModels()
+                NavGraph(loginViewModel = loginViewModel , smsViewModel = smsViewModel )
             }
         }
     }

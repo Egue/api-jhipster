@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.ksp)
 }
 
 android {
@@ -62,4 +63,8 @@ dependencies {
     implementation ("com.squareup.retrofit2:converter-gson:2.6.4")
     implementation ("com.squareup.okhttp3:logging-interceptor:4.9.3")
     implementation("com.google.dagger:hilt-android-gradle-plugin:2.50")
+    implementation("androidx.room:room-runtime:2.7.2")
+    implementation("androidx.room:room-ktx:2.7.2")
+    implementation("androidx.work:work-runtime-ktx:2.10.3")
+    ksp("androidx.room:room-compiler:2.7.2")
 }

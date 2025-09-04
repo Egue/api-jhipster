@@ -29,7 +29,7 @@ import com.hjsolutions.msm_send.ui.theme.Purple40
 @Composable
 fun TopBarHome()
 {
-    Box(modifier = Modifier.fillMaxWidth().background(Purple40)) {
+    Box(modifier = Modifier.fillMaxWidth().background(Purple40).padding(top = 10.dp)) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween ,
             verticalAlignment = Alignment.CenterVertically,

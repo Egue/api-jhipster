@@ -31,12 +31,12 @@ spring:
     serialization:
       indent-output: true
   datasource:
-    #url: jdbc:mysql://10.112.109.2:3306/controlmas?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
-    url: jdbc:mysql://192.168.131.11:33311/controlmas_ju30?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
-    #username: LNWW(345
-    username: root
-    #password: 9C9UAaqKecHRZA79
-    password: mysql1234
+    url: jdbc:mysql://10.112.109.2:3306/controlmas?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+    #url: jdbc:mysql://192.168.131.11:33311/controlmas_ju30?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC&createDatabaseIfNotExist=true
+    username: LNWW(345
+    #username: root
+    password: 9C9UAaqKecHRZA79
+    #password: mysql1234
     driver-class-name: com.mysql.jdbc.Driver
     hikari:
       poolName: Hikari
@@ -48,7 +48,8 @@ spring:
         useServerPrepStmts: true
   data:
     mongodb:
-      uri: mongodb://root:mongo12FbKill@localhost:27017/inconnection?minPoolSize=5&maxPoolSize=20&maxIdleTimeMS=30000
+      #uri: mongodb://root:mongo12FbKill@localhost:27017/inconnection?minPoolSize=5&maxPoolSize=20&maxIdleTimeMS=30000
+      uri: mongodb://root:mongo12FbKill@10.112.109.3:27017/inconnection?minPoolSize=5&maxPoolSize=20&maxIdleTimeMS=30000
   jpa:
   hibernate:
     use-new-id-generator-mappings: true
