@@ -244,9 +244,9 @@ public class ContratoServiceImpl implements IContratoService {
 		datos.setId_cliente(infoAdd.getId_cliente());
 		datos.setVigencia(infoAdd.getVigencia());
 		datos.setComentario(infoAdd.getComentario());
-		  
-		
-		Cliente cliente = clienteDao.getClientByIdContrato(idContrato);		
+
+
+		Cliente cliente = clienteDao.getClientByIdContrato(idContrato);
 		String reconexion = cliente.getTipoCliente().equals("N") ? "15000" : "50000";
 		datos.setReconexion(reconexion);
 		ContratosFirmasDTO.DatosSuscriptor suscriptor = contratoFirmas.new DatosSuscriptor();
@@ -258,7 +258,7 @@ public class ContratoServiceImpl implements IContratoService {
 		String nameCliente = cliente.getTipoCliente().equals("N") ? cliente.getApellidoPaterno() + " "+cliente.getApellidoMaterno() +" " + cliente.getNombrePrimer() +" " +cliente.getNombreSegundo() : cliente.getRazonSocial();
 		suscriptor.setNombre(nameCliente);
 		datos.setDatos_suscriptor(suscriptor);
-		//contacto		 
+		//contacto
 		datos.setDatos_contacto(direccionService.findInfoByFimra(idContrato));
 		//datos servicios
 		ContratosFirmasDTO.DatosServicio servicio = contratoFirmas.new DatosServicio();
@@ -279,7 +279,7 @@ public class ContratoServiceImpl implements IContratoService {
 		LocalDate finale = initial.plusMonths(Integer.parseInt(infoAdd.getVigencia()));
 		clausura.setFin(finale.toString());
 		clausura.setInicio(infoAdd.getRegistro());
-		clausura.setMes_1(clau.getMes1());
+		clausura.setMes_1(clau.getMes1().toString());
 		clausura.setMes_2(clau.getMes2().toString());
 		clausura.setMes_3(clau.getMes3().toString());
 		clausura.setMes_4(clau.getMes4().toString());
@@ -298,7 +298,7 @@ public class ContratoServiceImpl implements IContratoService {
 		save.setId_cliente(infoAdd.getId_cliente());
 		save.setIdServicio(infoAdd.getIdServicio());
 		save.setDatosContrato(datos);
-		
+
 		portalWebService.sincroniceContratos(save, token);
 
 		return datos;
