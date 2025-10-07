@@ -22,9 +22,9 @@ class LoginViewModel() : ViewModel() {
     private val loginRepository = LoginRepository()
     var uiState by mutableStateOf(AuthUiState())
 
-    init {
+    /*init {
         checkout()
-    }
+    }*/
 
     private fun checkout() {
 
@@ -53,6 +53,7 @@ class LoginViewModel() : ViewModel() {
             uiState = uiState.copy(isLoading = true, errorMessage = null)
             loginRepository.login(email = email, password = password)
                 .onSuccess {
+
                     checkout()
                 }.onFailure { error ->
                     uiState = uiState.copy(isLoading = true, errorMessage = error.message)

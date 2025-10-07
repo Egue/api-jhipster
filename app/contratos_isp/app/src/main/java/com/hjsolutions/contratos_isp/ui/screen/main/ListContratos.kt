@@ -40,7 +40,9 @@ import androidx.compose.runtime.getValue
 fun ListContratos(
     contratosViewModel: ContratosViewModel,
     implementacion: String,
-    onViewPdf:(path:String) -> Unit) {
+    onViewPdf:(path:String) -> Unit ,
+    onSignature:(url:String) -> Unit
+    ) {
 
     val uiState by contratosViewModel.uiState.collectAsState()
     Column(

@@ -117,6 +117,9 @@ fun MainScreen(
                     Log.d("MainScreen", "${path}")
                     //contratosViewModel.navigateToPdf(url = path , title = "Contrato ISP")
                     navController.navigate("pdf_viewer/${Uri.encode(path)}")
+                },
+                onSignature = {
+                    navController.navigate("signature")
                 }
                 )
         }

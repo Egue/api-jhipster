@@ -1,5 +1,6 @@
 package com.hjsolutions.contratos_isp.data.repository
 
+import android.util.Log
 import com.hjsolutions.contratos_isp.api.client.AppWriteClient
 import io.appwrite.exceptions.AppwriteException
 import io.appwrite.models.Session
@@ -20,10 +21,12 @@ class LoginRepository {
     suspend fun login(email: String, password: String): Result<Session> {
         return withContext(Dispatchers.IO) {
             try {
+                Log.e("GetCurrentLogin" , "entro aca")
                 val sesion = account.createEmailPasswordSession(
                     email = email,
                     password = password
                 )
+                Log.e("GetCurrentLogin" , "${sesion}")
                 Result.success(sesion)
             } catch (e: AppwriteException) {
                 when (e.code) {
@@ -39,8 +42,10 @@ class LoginRepository {
 
     suspend fun getCurrentUser(): Result<User<Map<String, Any>>> {
         return withContext(Dispatchers.IO) {
+            Log.e("GetCurrentUser" , "entro aca")
             try {
                 val user = account.get()
+                Log.e("GetCurrentUser" , "${user}")
                 Result.success(user)
             } catch (e: Exception) {
                 Result.failure(e)

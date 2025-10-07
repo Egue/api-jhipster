@@ -11,6 +11,7 @@ import androidx.navigation.navArgument
 import com.hjsolutions.contratos_isp.ui.components.PdfViewScreen
 import com.hjsolutions.contratos_isp.ui.screen.login.LoginScreen
 import com.hjsolutions.contratos_isp.ui.screen.main.MainScreen
+import com.hjsolutions.contratos_isp.ui.screen.signature.SignatureScreen
 import com.hjsolutions.contratos_isp.ui.viewModels.ContratosViewModel
 import com.hjsolutions.contratos_isp.ui.viewModels.LoginViewModel
 
@@ -18,6 +19,7 @@ sealed class Screen(val route: String) {
     object Login : Screen("login")
     object Main : Screen("main")
     object PDF : Screen("pdf_viewer/{pdfUrl}")
+    object Signature: Screen("signature")
 }
 
 @Composable
@@ -53,6 +55,12 @@ fun NavGraph(
                 atras = {navController.popBackStack()}
             )
 
+        }
+
+        composable(
+            route = Screen.Signature.route
+        ) {
+            SignatureScreen()
         }
     }
 
