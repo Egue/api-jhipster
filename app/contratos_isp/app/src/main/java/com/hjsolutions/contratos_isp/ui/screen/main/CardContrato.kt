@@ -28,7 +28,11 @@ import androidx.compose.ui.unit.dp
 import com.hjsolutions.contratos_isp.data.models.ContratoModels
 
 @Composable
-fun CardContrato(contrato: ContratoModels , onViewPdf:()-> Unit){
+fun CardContrato(
+    contrato: ContratoModels ,
+    onViewPdf:()-> Unit ,
+    onFirma:()-> Unit ,
+    onDoc: () -> Unit){
 
     Card(modifier = Modifier
         .fillMaxWidth() ,
@@ -76,7 +80,9 @@ fun CardContrato(contrato: ContratoModels , onViewPdf:()-> Unit){
                 }
                 Spacer(Modifier.width(8.dp))
                 ElevatedButton(
-                    onClick = {},
+                    onClick = {
+                        onDoc()
+                    },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF6200EE)
 
@@ -99,7 +105,9 @@ fun CardContrato(contrato: ContratoModels , onViewPdf:()-> Unit){
             ////
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 ElevatedButton(
-                    onClick = {},
+                    onClick = {
+                        onFirma()
+                    },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF4CAF50)
 

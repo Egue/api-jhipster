@@ -30,6 +30,7 @@ import android.graphics.Paint
 import android.graphics.Path as AndroidPath
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
+import com.hjsolutions.contratos_isp.ui.viewModels.SignatureViewModel
 import kotlin.math.abs
 
 data class PathPoint(
@@ -45,8 +46,8 @@ data class SignaturePath(
 
 @Composable
 fun SignatureComponent(
-    onSignatureSaved: (File) -> Unit,
-    modifier: Modifier  = Modifier
+    signatureViewModel: SignatureViewModel,
+    onSignatureSaved: (File) -> Unit
 ){
     var paths by remember { mutableStateOf(listOf<SignaturePath>()) }
     var currentPath by remember { mutableStateOf(SignaturePath()) }
@@ -62,14 +63,11 @@ fun SignatureComponent(
     val canvasHeight = 300.dp
 
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
+
     ) {
-        Text(
-            text = "Firma Aqui",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
+
 
         Canvas(
             modifier = Modifier
@@ -136,13 +134,24 @@ fun SignatureComponent(
                                 context = context
                             )
                             onSignatureSaved(signatureFile)
+                            paths = emptyList()
+                            currentPath = SignaturePath()
                         }
                     }
                 },
                 enabled = paths.isNotEmpty(),
                 modifier = Modifier.weight(1f)
             ) {
-                Text("Guardar Firma")
+                if(signatureViewModel.response.isLoading){
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(20.dp)
+                            .background(Color.Transparent),  // Centrado en el Box
+                        color = Color.White,
+                        trackColor = Color.Transparent)
+                }else{
+                    Text("Guardar Firma")
+                }
             }
         }
     }

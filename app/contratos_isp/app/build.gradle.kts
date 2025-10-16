@@ -13,7 +13,7 @@ android {
         minSdk = 29
         targetSdk = 35
         versionCode = 1
-        versionName = "1.0.4"
+        versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -59,4 +59,5 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.9.3")
     implementation("androidx.compose.material:material-icons-extended:1.6.8")
     implementation("io.appwrite:sdk-for-android:8.0.0")
+    implementation("io.coil-kt:coil-compose:2.5.0")
 }

@@ -1,5 +1,6 @@
 package com.hjsolutions.contratos_isp.ui.viewModels
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,7 +9,6 @@ import androidx.lifecycle.viewModelScope
 import com.hjsolutions.contratos_isp.data.repository.LoginRepository
 import io.appwrite.models.User
 import kotlinx.coroutines.launch
-import kotlin.math.log
 
 data class AuthUiState(
     val isLoading: Boolean = false,
@@ -22,9 +22,9 @@ class LoginViewModel() : ViewModel() {
     private val loginRepository = LoginRepository()
     var uiState by mutableStateOf(AuthUiState())
 
-    /*init {
+    init {
         checkout()
-    }*/
+    }
 
     private fun checkout() {
 
@@ -51,12 +51,13 @@ class LoginViewModel() : ViewModel() {
     fun login(email: String, password: String) {
         viewModelScope.launch {
             uiState = uiState.copy(isLoading = true, errorMessage = null)
+            Log.d("Login :" , "${email}  : ${password}")
             loginRepository.login(email = email, password = password)
                 .onSuccess {
 
                     checkout()
                 }.onFailure { error ->
-                    uiState = uiState.copy(isLoading = true, errorMessage = error.message)
+                    uiState = uiState.copy(isLoading = false, errorMessage = error.message)
                 }
         }
     }

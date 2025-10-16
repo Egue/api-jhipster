@@ -1,7 +1,5 @@
 package com.hjsolutions.contratos_isp.data.models
 
-import kotlinx.serialization.Serializable
-
 data class ContratoModels(
     val id: String,
     val id_contrato:String,
@@ -12,8 +10,15 @@ data class ContratoModels(
     val path_contrato:String,
     val estado:Number,
     val photo:String,
-    val documentos:Array<Any>,
-    val contratoClass : ContratoInfo?
+    val firma:String,
+    val documentos: Documentos?,
+    val contratoClass: ContratoInfo?
+)
+
+data class Documentos(
+    val photo:String = "",
+    val document:List<String> = emptyList(),
+    val anexos:List<String> = emptyList()
 )
 
 data class ContratoInfo(
@@ -79,6 +84,13 @@ sealed class UiStateContrato {
     object Empty : UiStateContrato()
     data class Success(val contratos: List<ContratoModels>) : UiStateContrato()
     data class Error(val message: String) : UiStateContrato()
+}
+
+sealed class UiStateOneContrato{
+    object Loading : UiStateOneContrato()
+    object Empty : UiStateOneContrato()
+    data class Success(val contrato:ContratoModels):UiStateOneContrato()
+    data class Error(val message:String) : UiStateOneContrato()
 }
 
 

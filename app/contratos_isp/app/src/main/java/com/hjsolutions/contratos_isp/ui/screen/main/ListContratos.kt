@@ -35,13 +35,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import com.hjsolutions.contratos_isp.data.models.UiStateContrato
 import androidx.compose.runtime.getValue
+import com.hjsolutions.contratos_isp.ui.screen.gallery.GalleryScreen
 
 @Composable
 fun ListContratos(
     contratosViewModel: ContratosViewModel,
     implementacion: String,
     onViewPdf:(path:String) -> Unit ,
-    onSignature:(url:String) -> Unit
+    onSignature:(documentId:String) -> Unit,
+    onDoc:(documentId:String) -> Unit
     ) {
 
     val uiState by contratosViewModel.uiState.collectAsState()
@@ -74,14 +76,23 @@ fun ListContratos(
                     }
 
                     is UiStateContrato.Success -> {
-                        Log.d("ListContratos", "${state.contratos}")
+                        //Log.d("ListContratos", "${state.contratos}")
                         LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                             items(state.contratos) { contrato ->
-                                CardContrato(contrato = contrato , onViewPdf = {
-                                    //Log.d("ListContrato" , "${contrato.path_contrato}")
-                                    onViewPdf(contrato.path_contrato)
-                                    //contratosViewModel.navigateToPdf(contrato.path_contrato , "Contrato ISP")
-                                })
+                                CardContrato(
+                                    contrato = contrato ,
+                                    onViewPdf = {
+                                        onViewPdf(contrato.path_contrato) } ,
+                                    onFirma = {
+                                        onSignature(contrato.id)
+                                    },
+                                    onDoc = {
+                                        onDoc(contrato.id)
+                                    }
+
+                                )
+
+
                             }
                         }
 

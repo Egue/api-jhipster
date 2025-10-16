@@ -6,11 +6,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -43,8 +46,11 @@ fun MainScreen(
     navController: NavController,
     loginViewModel: LoginViewModel ,
     contratosViewModel: ContratosViewModel) {
+
     val uIstate = loginViewModel.uiState
+
     var user : String by remember { mutableStateOf("") }
+
     LaunchedEffect(uIstate.user) {
         uIstate.user?.let { userObj ->
             user = userObj.name
@@ -53,7 +59,7 @@ fun MainScreen(
     }
 
 
-    Surface(modifier = Modifier.fillMaxSize()) {
+    Surface(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.navigationBars)) {
         Column(modifier = Modifier
             .fillMaxWidth()
             .background(Color(0x0FF8C0C0))) {
@@ -118,8 +124,11 @@ fun MainScreen(
                     //contratosViewModel.navigateToPdf(url = path , title = "Contrato ISP")
                     navController.navigate("pdf_viewer/${Uri.encode(path)}")
                 },
-                onSignature = {
-                    navController.navigate("signature")
+                onSignature = {documentId->
+                    navController.navigate("signature/${documentId}")
+                },
+                onDoc = { documentId ->
+                    navController.navigate("gallery/${documentId}")
                 }
                 )
         }
