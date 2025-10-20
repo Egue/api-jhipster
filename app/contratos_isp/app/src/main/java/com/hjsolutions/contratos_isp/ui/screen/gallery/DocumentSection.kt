@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.hjsolutions.contratos_isp.ui.components.ImageCard
@@ -35,13 +36,14 @@ fun DocumentSection(
             Text(
                 text=title,
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF6200EE)
             )
             IconButton(onClick = onAddClik) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = "Agregar",
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = Color(0xFF6200EE)
                 )
             }
         }
@@ -51,7 +53,8 @@ fun DocumentSection(
             Text(
                 text="No hay $title agregados",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = Color(0xFF6200EE)
+
             )
         }else{
             LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {

@@ -59,10 +59,11 @@ fun MainScreen(
     }
 
 
-    Surface(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.navigationBars)) {
+    Surface(modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.navigationBars)
+        .background(Color.White)) {
         Column(modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0x0FF8C0C0))) {
+            .background(Color.White)) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()

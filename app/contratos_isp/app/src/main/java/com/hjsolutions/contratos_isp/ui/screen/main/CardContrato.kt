@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.hjsolutions.contratos_isp.data.models.ContratoModels
+import okhttp3.internal.wait
 
 @Composable
 fun CardContrato(
@@ -37,7 +38,7 @@ fun CardContrato(
     Card(modifier = Modifier
         .fillMaxWidth() ,
         colors = CardDefaults.cardColors(
-            containerColor = Color.White,
+            containerColor = Color(0xFFF6DEE0),
             contentColor = Color(0xFF86030E)
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)) {
@@ -93,9 +94,10 @@ fun CardContrato(
                     Row(horizontalArrangement = Arrangement.Center , verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Filled.Add,
-                            contentDescription = "Doc"
+                            contentDescription = "Doc",
+                            tint = Color.White
                         )
-                        Text("Doc" , style = MaterialTheme.typography.bodyLarge)
+                        Text("Doc" , style = MaterialTheme.typography.bodyLarge, color = Color.White)
                     }
                 }
 
@@ -118,9 +120,10 @@ fun CardContrato(
                     Row(horizontalArrangement = Arrangement.Center , verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Filled.Edit,
-                            contentDescription = "edit"
+                            contentDescription = "edit",
+                            tint = Color.White
                         )
-                        Text("Firmar" , style = MaterialTheme.typography.bodyLarge)
+                        Text("Firmar" , style = MaterialTheme.typography.bodyLarge , color = Color.White)
                     }
                 }
                 Spacer(Modifier.width(8.dp))
@@ -136,9 +139,10 @@ fun CardContrato(
                     Row(horizontalArrangement = Arrangement.Center , verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Filled.DriveFileRenameOutline,
-                            contentDescription = "estado"
+                            contentDescription = "estado",
+                            tint = Color.White
                         )
-                        Text("Estado" , style = MaterialTheme.typography.bodyLarge)
+                        Text("Estado" , style = MaterialTheme.typography.bodyLarge , color = Color.White)
                     }
                 }
 

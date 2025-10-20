@@ -38,6 +38,9 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import android.Manifest
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.ui.graphics.Color
 
 @Composable
 fun DocumentsImages(
@@ -146,13 +149,16 @@ fun DocumentsImages(
         )
 
         Button(
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF6200EE)
+            ),
             onClick = {},
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
             //enabled = currentDocument.photo.isNotEmpty()
         ) {
-            Text("Guardar", style = MaterialTheme.typography.titleMedium)
+            Text("Guardar", style = MaterialTheme.typography.titleMedium , color = Color.White)
         }
 
     }
