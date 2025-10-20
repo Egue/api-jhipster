@@ -165,4 +165,10 @@ airflow/sincronice_portalweb.py
 airflow/reporte_clausuras.py
 src/main/resources/config/application-dev.yml
 src/main/resources/config/application-dev.yml
-src/main/resources/config/application-dev.yml
+inventory_agente/target/inventory_agente-0.0.1-SNAPSHOT.jar.original
+inventory_agente/target/maven-archiver/pom.properties
+inventory_agente/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
+inventory_agente/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst
+inventory_agente/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst
+inventory_agente/target/test-classes/META-INF/inventory_agente.kotlin_module
+
