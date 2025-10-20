@@ -164,3 +164,6 @@ Desktop.ini
 airflow/sincronice_portalweb.py
 airflow/reporte_clausuras.py
 src/main/resources/config/application-dev.yml
+IMPLEMENTACION_BACKEND.md
+PROXI MOS_PASOS.md
+src/main/resources/config/application.yml

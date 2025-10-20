@@ -86,4 +86,43 @@ public interface IEmailCampaignDetalleDao extends CrudRepository<EmailCampaignDe
 	@Query(value = "SELECT * FROM email_campaign_detalle WHERE id_email_campaign = :idCampaign", nativeQuery = true)
     List<EmailCampaignDetalle> findDetallesByIdCampaign(@Param("idCampaign") int idCampaign);
 
+	/**
+	 * Cuenta el total de detalles de una campaña.
+	 * 
+	 * @param campaignId ID de la campaña
+	 * @return Cantidad total de detalles
+	 */
+	@Query(value = "SELECT COUNT(*) FROM email_campaing_detalle WHERE id_email_campaing = :campaignId", nativeQuery = true)
+	long countByCampaignId(@Param("campaignId") Long campaignId);
+
+	/**
+	 * Cuenta detalles pendientes (procesado = 0 o procesado IS NULL).
+	 * 
+	 * @param campaignId ID de la campaña
+	 * @return Cantidad de detalles pendientes
+	 */
+	@Query(value = "SELECT COUNT(*) FROM email_campaing_detalle WHERE id_email_campaing = :campaignId " +
+				   "AND (procesado = 0 OR procesado IS NULL)", nativeQuery = true)
+	long countPendingByCampaignId(@Param("campaignId") Long campaignId);
+
+	/**
+	 * Cuenta detalles enviados exitosamente (procesado = 1).
+	 * 
+	 * @param campaignId ID de la campaña
+	 * @return Cantidad de detalles enviados
+	 */
+	@Query(value = "SELECT COUNT(*) FROM email_campaing_detalle WHERE id_email_campaing = :campaignId " +
+				   "AND procesado = 1", nativeQuery = true)
+	long countSentByCampaignId(@Param("campaignId") Long campaignId);
+
+	/**
+	 * Cuenta detalles con error (procesado = 2).
+	 * 
+	 * @param campaignId ID de la campaña
+	 * @return Cantidad de detalles con error
+	 */
+	@Query(value = "SELECT COUNT(*) FROM email_campaing_detalle WHERE id_email_campaing = :campaignId " +
+				   "AND procesado = 2", nativeQuery = true)
+	long countErrorByCampaignId(@Param("campaignId") Long campaignId);
+
 }

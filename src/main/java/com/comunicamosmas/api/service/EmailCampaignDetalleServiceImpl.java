@@ -566,6 +566,80 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 		return detalle;
 	}
 
+	/**
+	 * Cuenta el total de detalles de una campaña.
+	 * Útil para estadísticas y cálculo de progreso.
+	 * 
+	 * @param campaignId ID de la campaña
+	 * @return Cantidad total de detalles
+	 */
+	@Override
+	public long countByCampaign(Long campaignId) {
+		if (campaignId == null) {
+			return 0;
+		}
+		return emailCampaignDetalleDao.countByCampaignId(campaignId);
+	}
+
+	/**
+	 * Cuenta detalles pendientes de envío (estado = 0 o NULL).
+	 * Los detalles pendientes son aquellos que aún no han sido procesados.
+	 * 
+	 * @param campaignId ID de la campaña
+	 * @return Cantidad de detalles pendientes
+	 */
+	@Override
+	public long countPendingByCampaign(Long campaignId) {
+		if (campaignId == null) {
+			return 0;
+		}
+		return emailCampaignDetalleDao.countPendingByCampaignId(campaignId);
+	}
+
+	/**
+	 * Cuenta detalles enviados exitosamente (estado = 1).
+	 * 
+	 * @param campaignId ID de la campaña
+	 * @return Cantidad de detalles enviados
+	 */
+	@Override
+	public long countSentByCampaign(Long campaignId) {
+		if (campaignId == null) {
+			return 0;
+		}
+		return emailCampaignDetalleDao.countSentByCampaignId(campaignId);
+	}
+
+	/**
+	 * Cuenta detalles con error (estado = 2).
+	 * Emails que fallaron durante el proceso de envío.
+	 * 
+	 * @param campaignId ID de la campaña
+	 * @return Cantidad de detalles con error
+	 */
+	@Override
+	public long countErrorByCampaign(Long campaignId) {
+		if (campaignId == null) {
+			return 0;
+		}
+		return emailCampaignDetalleDao.countErrorByCampaignId(campaignId);
+	}
+
+	/**
+	 * Sobrecarga del método findEmailCampaignDetalleSinProcesar para aceptar Long.
+	 * Busca detalles pendientes de procesamiento (estado != 1).
+	 * 
+	 * @param campaignId ID de la campaña (Long)
+	 * @return Lista de detalles sin procesar
+	 */
+	@Override
+	public List<EmailCampaignDetalleDTO> findEmailCampaignDetalleSinProcesar(Long campaignId) {
+		if (campaignId == null) {
+			return Collections.emptyList();
+		}
+		return findEmailCampaignDetalleSinProcesar(campaignId.intValue());
+	}
+
 	 
 
 }

@@ -64,5 +64,15 @@ public interface IEmailCampanignDao extends CrudRepository< EmailCampaign, Integ
 
 	@Query(value = "SELECT * FROM email_campaign_detalle WHERE id_email_campaign = :idCampaign", nativeQuery = true)
 	List<EmailCampaignDetalle> findDetallesByIdCampaign(@Param("idCampaign") int idCampaign);
+
+	/**
+	 * Busca campañas cuyo estado NO esté en la lista de estados excluidos.
+	 * Utilizado para obtener campañas activas para procesamiento batch.
+	 * 
+	 * @param excludedStates Lista de estados a excluir (ej: PortalWeb, Finalizado, Inactivo)
+	 * @return Lista de campañas con estados válidos para procesamiento
+	 */
+	@Query(value = "SELECT * FROM email_campaign WHERE estado NOT IN (:excludedStates)", nativeQuery = true)
+	List<EmailCampaign> findByEstadoNotIn(@Param("excludedStates") List<String> excludedStates);
 	
 }

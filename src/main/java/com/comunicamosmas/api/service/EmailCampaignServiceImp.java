@@ -154,4 +154,42 @@ public class EmailCampaignServiceImp implements IEmailCampaignService{
 	    return detalles;
 	}
 
+	/**
+	 * Implementación de findActiveCampaignsForBatch
+	 * Busca campañas activas excluyendo estados no procesables por batch.
+	 * 
+	 * Estados excluidos:
+	 * - PortalWeb: Se procesan de forma diferente (MongoDB)
+	 * - Finalizado: Ya no requieren procesamiento
+	 * - Inactivo: Campañas deshabilitadas
+	 * 
+	 * @return Lista de campañas activas listas para procesamiento batch
+	 */
+	@Override
+	public List<EmailCampaign> findActiveCampaignsForBatch() {
+		// Lista de estados que NO deben procesarse en batch
+		List<String> excludedStates = new ArrayList<>();
+		excludedStates.add("PortalWeb");
+		excludedStates.add("Finalizado");
+		excludedStates.add("Inactivo");
+		
+		// Buscar campañas que NO estén en los estados excluidos
+		return emailCampaignDao.findByEstadoNotIn(excludedStates);
+	}
+
+	/**
+	 * Sobrecarga del método findById para aceptar Long
+	 * Facilita la integración con otros componentes que usan Long como ID
+	 * 
+	 * @param id ID de la campaña (Long)
+	 * @return EmailCampaign o null si no existe
+	 */
+	@Override
+	public EmailCampaign findById(Long id) {
+		if (id == null) {
+			return null;
+		}
+		return emailCampaignDao.findById(id.intValue()).orElse(null);
+	}
+
 }

@@ -25,5 +25,25 @@ public interface IEmailCampaignService {
 	public List<EmailCampanignDTO> filterEmailCampaign(Long idEmpresa , String fecha);
 
 	public List<EmailCampaignDetalle> findByMesAndAnio(int mes, int anio);
+
+	/**
+	 * Busca campañas activas disponibles para procesamiento batch.
+	 * Excluye campañas con estado 'PortalWeb', 'Finalizado' o 'Inactivo'.
+	 * 
+	 * Este método es utilizado por:
+	 * - EmailCampaignAirflowController para obtener campañas pendientes
+	 * - Procesos batch automáticos
+	 * 
+	 * @return Lista de campañas activas listas para procesar
+	 */
+	public List<EmailCampaign> findActiveCampaignsForBatch();
+
+	/**
+	 * Busca una campaña por ID (sobrecarga para Long)
+	 * 
+	 * @param id ID de la campaña (Long)
+	 * @return EmailCampaign o null si no existe
+	 */
+	public EmailCampaign findById(Long id);
 	 
 }
