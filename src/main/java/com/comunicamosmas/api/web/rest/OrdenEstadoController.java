@@ -22,30 +22,30 @@ import com.comunicamosmas.api.service.IOrdenEstadoService;
 @RestController
 @RequestMapping("/api/controlmas")
 public class OrdenEstadoController {
-	
-	
+
+
 	@Autowired
 	IOrdenEstadoService ordenEstadoService;
-	
+
 	/**
 	 * list*/
 	@GetMapping("/ordenestado/all/{rol}")
 	public ResponseEntity<?> all(@PathVariable String rol)
 	{
 		Map<String, Object> response = new HashMap<>();
-		
+
 		try {
-			
+
 			List<OrdenEstado> result = ordenEstadoService.findAllByEstadoAndCliente(rol);
-			
+
 			response.put("response", result);
-			
+
 			return new ResponseEntity<Map<String, Object>>(response , HttpStatus.OK);
-			
+
 		}catch(Exception e)
 		{
 			response.put("response", e.getMessage());
-			
+
 			return new ResponseEntity<Map<String, Object>>(response , HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -54,29 +54,32 @@ public class OrdenEstadoController {
 	public ResponseEntity<?> findAll()
 	{
 		Map<String, Object> response = new HashMap<>();
-		
+
 		try {
-			
+
 			List<OrdenEstado>  result = ordenEstadoService.findAll();
-			
+
 			response.put("response", result);
-			
+
 			return new ResponseEntity<Map<String, Object>>(response , HttpStatus.OK);
-			
+
 		}catch(Exception e)
 		{
 			response.put("response", e.getMessage());
-			
+
 			return new ResponseEntity<Map<String, Object>>(response , HttpStatus.BAD_REQUEST);
 		}
 	}*/
 
 	@GetMapping("/ordenestado")
-	public ResponseEntity<?> orders(@RequestParam(defaultValue = "1") Long client , @RequestParam(defaultValue = "0") Long estacion , @RequestParam(defaultValue = "0") Long reservada)
+	public ResponseEntity<?> ordersEstado(
+        @RequestParam(defaultValue = "C") String type ,
+        @RequestParam(defaultValue = "0") Long reservada,
+        @RequestParam(defaultValue = "1") Long estado)
 	{
 
 		try {
-			Optional<List<OrdenEstado>> list = ordenEstadoService.find(client , estacion , reservada);
+			Optional<List<OrdenEstado>> list = ordenEstadoService.find(type, reservada , estado);
 			return ResponseEntity.status(HttpStatus.OK).body(list);
 		} catch (Exception e) {
 			// TODO: handle exception

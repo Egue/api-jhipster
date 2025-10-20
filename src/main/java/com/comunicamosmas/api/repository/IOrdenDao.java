@@ -302,5 +302,51 @@ Page<Object[]> findOrdenesDetalladas(
         """, nativeQuery = true)
     public List<Orden> findOrdenCorteAndReconexionExist(@Param("contratos") List<Long> contratos);
 
+    @Query(value = """
+        SELECT\s
+        o.id_orden ,
+        o.causa_solicitud,
+        case\s
+        	when cli.tipo_cliente = 'J' THEN concat(cli.razon_social ,' / ' , cli.documento)
+            when cli.tipo_cliente = 'N' THEN concat(cli.nombre_primer, ' ', cli.nombre_segundo , ' ', cli.apellido_paterno , ' / ', cli.documento)
+        end as cliente,
+        concat(di.tipo, ' / ', di.a_tipo, ' ', di.a_numero, di.a_letra , ' ', di.b_tipo, ' ',di.b_numero , di.b_letra, ' ',di.numero , ' / ', di.barrio) as direccion ,\s
+        o.fechaf_registra,
+        o.fechaf_asigna,
+        o.fechaf_asiste,
+        o.id_usuario_ejecuta,
+        o.nota,
+        o.id_contrato
+        FROM ordenes o
+         inner join clientes cli on cli.id_cliente = o.id_cliente
+         inner join direcciones di on di.id_direccion = o.id_direccion
+        inner join ordenes_estados oe on oe.id_estado = o.tipo_orden
+        where o.tipo_orden = :tipo and
+        o.id_servicio = :servicio and
+        o.anulada = '0' and
+        o.estado in (0,1,2);
+        """, nativeQuery = true)
+    public List<Object[]> findOrdenes(@Param("servicio") Long servicio, @Param("tipo") Long tipo);
+
+    @Query(value = """
+        SELECT numero_a FROM ordenes o  WHERE o.refiere = :refiere AND o.id_empresa = :empresa ORDER BY numero_a DESC LIMIT 0,1
+        """, nativeQuery = true)
+    public Long findLastRefiereA(@Param("refiere") String refiere , @Param("empresa") Long idEmpresa);
+
+    @Query(value = """
+        SELECT numero_b FROM ordenes o  WHERE o.refiere = :refiere AND o.id_empresa = :empresa ORDER BY numero_b DESC LIMIT 0,1
+        """, nativeQuery = true)
+    public Long findLastRefiereB(@Param("refiere") String refiere , @Param("empresa") Long idEmpresa);
+
+    @Query(value = """
+        SELECT 1 FROM ordenes o WHERE o.tipo_orden = :type and o.estado IN (0,1,2) and o.anulada =0 AND o.abierta = 1 and o.id_contrato = :idContrato LIMIT 1
+        """, nativeQuery = true)
+    public Integer existByAbierta(@Param("idContrato") Long idContrato, @Param("type") Long type);
+
+    @Query(value = """
+        SELECT 1 FROM ordenes o WHERE o.id_contrato = :idContrato AND o.tipo_orden IN (:type) AND o.abierta = 1 AND o.anulada = '0'
+        """, nativeQuery = true)
+    public Integer existOrdenByStatus(@Param("idContrato") Long idContrato , @Param("type") List<Integer> type);
+
 
 }

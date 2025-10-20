@@ -5,6 +5,7 @@ import com.comunicamosmas.api.domain.Contrato;
 import java.util.List;
 import java.util.Optional;
 
+import com.comunicamosmas.api.service.dto.ClienteContratoDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -34,7 +35,7 @@ public interface IContratoDao extends JpaRepository<Contrato, Long> {
         INNER JOIN direcciones dir ON dir.id_direccion = co.id_direccion_servicio
         INNER JOIN servicios ser ON ser.id_servicio = co.id_servicio
         INNER JOIN lista_municipios mun ON mun.id_municipio = dir.municipio
-		INNER JOIN deudas deudasb ON deudasb.id_contrato = co.id_contrato
+		LEFT JOIN deudas deudasb ON deudasb.id_contrato = co.id_contrato
         WHERE clientes.id_cliente = :idCliente
 		GROUP BY
     mun.municipio,
@@ -273,6 +274,13 @@ public interface IContratoDao extends JpaRepository<Contrato, Long> {
         GROUP BY co.id_contrato
         """, nativeQuery = true)
     public List<Object[]> listContratoByCorteMasivamente(@Param("service") Long service);
+
+    @Query(value = """
+        select cli.celular_a , cli.celular_b from clientes cli
+                            inner join contratos co on co.id_cliente = cli.id_cliente
+                            where co.id_servicio = :service and co.estado = :estado
+        """, nativeQuery = true)
+    public List<Object[]> listNumberbyidService(@Param("service") Long service , @Param("estado") Long estado);
 
 
 }

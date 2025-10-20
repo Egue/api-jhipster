@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 import java.io.Serializable
 
 data class ProrrogaDTO(
-      var idContrato:Long?  = 0, 
+      var idContrato:Long?  = 0,
       var createBy:Long? = 0,
       var fechaProrroga: String? = "",
       var state: String? = "A"
@@ -26,6 +26,7 @@ data class DataProrrogaByServiceDTO(
 ):Serializable{}
 
 data class ProrrogaInfoDTO(
+    var id:String?="",
       var idContrato:Int? =0,
       var tipo:String? = "",
       var nameCliente:String?= "",
