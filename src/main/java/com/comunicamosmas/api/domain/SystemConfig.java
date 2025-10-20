@@ -14,6 +14,15 @@ public class SystemConfig implements Serializable{
     
     private static final long serialVersionUID = 1L;
 
+    SystemConfig(String origen , String comando) {
+        this.origen = origen;
+        this.comando = comando;
+    }
+
+    public SystemConfig() {
+        // Default constructor
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) 
     private Integer id;

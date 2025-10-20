@@ -52,5 +52,11 @@ public class ServicioServiceImpl implements IServicioService {
         return servicioDao.findByIdEmpresa(idEmpresa);
     }
 
+    @Override
+    public Optional<List<Servicio>> findByEstado(Long estado) {
+        // TODO Auto-generated method stub
+        return servicioDao.findByEstado(estado);
+    }
+
     
 }

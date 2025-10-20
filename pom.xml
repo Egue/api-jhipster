@@ -25,7 +25,7 @@
 	<properties>
 		<!-- Build properties -->
 		<maven.version>3.3.9</maven.version>
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
@@ -79,6 +79,7 @@
 		<lifecycle-mapping.version>1.0.0</lifecycle-mapping.version>
 		<properties-maven-plugin.version>1.0.0</properties-maven-plugin.version>
 		<sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
+		<kotlin.version>1.9.0</kotlin.version>
 		<!-- jhipster-needle-maven-property -->
 	</properties>
 
@@ -96,12 +97,66 @@
 	</dependencyManagement>
 
 	<dependencies>
-	
+        <!--coroutines-->
+
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-reactor</artifactId>
+        </dependency>
+
+        <!--AppWrite-->
+            <dependency>
+                <groupId>io.appwrite</groupId>
+                <artifactId>sdk-for-kotlin</artifactId>
+                <version>10.0.0</version>
+            </dependency>
+        <!---->
+	<!--SSH-->
+	<dependency>
+    <groupId>com.github.mwiede</groupId>
+    <artifactId>jsch</artifactId>
+    <version>0.2.26</version>
+</dependency>
+	<!---->
+<!--oktt-->
+<dependency>
+    <groupId>com.squareup.okhttp3</groupId>
+    <artifactId>okhttp</artifactId>
+    <version>4.12.0</version> <!-- Usa al menos la 4.11.0 -->
+</dependency>
+	<!--minio-->
+
+	<dependency>
+    <groupId>io.minio</groupId>
+    	<artifactId>minio</artifactId>
+    	<version>8.5.17</version>
+	</dependency>
+
+	<!--kotlin-->
+			 <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib-jdk8</artifactId>
+        </dependency>
+
+        <!-- Kotlin Reflect (necesario para Spring) -->
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId>
+        </dependency>
+	<!--kotlin-->
+	<!-- OpenCSV -->
+		<dependency>
+			<groupId>com.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>5.9</version>
+		</dependency>
+
+
 	<!--Cache redis-->
 	<dependency>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-data-redis</artifactId>
-		
+
 	</dependency>
 	<!---->
 	<!--MogoDB-->
@@ -315,7 +370,7 @@
 			<version>${archunit-junit5.version}</version>
 			<scope>test</scope>
 		</dependency>
-		<!-- Adding the engine dependency to the surefire-plugin unfortunately 
+		<!-- Adding the engine dependency to the surefire-plugin unfortunately
 			does not work in the current version. -->
 		<!-- https://www.archunit.org/userguide/html/000_Index.html#_junit_5 -->
 		<dependency>
@@ -366,6 +421,34 @@
 	<build>
 		<defaultGoal>spring-boot:run</defaultGoal>
 		<plugins>
+		 <!--kotlin-->
+				<plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+                <version>${kotlin.version}</version>
+                <executions>
+                    <execution>
+                        <id>compile</id>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+						<configuration>
+							<sourceDirs>
+								<sourceDir>src/main/java</sourceDir>
+								<sourceDir>src/main/kotlin</sourceDir>
+							</sourceDirs>
+						</configuration>
+                    </execution>
+                    <execution>
+                        <id>test-compile</id>
+                        <goals>
+                            <goal>test-compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+		 <!---->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -592,7 +675,7 @@
 								<goal>prepare-agent</goal>
 							</goals>
 						</execution>
-						<!-- Ensures that the code coverage report for unit tests is created 
+						<!-- Ensures that the code coverage report for unit tests is created
 							after unit tests have been run -->
 						<execution>
 							<id>post-unit-test</id>
@@ -607,7 +690,7 @@
 								<goal>prepare-agent-integration</goal>
 							</goals>
 						</execution>
-						<!-- Ensures that the code coverage report for integration tests is 
+						<!-- Ensures that the code coverage report for integration tests is
 							created after integration tests have been run -->
 						<execution>
 							<id>post-integration-tests</id>
@@ -681,7 +764,7 @@
 					</configuration>
 					<dependencies>
 					<!--Generarl excel-->
-					
+
 						<dependency>
 							<groupId>org.liquibase</groupId>
 							<artifactId>liquibase-core</artifactId>
@@ -828,7 +911,7 @@
 					<artifactId>maven-failsafe-plugin</artifactId>
 					<version>${maven-failsafe-plugin.version}</version>
 					<configuration>
-						<!-- Due to spring-boot repackage, without adding this property test 
+						<!-- Due to spring-boot repackage, without adding this property test
 							classes are not found See https://github.com/spring-projects/spring-boot/issues/6254 -->
 						<classesDirectory>${project.build.outputDirectory}</classesDirectory>
 						<!-- Force alphabetical order to have a reproducible build -->
@@ -872,7 +955,7 @@
 					<configuration>
 						<mainClass>${start-class}</mainClass>
 						<fork>true</fork>
-						<!-- Enable the line below to have remote debugging of your application 
+						<!-- Enable the line below to have remote debugging of your application
 							on port 5005 <jvmArguments>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005</jvmArguments> -->
 					</configuration>
 
@@ -985,8 +1068,8 @@
 			</dependencies>
 		</profile>
 		<profile>
-			<!-- Profile for applying IDE-specific configuration. At the moment it 
-				configures MapStruct and Hibernate JPA Metamodel Generator, which you need 
+			<!-- Profile for applying IDE-specific configuration. At the moment it
+				configures MapStruct and Hibernate JPA Metamodel Generator, which you need
 				when working with DTOs and entity filtering. -->
 			<id>IDE</id>
 			<dependencies>
@@ -1019,8 +1102,8 @@
 			<build>
 				<pluginManagement>
 					<plugins>
-						<!-- This plugin's configuration is used to store Eclipse m2e settings 
-							only. It has no influence on the Maven build itself. Remove when the m2e 
+						<!-- This plugin's configuration is used to store Eclipse m2e settings
+							only. It has no influence on the Maven build itself. Remove when the m2e
 							plugin can correctly bind to Maven lifecycle -->
 						<plugin>
 							<groupId>org.eclipse.m2e</groupId>

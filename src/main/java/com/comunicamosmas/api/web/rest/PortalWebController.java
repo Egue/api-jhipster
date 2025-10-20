@@ -156,7 +156,7 @@ public class PortalWebController {
     public ResponseEntity<?> generate(@RequestParam Long idContrato , @RequestHeader("Authorization") String token)
     {
         try {
-            String url = "https://portalweb.server.cableytv.com/#/c3b73a718e2971292c9101fb1b3ea3445754c49261c8ecf513427d84a47bf03c/" + idContrato;
+            String url = "https://portalweb.server.internetinalambrico.com.co/#/c3b73a718e2971292c9101fb1b3ea3445754c49261c8ecf513427d84a47bf03c/" + idContrato;
             contratoService.generateLink(idContrato , token);
             Map<String,Object> resp = new HashMap<>();
             resp.put("url" , url);

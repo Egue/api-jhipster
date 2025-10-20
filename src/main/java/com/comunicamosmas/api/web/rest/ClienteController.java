@@ -4,8 +4,7 @@ import com.comunicamosmas.api.domain.Cliente;
 import com.comunicamosmas.api.security.AuthoritiesConstants;
 import com.comunicamosmas.api.service.IClienteService; 
 import com.comunicamosmas.api.service.dto.ClienteDTO;
-import com.comunicamosmas.api.service.dto.ClientePortalWebDTO;
-import com.comunicamosmas.api.service.dto.ClientesDeclineClausuraDTO;
+import com.comunicamosmas.api.service.dto.ClientePortalWebDTO; 
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
  
 
@@ -15,13 +14,10 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest; 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.http.ResponseEntity; 
+import org.springframework.security.access.prepost.PreAuthorize; 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -140,6 +136,17 @@ public class ClienteController {
         } catch (Exception e) {
             // TODO: handle exception
 
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/clientes")
+    public ResponseEntity<?> query(@RequestParam(defaultValue = "") String query)
+    {
+        try {
+            return  ResponseEntity.status(HttpStatus.OK).body(clienteService.ClienteQuery(query));
+        } catch (Exception e) {
+            // TODO: handle exception
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }

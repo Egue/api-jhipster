@@ -2,6 +2,7 @@ package com.comunicamosmas.api.service;
 
 import com.comunicamosmas.api.domain.Contrato;
 import com.comunicamosmas.api.domain.Pago;
+import com.comunicamosmas.api.service.dto.InfoPagosDTO;
 import com.comunicamosmas.api.service.dto.PagosEstadoCuentaDTO;
 import com.comunicamosmas.api.service.dto.PaymentOnlineDTO;
 import com.comunicamosmas.api.service.dto.ReciboCajaDTO;
@@ -45,4 +46,6 @@ public interface IPagoService {
     public List<ReporteSiustOneThreeDTO>  reporteOneToThree(List<Integer> servicios  , Integer firts , Integer end);
     
     public List<PagosEstadoCuentaDTO> findByIdDeuda(Integer idDeuda);
+
+    public List<InfoPagosDTO> infoRc(Long idContrato , Long rc);
 }

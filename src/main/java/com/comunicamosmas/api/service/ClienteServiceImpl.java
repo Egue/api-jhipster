@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable; 
 import org.springframework.stereotype.Service;
 
@@ -217,7 +218,7 @@ public class ClienteServiceImpl implements IClienteService {
         client.setNombreSegundo((String) obj.getNombreSegundo());
         client.setNombresRep((String) obj.getNombresRep());
         client.setApellidosRep((String) obj.getApellidosRep());
-        client.setIdDocumento((String) obj.getIdDocumento() );
+        client.setIdDocumento((Integer) obj.getIdDocumento() );
         client.setDocumento((Long) obj.getDocumento());
         client.setDv((Long) obj.getDv());
         client.setTelefono((Long) obj.getTelefono());
@@ -354,6 +355,22 @@ public class ClienteServiceImpl implements IClienteService {
             this.clienteDao.save(exist);
             return exist;
         });
+    }
+
+    @Override
+    public Page<Cliente> ClienteQuery(String query) {
+        query = query.trim();
+        Pageable page = PageRequest.of(1, 10);
+        // Check if query is numeric
+        if (query.matches("\\d+")) { // Only digits
+            Long documentNumber = Long.parseLong(query);
+            return clienteDao.findByRazonSocialOrNombrePrimerOrDocumento(
+                query, query, documentNumber, page);
+        } else {
+            // For non-numeric queries, set documentNumber to null or impossible value
+            return clienteDao.findByRazonSocialOrNombrePrimerOrDocumento(
+                query, query, null ,page); // Assuming -1 won't match any real document
+        }
     }
 
      

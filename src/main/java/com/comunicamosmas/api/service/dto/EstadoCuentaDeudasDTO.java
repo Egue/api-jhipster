@@ -3,6 +3,7 @@ package com.comunicamosmas.api.service.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.comunicamosmas.api.domain.ContratoSaldoFavorLog;
 import com.comunicamosmas.api.domain.FinancieroNc;
 
 public class EstadoCuentaDeudasDTO {
@@ -15,7 +16,7 @@ public class EstadoCuentaDeudasDTO {
 	private Double valor;
 	private Float abono;
 	private List<PagosEstadoCuentaDTO> pagos;
-	private List<SaldoFavorDTO> saldosFavor;
+	private List<ContratoSaldoFavorLog> saldosFavor;
 	private List<FinancieroNc> notasCredito;
 	
 	public EstadoCuentaDeudasDTO() {
@@ -23,7 +24,7 @@ public class EstadoCuentaDeudasDTO {
 	}
 
 	public EstadoCuentaDeudasDTO(Integer idDeuda, Integer factura, String periodo, String generador, Double valor, Float abono,
-			List<PagosEstadoCuentaDTO> pagos, List<SaldoFavorDTO> saldosFavor,
+			List<PagosEstadoCuentaDTO> pagos, List<ContratoSaldoFavorLog> saldosFavor,
 			List<FinancieroNc> notasCredito) {
 	 
 		this.idDeuda = idDeuda;
@@ -85,11 +86,11 @@ public class EstadoCuentaDeudasDTO {
 		this.pagos = pagos;
 	}
 
-	public List<SaldoFavorDTO> getSaldosFavor() {
+	public List<ContratoSaldoFavorLog> getSaldosFavor() {
 		return saldosFavor;
 	}
 
-	public void setSaldosFavor(List<SaldoFavorDTO> saldosFavor) {
+	public void setSaldosFavor(List<ContratoSaldoFavorLog> saldosFavor) {
 		this.saldosFavor = saldosFavor;
 	}
 

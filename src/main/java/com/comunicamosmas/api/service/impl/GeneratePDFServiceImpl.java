@@ -158,10 +158,10 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 
 		// link de fondo
 		//String fondoA = "http://10.112.109.2/control/archivos/fondo_factura/" + empresa.getFondoFactura();
-		String fondoA = "http://gestion.cableytv.com:8050/control/archivos/fondo_factura/" + empresa.getFondoFactura();
+		String fondoA = "http://131.221.41.20:8050/control/archivos/fondo_factura/" + empresa.getFondoFactura();
 		//String fondoA = "http://190.121.145.227:9050/control/archivos/fondo_factura/" + empresa.getFondoFactura();
 		//String fondoB = "http://10.112.109.2/control/archivos/fondo_factura/" + empresa.getFondoFacturaB();
-		String fondoB = "http://gestion.cableytv.com:8050/control/archivos/fondo_factura/" + empresa.getFondoFacturaB();
+		String fondoB = "http://131.221.41.20:8050/control/archivos/fondo_factura/" + empresa.getFondoFacturaB();
 		//String fondoB = "http://190.121.145.227:9050/control/archivos/fondo_factura/" + empresa.getFondoFacturaB();
 
 		// factura

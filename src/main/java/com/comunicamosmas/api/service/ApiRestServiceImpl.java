@@ -315,7 +315,7 @@ public class ApiRestServiceImpl implements IApiRestService {
 
 		//String url = "http://10.111.39.2/controlmas/scriptPhp/index.php";
 		//String url = "http://10.112.109.2/api/scriptPhp/index.php";
-		String url = "http://gestion.cableytv.com:8050/api/scriptPhp/index.php";
+		String url = "http://131.221.41.20:8050/api/scriptPhp/index.php";
 
 		 
 		JsonString jsonString = new JsonString(factura, mesServicio , idEmpresa);

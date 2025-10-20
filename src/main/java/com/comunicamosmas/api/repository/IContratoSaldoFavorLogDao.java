@@ -35,4 +35,24 @@ public interface IContratoSaldoFavorLogDao extends CrudRepository<ContratoSaldoF
                   "inner join medios_pago mp on mp.id_medio_pago = csfl.id_medio_pago \n" + //
                   "WHERE csfl.id_medio_pago IN :payments AND csfl.tipo  = 1 AND csfl.fechaf BETWEEN :first AND :last" ,nativeQuery = true)
      public Optional<List<Object[]>> findByMedioPago(@Param("payments") List<Integer> pyments , @Param("first") String firts , @Param("last") String last);
+
+     public List<ContratoSaldoFavorLog> findByIdDeuda(@Param("idDeuda") Long idDeuda);
+
+     @Query(value= """
+               SELECT 
+csf.id_log_saldo_favor,
+concat(us.nombre , ' ' , us.apellidos) as cajero,
+csf.valor,
+csf.detalle,
+csf.marca,
+mp.nombre,
+case  
+	WHEN csf.tipo = 1 THEN 'Cargado' ELSE 'Descargado'
+    END as tipo
+    FROM contratos_saldo_favor_log csf 
+inner join usuarios us on us.id_usuario = csf.id_cajero
+inner join medios_pago mp on mp.id_medio_pago = csf.id_medio_pago
+where csf.id_log_saldo_favor  = :id
+               """, nativeQuery = true)
+     public List<Object[]> findInfoContrato(@Param("id") Long id);
 }

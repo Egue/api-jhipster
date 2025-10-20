@@ -1,0 +1,9 @@
+package com.hjsolutions.contratos_isp.constants
+
+const val APPWRITE_PROJECT_ID = "68bceb260025a20cf69f"
+const val APPWRITE_PROJECT_NAME = "contratos"
+const val APPWRITE_PUBLIC_ENDPOINT = "https://nyc.cloud.appwrite.io/v1"
+const val APP_WRITE_KEY_DATABASE = "standard_871a17ea8107a75a7fae408100279588605fd30102855ed802a65ffb50d37f006b0e22a4a3c0a50dca522aa1d0f562be7c9f9fbe47838690b13804b3c07b437145bf18918369e31ec2d02888752a4a9449308b5aa6de5a397992f679316ed3e37ed5ef71a91db74cbd26d7988fd305377d9ee3e62043d9b1c80418c3f533c2f1"
+const val APPWRITE_DATABASE_ID = "68bdf0c3003e769ff3be"
+
+const val APPWRITE_BUNKET_ID="68bee7b100153cee2c5a"

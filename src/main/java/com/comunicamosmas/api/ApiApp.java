@@ -14,12 +14,17 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties; 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+
 import tech.jhipster.config.DefaultProfileUtil;
 import tech.jhipster.config.JHipsterConstants;
 
 @SpringBootApplication()
 @EnableConfigurationProperties({ LiquibaseProperties.class, ApplicationProperties.class })
+@ComponentScan(basePackages = {"com.comunicamosmas.api", "com.hjsolutions.isp_api"})
+@EnableMongoRepositories(basePackages = {"com.hjsolutions.isp_api.repository" , "com.comunicamosmas.api.repositoryMongo"})
 public class ApiApp {
 
     private static final Logger log = LoggerFactory.getLogger(ApiApp.class);

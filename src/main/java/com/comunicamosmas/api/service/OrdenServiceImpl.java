@@ -9,11 +9,10 @@ import com.comunicamosmas.api.service.dto.OrdenByContratoDTO;
 import com.comunicamosmas.api.service.dto.OrdenByTipoOrdenDTO;
 import com.comunicamosmas.api.service.dto.OrdenForInstalacionFindByIdOrdenDTO;
 import com.comunicamosmas.api.service.dto.OrdenInstalacionDTO;
-import com.comunicamosmas.api.service.dto.ReporteOrdenConVisitaFallidaDTO;
+import com.comunicamosmas.api.service.dto.OrderDetalleDTO; 
+import com.comunicamosmas.api.service.dto.ReporteOrdenConVisitaFallidaDTO; 
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
-
-import liquibase.pro.packaged.O;
-import liquibase.pro.packaged.fo;
+ 
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -24,6 +23,8 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -37,6 +38,7 @@ public class OrdenServiceImpl implements IOrdenService {
 
 	@Autowired
 	IContratoService contratoService;
+ 
 
 	@Override
 	public List<Orden> findAll() {
@@ -82,7 +84,16 @@ public class OrdenServiceImpl implements IOrdenService {
 	@Override
 	public List<OrdenInstalacionDTO> getListFindBetwee(String valor1, String valor2) {
 		// TODO Auto-generated method stub
-		return (List<OrdenInstalacionDTO>) ordenDao.getListFindBetwee(valor1, valor2);
+		Optional<List<Object[]>> ordenes =  ordenDao.getListFindBetwee(valor1, valor2);
+
+		return ordenes.map(resp -> {
+			List<OrdenInstalacionDTO> list = new ArrayList<>();
+			for (Object[] rs : resp) {
+				OrdenInstalacionDTO obj = this.mapToOrdenInstalacionDTO(rs);
+				list.add(obj);
+			}
+			return list;
+		}).orElse(new ArrayList<>());
 	}
 
 	@Override
@@ -544,6 +555,56 @@ public class OrdenServiceImpl implements IOrdenService {
 
 		return numero;
 
+	}
+
+	@Override
+	public Page<OrderDetalleDTO> ordenes(Long abierta, Long anulada ,List<Integer> estado ,Long idServicio, Long idTipo, Long fechaInicio , Long fechaFinal, Pageable pageable) {
+		// TODO Auto-generated method stub
+		Page<Object[]> page =  ordenDao.findOrdenesDetalladas(abierta, anulada ,estado, idServicio, 
+            idTipo, 
+            fechaInicio, 
+            fechaFinal, 
+            pageable);
+
+		return page.map(this::mapToOrderDetalleDTO);
+	}
+
+	private OrderDetalleDTO mapToOrderDetalleDTO(Object[] row)
+    {
+        OrderDetalleDTO dto = new OrderDetalleDTO();
+        dto.setIdOrden((String) row[0].toString());
+        dto.setNombreEstado((String) row[1]);
+        dto.setCausaSolicitud((String) row[2]);
+        dto.setIdContrato((String) row[3].toString());
+        dto.setFechaRegistro((String) row[4].toString());
+        dto.setRefiere((String) row[5]);
+        dto.setTipoCliente((String) row[6]);
+        dto.setCliente((String) row[7]);
+        dto.setDocumento((String) row[8].toString());
+        dto.setBarrio((String) row[9]);
+        dto.setDireccion((String) row[10]);
+        dto.setTelefonoContacto((String) row[11].toString() + " / "+ (String) row[12].toString());
+        dto.setNombreTecnologia((String) row[13]);
+        dto.setNota((String) row[14]);
+        dto.setEstado((String) row[15]);
+        dto.setNotaFinal((String) row[16]);
+        dto.setAnulada((String) row[17].toString());
+        dto.setVisitasFallidas((String) row[18]);
+		dto.setUserEjecuta((Integer) row[19]);
+        return dto;
+
+    }
+
+	private OrdenInstalacionDTO mapToOrdenInstalacionDTO(Object[] row) {
+		OrdenInstalacionDTO dto = new OrdenInstalacionDTO();
+		 dto.setIdOrden((Integer) row[0]);
+		 dto.setIdContrato((Integer)	 row[1]);
+		 dto.setNombreCliente((String) row[2]);
+		 dto.setDocumento((String) row[3].toString());
+		 dto.setTipoTecnologia((String) row[5]);
+		 dto.setNombre((String) row[4]);
+
+		return dto;
 	}
 
 }

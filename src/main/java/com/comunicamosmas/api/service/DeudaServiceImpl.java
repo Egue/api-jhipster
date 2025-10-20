@@ -1,8 +1,10 @@
 package com.comunicamosmas.api.service;
 
+import com.comunicamosmas.api.domain.ContratoSaldoFavorLog;
 import com.comunicamosmas.api.domain.Deuda;
 import com.comunicamosmas.api.domain.EmailCampaign;
 import com.comunicamosmas.api.domain.FinancieroNc;
+import com.comunicamosmas.api.repository.IContratoSaldoFavorLogDao;
 import com.comunicamosmas.api.repository.IDeudaDao;
 import com.comunicamosmas.api.repository.IFinancieroNcDao;
 import com.comunicamosmas.api.repository.IPagoDao;
@@ -42,6 +44,9 @@ public class DeudaServiceImpl implements IDeudaService {
 
 	@Autowired
 	IFinancieroNcDao financieroNcDao;
+
+	@Autowired
+	IContratoSaldoFavorLogDao contratoSaldoaFavorlogDao;
 
 	/*private final IDeudaDao deudaDao; 
 	private final IPagoService pagoService;
@@ -120,7 +125,9 @@ public class DeudaServiceImpl implements IDeudaService {
 		//nc
 		Integer id_deuda = (Integer) resultado[0];
 		List<FinancieroNc> nc = financieroNcDao.findByIdDeuda(Long.valueOf(id_deuda));
+		List<ContratoSaldoFavorLog> sal = contratoSaldoaFavorlogDao.findByIdDeuda(Long.valueOf(id_deuda));
 		obj.setNotasCredito(nc);
+		obj.setSaldosFavor(sal);
 		//saldo favor
 		return obj;
 	} 

@@ -7,9 +7,15 @@ import com.comunicamosmas.api.service.dto.OrdenByContratoDTO;
 import com.comunicamosmas.api.service.dto.OrdenByTipoOrdenDTO;
 import com.comunicamosmas.api.service.dto.OrdenForInstalacionFindByIdOrdenDTO;
 import com.comunicamosmas.api.service.dto.OrdenInstalacionDTO;
+import com.comunicamosmas.api.service.dto.OrderDetalleDTO;
+import com.comunicamosmas.api.service.dto.OrdesQueryDTO;
 import com.comunicamosmas.api.service.dto.ReporteOrdenConVisitaFallidaDTO;
 
 import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface IOrdenService {
 	//buscar por tipo y activo
@@ -64,4 +70,6 @@ public interface IOrdenService {
     public ChartDataLineDTO chartLineOrdenesCortados(Integer ano , List<Integer> servicios);
     //crear orden de cambio de plan
     public void ordenCambioPlan(Long idContrato , Long idAdmin);	
+
+    public Page<OrderDetalleDTO> ordenes(Long abierta, Long anulada , List<Integer> estado, Long idServicio, Long idTipo, Long fechaInicio , Long fechaFinal, Pageable pageable);
 }
