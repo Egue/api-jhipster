@@ -8,6 +8,19 @@
 /target/classes/static/**
 /src/test/javascript/coverage/
 /src/main/resources/config/application-dev.yml
+
+######################
+# Apache Airflow
+######################
+# DAGs con credenciales y configuración sensible
+airflow/
+airflow/**
+*.pyc
+__pycache__/
+airflow.cfg
+airflow.db
+logs/
+dags/__pycache__/
 ######################
 # Node
 ######################
@@ -177,3 +190,6 @@ inventory_agente/target/maven-status/maven-compiler-plugin/testCompile/default-t
 inventory_agente/target/test-classes/META-INF/inventory_agente.kotlin_module
 
 
+SEGURIDAD_TOKEN_AIRFLOW.md
+.gitignore
+CAMBIOS_TOKEN_AIRFLOW.md
