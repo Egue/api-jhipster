@@ -20,14 +20,20 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import com.hjsolutions.contratos_isp.constants.APPWRITE_BUNKET_ID
+import com.hjsolutions.contratos_isp.constants.APPWRITE_PROJECT_ID
+import com.hjsolutions.contratos_isp.constants.APPWRITE_PUBLIC_ENDPOINT
 import java.io.File
 
 @Composable
@@ -72,18 +78,35 @@ fun PhotoSection(
                 }
             }else{
                 //Mostrar foto
-                Box{
-                    Image(
-                        painter = rememberAsyncImagePainter(File(photoPath)),
-                        contentDescription = "Foto Cliente",
-                        modifier = Modifier.size(150.dp).clip(CircleShape)
-                            .border(2.dp , MaterialTheme.colorScheme.primary, CircleShape),
-                        contentScale = ContentScale.Crop
-                    )
+                if(File(photoPath).exists()){
+                    Box{
+                        Image(
+                            painter = rememberAsyncImagePainter(File(photoPath)),
+                            contentDescription = "Foto Cliente",
+                            modifier = Modifier.size(150.dp).clip(CircleShape)
+                                .border(2.dp , Color(0xFF6200EE), CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
 
-                    //eliminar
+                        //eliminar
 
+                    }
+                }else{
+                    val bunkendId = APPWRITE_BUNKET_ID
+                    val imagenUlr = remember(photoPath , bunkendId) {
+                        "$APPWRITE_PUBLIC_ENDPOINT/storage/buckets/$bunkendId/files/$photoPath/view?project=$APPWRITE_PROJECT_ID"
+                    }
+                    Box {
+                        AsyncImage(
+                            model = imagenUlr,
+                            contentDescription = "Perfil",
+                            modifier = Modifier.size(150.dp).clip(CircleShape)
+                                .border(2.dp ,Color(0xFF6200EE), CircleShape),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 }
+
             }
         }
     }

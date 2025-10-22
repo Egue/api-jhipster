@@ -26,14 +26,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.hjsolutions.contratos_isp.data.models.ContratoModels
-import okhttp3.internal.wait
 
 @Composable
 fun CardContrato(
     contrato: ContratoModels ,
     onViewPdf:()-> Unit ,
     onFirma:()-> Unit ,
-    onDoc: () -> Unit){
+    onDoc: () -> Unit ,
+    onStatus:() ->Unit){
 
     Card(modifier = Modifier
         .fillMaxWidth() ,
@@ -128,7 +128,9 @@ fun CardContrato(
                 }
                 Spacer(Modifier.width(8.dp))
                 ElevatedButton(
-                    onClick = {},
+                    onClick = {
+                        onStatus()
+                    },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF4CAF50)
 

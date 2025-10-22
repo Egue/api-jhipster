@@ -21,7 +21,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import android.graphics.Bitmap
@@ -31,7 +30,6 @@ import android.graphics.Path as AndroidPath
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalConfiguration
 import com.hjsolutions.contratos_isp.ui.viewModels.SignatureViewModel
-import kotlin.math.abs
 
 data class PathPoint(
     val offset: Offset,

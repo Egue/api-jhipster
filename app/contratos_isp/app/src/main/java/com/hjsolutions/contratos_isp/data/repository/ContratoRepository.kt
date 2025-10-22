@@ -1,5 +1,7 @@
 package com.hjsolutions.contratos_isp.data.repository
 
+import android.util.Log
+import com.google.gson.Gson
 import com.hjsolutions.contratos_isp.api.client.AppWriteClient
 import com.hjsolutions.contratos_isp.constants.APPWRITE_DATABASE_ID
 import io.appwrite.Query
@@ -62,6 +64,42 @@ class ContratoRepository {
                 Result.success(response)
             }catch (e: AppwriteException){
                 Result.failure(Exception("error ${e.message}"))
+            }
+        }
+    }
+
+    suspend fun updatedDocuments(id:String, documentos: Map<String, Any?>):Result<Document<Map<String,Any>>>{
+        return withContext(Dispatchers.IO){
+            try {
+                val jsonString = Gson()
+                val documents:String = jsonString.toJson(documentos)
+                val response = databases.updateDocument(
+                    databaseId = APPWRITE_DATABASE_ID,
+                    collectionId = "contratos",
+                    documentId = id,
+                    data = mapOf("documentos" to documents )
+                )
+                Result.success(response)
+            }catch (e:AppwriteException){
+                e.printStackTrace()
+                Result.failure(Exception("error ${e.message}"))
+            }
+        }
+    }
+
+    suspend fun updatedStatus(id:String):Result<Document<Map<String, Any>>>{
+        return withContext((Dispatchers.IO)){
+            try {
+                val response = databases.updateDocument(
+                    databaseId =  APPWRITE_DATABASE_ID,
+                    collectionId = "contratos",
+                    documentId = id,
+                    data = mapOf("estado" to 1)
+                )
+                Result.success(response)
+            }catch (e:Exception){
+                e.printStackTrace()
+                Result.failure(Exception("Error actualizando ${e.message}"))
             }
         }
     }

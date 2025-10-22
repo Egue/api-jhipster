@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -12,13 +13,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import com.hjsolutions.contratos_isp.constants.APPWRITE_BUNKET_ID
+import com.hjsolutions.contratos_isp.constants.APPWRITE_PROJECT_ID
+import com.hjsolutions.contratos_isp.constants.APPWRITE_PUBLIC_ENDPOINT
 import java.io.File
 
 
@@ -28,15 +34,32 @@ fun DocumentItem(
     onRemove: () -> Unit
 ) {
     Box() {
-        Image(
-            painter = rememberAsyncImagePainter(File(imagePath)),
-            contentDescription = "Documento",
-            modifier = Modifier
-                .size(120.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp)),
-            contentScale = ContentScale.Crop
-        )
+        if(File(imagePath).exists()){
+            Image(
+                painter = rememberAsyncImagePainter(File(imagePath)),
+                contentDescription = "Documento",
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop
+            )
+        }else{
+            val bunkendId = APPWRITE_BUNKET_ID
+            val imagenUlr = remember(imagePath , bunkendId) {
+                "$APPWRITE_PUBLIC_ENDPOINT/storage/buckets/$bunkendId/files/$imagePath/view?project=$APPWRITE_PROJECT_ID"
+            }
+
+            AsyncImage(
+                model = imagenUlr,
+                contentDescription = "description",
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop
+            )
+        }
 
         IconButton (
             onClick = onRemove,

@@ -24,7 +24,6 @@ import coil.compose.AsyncImage
 import com.hjsolutions.contratos_isp.constants.APPWRITE_BUNKET_ID
 import com.hjsolutions.contratos_isp.constants.APPWRITE_PROJECT_ID
 import com.hjsolutions.contratos_isp.constants.APPWRITE_PUBLIC_ENDPOINT
-import com.hjsolutions.contratos_isp.ui.viewModels.SignatureViewModel
 
 @Composable
 fun ImageCard(
