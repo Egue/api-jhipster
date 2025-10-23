@@ -45,5 +45,16 @@ public interface IEmailCampaignService {
 	 * @return EmailCampaign o null si no existe
 	 */
 	public EmailCampaign findById(Long id);
+
+	/**
+	 * Busca campañas por estado específico.
+	 * 
+	 * Utilizado por el proceso automático para encontrar
+	 * campañas en estado "Abierto" disponibles para procesamiento.
+	 * 
+	 * @param estado Estado de la campaña (ej: "Abierto", "Finalizado")
+	 * @return Lista de campañas con el estado especificado
+	 */
+	public List<EmailCampaign> findByEstado(String estado);
 	 
 }

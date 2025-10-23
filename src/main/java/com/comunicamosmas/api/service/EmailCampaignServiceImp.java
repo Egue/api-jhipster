@@ -192,4 +192,20 @@ public class EmailCampaignServiceImp implements IEmailCampaignService{
 		return emailCampaignDao.findById(id.intValue()).orElse(null);
 	}
 
+	/**
+	 * Busca campañas por estado específico.
+	 * Utilizado por el proceso automático para encontrar campañas "Abiertas".
+	 * 
+	 * @param estado Estado de la campaña (ej: "Abierto", "Finalizado")
+	 * @return Lista de campañas con ese estado
+	 */
+	@Override
+	public List<EmailCampaign> findByEstado(String estado) {
+		if (estado == null || estado.trim().isEmpty()) {
+			return new ArrayList<>();
+		}
+		return emailCampaignDao.findByEstado(estado);
+	}
+
 }
+

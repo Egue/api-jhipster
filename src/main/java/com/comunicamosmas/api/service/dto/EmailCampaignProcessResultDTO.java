@@ -1,7 +1,9 @@
 package com.comunicamosmas.api.service.dto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,6 +45,26 @@ public class EmailCampaignProcessResultDTO {
     
     /** Error general si el proceso completo falló */
     private String generalError;
+
+    // ========== Campos para Proceso Automático ==========
+    
+    /** Hora de inicio de la ventana de ejecución (01:00 AM) */
+    private LocalDateTime executionWindowStart;
+    
+    /** Hora de fin de la ventana de ejecución (05:00 AM o cuando terminó) */
+    private LocalDateTime executionWindowEnd;
+    
+    /** Indica si el proceso fue detenido por el scheduler a las 05:00 AM */
+    private Boolean stoppedByScheduler = false;
+    
+    /** Cantidad de campañas procesadas en esta ejecución */
+    private Integer campaignsProcessed = 0;
+    
+    /** Lista de IDs de campañas procesadas */
+    private List<Long> campaignIds = new ArrayList<>();
+    
+    /** Lista de errores generales */
+    private List<String> errorsList = new ArrayList<>();
 
     // Constructores
     
@@ -165,6 +187,71 @@ public class EmailCampaignProcessResultDTO {
      */
     public void addError(String email, String errorMsg) {
         this.errors.put(email, errorMsg);
+    }
+
+    /**
+     * Agrega un error a la lista de errores generales
+     * @param errorMsg Mensaje de error
+     */
+    public void addError(String errorMsg) {
+        this.errorsList.add(errorMsg);
+    }
+
+    /**
+     * Incrementa el contador total de procesados
+     */
+    public void incrementTotalProcessed() {
+        this.totalProcessed++;
+    }
+
+    // ========== Getters y Setters para campos de proceso automático ==========
+
+    public LocalDateTime getExecutionWindowStart() {
+        return executionWindowStart;
+    }
+
+    public void setExecutionWindowStart(LocalDateTime executionWindowStart) {
+        this.executionWindowStart = executionWindowStart;
+    }
+
+    public LocalDateTime getExecutionWindowEnd() {
+        return executionWindowEnd;
+    }
+
+    public void setExecutionWindowEnd(LocalDateTime executionWindowEnd) {
+        this.executionWindowEnd = executionWindowEnd;
+    }
+
+    public Boolean getStoppedByScheduler() {
+        return stoppedByScheduler;
+    }
+
+    public void setStoppedByScheduler(Boolean stoppedByScheduler) {
+        this.stoppedByScheduler = stoppedByScheduler;
+    }
+
+    public Integer getCampaignsProcessed() {
+        return campaignsProcessed;
+    }
+
+    public void setCampaignsProcessed(Integer campaignsProcessed) {
+        this.campaignsProcessed = campaignsProcessed;
+    }
+
+    public List<Long> getCampaignIds() {
+        return campaignIds;
+    }
+
+    public void setCampaignIds(List<Long> campaignIds) {
+        this.campaignIds = campaignIds;
+    }
+
+    public List<String> getErrorsList() {
+        return errorsList;
+    }
+
+    public void setErrorsList(List<String> errors) {
+        this.errorsList = errors;
     }
 
     /**

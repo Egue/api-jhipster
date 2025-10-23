@@ -64,7 +64,7 @@ public interface IEmailCampaignDetalleDao extends CrudRepository<EmailCampaignDe
 	+ "			case\n"
 	+ "				when cl.tipo_cliente = 'N' then concat(cl.apellido_paterno, ' ', cl.apellido_materno, ' ', cl.nombre_primer, ' ', cl.nombre_segundo)\n"
 	+ "			    when cl.tipo_cliente = 'J' then cl.razon_social\n"
-	+ "			end nombreCliente , detalle.id  , detalle.id_email_campaing\n"
+	+ "			end nombreCliente , detalle.id  , detalle.id_email_campaing , detalle.origen\n"
 	+ "			FROM email_campaing_detalle detalle\n"
 	+ "			inner join clientes cl on cl.id_cliente = detalle.id_cliente\n"
 	+ "			inner join servicios sr on sr.id_servicio = detalle.id_servicio\n"

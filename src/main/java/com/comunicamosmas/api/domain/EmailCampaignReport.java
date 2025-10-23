@@ -90,6 +90,35 @@ public class EmailCampaignReport implements Serializable {
     @Column(name = "created_date", nullable = false, updatable = false)
     private LocalDateTime createdDate;
 
+    /**
+     * Hora de inicio de la ventana de ejecución (01:00 AM)
+     * Para procesos automáticos que se ejecutan en ventana de tiempo
+     */
+    @Column(name = "execution_window_start")
+    private LocalDateTime executionWindowStart;
+
+    /**
+     * Hora de fin de la ventana de ejecución (05:00 AM o cuando terminó)
+     * Para procesos automáticos que se ejecutan en ventana de tiempo
+     */
+    @Column(name = "execution_window_end")
+    private LocalDateTime executionWindowEnd;
+
+    /**
+     * Indica si el proceso fue detenido por el scheduler a las 05:00 AM
+     * true = detenido por límite de tiempo
+     * false = terminó naturalmente
+     */
+    @Column(name = "stopped_by_scheduler")
+    private Boolean stoppedByScheduler;
+
+    /**
+     * Cantidad de campañas procesadas en esta ejecución
+     * Para ejecuciones que procesan múltiples campañas
+     */
+    @Column(name = "campaigns_processed")
+    private Integer campaignsProcessed;
+
     // Constructores
 
     /**
@@ -202,6 +231,38 @@ public class EmailCampaignReport implements Serializable {
 
     public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public LocalDateTime getExecutionWindowStart() {
+        return executionWindowStart;
+    }
+
+    public void setExecutionWindowStart(LocalDateTime executionWindowStart) {
+        this.executionWindowStart = executionWindowStart;
+    }
+
+    public LocalDateTime getExecutionWindowEnd() {
+        return executionWindowEnd;
+    }
+
+    public void setExecutionWindowEnd(LocalDateTime executionWindowEnd) {
+        this.executionWindowEnd = executionWindowEnd;
+    }
+
+    public Boolean getStoppedByScheduler() {
+        return stoppedByScheduler;
+    }
+
+    public void setStoppedByScheduler(Boolean stoppedByScheduler) {
+        this.stoppedByScheduler = stoppedByScheduler;
+    }
+
+    public Integer getCampaignsProcessed() {
+        return campaignsProcessed;
+    }
+
+    public void setCampaignsProcessed(Integer campaignsProcessed) {
+        this.campaignsProcessed = campaignsProcessed;
     }
 
     // Métodos helper
