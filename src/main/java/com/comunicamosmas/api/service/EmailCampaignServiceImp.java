@@ -139,19 +139,9 @@ public class EmailCampaignServiceImp implements IEmailCampaignService{
 	
 	@Override
 	public List<EmailCampaignDetalle> findByMesAndAnio(int mes, int anio) {
-	    // Obtener las campañas por mes y año
-	    List<EmailCampaign> campaigns = emailCampaignDao.findByMesAndAnio(mes, anio);
-
-	    // Lista para almacenar los detalles de las campañas
-	    List<EmailCampaignDetalle> detalles = new ArrayList<>();
-
-	    // Iterar sobre las campañas y obtener sus detalles
-	    for (EmailCampaign campaign : campaigns) {
-	        List<EmailCampaignDetalle> detallesCampaña = emailCampaignDetalleDao.findDetallesByIdCampaign(campaign.getId());
-	        detalles.addAll(detallesCampaña);
-	    }
-
-	    return detalles;
+	    // Ejecutar query optimizada con INNER JOIN en una sola consulta SQL
+	    // Esto reemplaza el problema N+1 (1 query para campañas + N queries para detalles)
+	    return emailCampaignDetalleDao.findDetallesByMesAndAnio(mes, anio);
 	}
 
 	/**

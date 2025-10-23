@@ -96,7 +96,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             .antMatchers("/api/kt//inventory").permitAll()
             //.antMatchers("/api/account/reset-password/finish").permitAll()
             .antMatchers("/api/controlmas/seguimiento/render/img/**").permitAll()
-            .antMatchers("/api/airflow/**").permitAll()
             .antMatchers("/api/controlmas/scheduled/**").permitAll()
             .antMatchers("/api/admin/**").hasAuthority(AuthoritiesConstants.ADMIN)
             .antMatchers("/api/**").authenticated()

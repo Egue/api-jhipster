@@ -87,6 +87,19 @@ public interface IEmailCampaignDetalleDao extends CrudRepository<EmailCampaignDe
     List<EmailCampaignDetalle> findDetallesByIdCampaign(@Param("idCampaign") int idCampaign);
 
 	/**
+	 * Obtiene todos los detalles de campañas filtradas por mes y año.
+	 * Optimizado con INNER JOIN para evitar múltiples queries (problema N+1).
+	 * 
+	 * @param mes Mes de la campaña (1-12)
+	 * @param anio Año de la campaña
+	 * @return Lista de detalles de todas las campañas que coincidan con mes y año
+	 */
+	@Query(value = "SELECT ecd.* FROM email_campaign_detalle ecd " +
+				   "INNER JOIN email_campaign ec ON ec.id = ecd.id_email_campaign " +
+				   "WHERE ec.mes = :mes AND ec.anno = :anio", nativeQuery = true)
+	List<EmailCampaignDetalle> findDetallesByMesAndAnio(@Param("mes") int mes, @Param("anio") int anio);
+
+	/**
 	 * Cuenta el total de detalles de una campaña.
 	 * 
 	 * @param campaignId ID de la campaña
