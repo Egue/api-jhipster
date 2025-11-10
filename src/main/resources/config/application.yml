@@ -181,3 +181,27 @@ jhipster:
 # ===================================================================
 
 # application:
+
+# ===================================================================
+# Configuración de Email Campaign Batch Processing
+# Parámetros para procesamiento automático de campañas de email
+# ===================================================================
+email-campaign:
+  batch:
+    # Habilitar procesamiento batch
+    enabled: true
+    # Tamaño de lote por defecto (emails procesados antes de pausa)
+    default-batch-size: 50
+    # Delay entre envíos en milisegundos (para no saturar servidor de correo)
+    default-delay-ms: 100
+    # Máximo de reintentos en caso de fallo
+    max-retries: 3
+    # Timeout máximo de procesamiento en segundos
+    timeout-seconds: 3600
+  reports:
+    # Días de retención de reportes en BD
+    retention-days: 90
+    # Habilitar limpieza automática de reportes antiguos
+    cleanup-enabled: true
+    # Habilitar generación de reportes detallados
+    detailed-logging: true
