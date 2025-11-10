@@ -28,7 +28,11 @@ data class DatosContrato(
     val valor_instalacion: Number,
     val valor_reconexion : Number,
     val valor_traslado : Number
-)
+){}
+data class TypeService(
+    val type:String,
+    val repHtml:String
+){}
 data class DireccionContrato(
     val departamento:String,
     val municipio:String,
@@ -37,7 +41,8 @@ data class DireccionContrato(
 ){}
 data class TarifaContrato(
     val valor: Double,
-    val tecnologia:String
+    val tecnologia:String,
+    val velocidad:String
 ){}
 
 data class  ClausulaContrato(

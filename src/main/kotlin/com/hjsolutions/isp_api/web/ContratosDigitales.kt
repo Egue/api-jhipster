@@ -1,6 +1,7 @@
 package com.hjsolutions.isp_api.web
 
 import com.hjsolutions.isp_api.service.ContratoDigitalService
+import io.appwrite.models.DocumentList
 import kotlinx.coroutines.CoroutineScope
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -20,7 +21,33 @@ class ContratosDigitales(private val contratoDigitalService: ContratoDigitalServ
 
             contratoDigitalService.sincronice(idContrato.toLong())
 
-            return ResponseEntity.ok().body("ok")
+            return ResponseEntity.ok().build()
+        }catch (e: Exception){
+            return ResponseEntity.badRequest().body(e.message)
+        }
+    }
+
+    @GetMapping("appWrite/contrato")
+    suspend fun getContratoAppWrite(@RequestParam("contrato") contrato:String): ResponseEntity<DocumentList<Map<String,Any>>>?{
+        try {
+            val response = contratoDigitalService.findContratoAppwrite(contrato)
+            return ResponseEntity.ok().body(response)
+        }catch (e: Exception){
+            e.printStackTrace()
+            return ResponseEntity.badRequest().build()
+        }
+    }
+
+
+
+    @GetMapping("/find")
+    suspend fun find(@RequestParam("contrato") contrato:String):ResponseEntity<Any>{
+
+        try {
+            val response = contratoDigitalService.findContratoByImplementacion(contrato)
+
+            return ResponseEntity.ok().body(response)
+
         }catch (e: Exception){
             return ResponseEntity.badRequest().body(e.message)
         }

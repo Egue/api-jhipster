@@ -14,7 +14,7 @@ public interface IEstacionDao extends CrudRepository<Estacion, Long> {
         nativeQuery = true
     )
     public List<Estacion> findByNombreAndIdServicio(@Param("nombre") String nombre, @Param("idServicio") Long idServicio);
-    
+
     @Query(value = "select \n"
     		+ "est.id_estacion as id,\n"
     		+ "est.nombre as nombreEstacion,\n"
@@ -48,7 +48,7 @@ public interface IEstacionDao extends CrudRepository<Estacion, Long> {
     		+ "ci.nombre as nombreCiudad,\n"
     		+ "zm.nombre as nombreZona,\n"
     		+ "est.codigo,\n"
-    		+ "est.api_ip as ip \n"
+    		+ "est.api_ip as ip , est.latitud, est.longitud \n"
     		+ "FROM estaciones est\n"
     		+ "INNER JOIN empresas em ON em.id_empresa = est.id_empresa\n"
     		+ "INNER JOIN ciudades ci ON ci.id_ciudad = est.id_ciudad\n"

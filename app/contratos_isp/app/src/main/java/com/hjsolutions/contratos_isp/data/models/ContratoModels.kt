@@ -56,7 +56,8 @@ data class DireccionContrato(
 ){}
 data class TarifaContrato(
     val valor: Double,
-    val tecnologia:String
+    val tecnologia:String,
+    val velocidad:String
 ){}
 
 data class  ClausulaContrato(

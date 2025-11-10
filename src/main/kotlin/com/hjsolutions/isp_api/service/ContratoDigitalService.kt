@@ -4,6 +4,7 @@ import com.comunicamosmas.api.domain.ClausulaPermanencia
 import com.comunicamosmas.api.domain.Cliente
 import com.comunicamosmas.api.domain.Contrato
 import com.comunicamosmas.api.domain.Direccion
+import com.comunicamosmas.api.domain.Empresa
 import com.comunicamosmas.api.domain.ListaDepartamento
 import com.comunicamosmas.api.domain.ListaMunicipio
 import com.comunicamosmas.api.domain.SystemConfig
@@ -13,6 +14,7 @@ import com.comunicamosmas.api.repository.IClausulaPermanenciaDao
 import com.comunicamosmas.api.repository.IClienteDao
 import com.comunicamosmas.api.repository.IContratoDao
 import com.comunicamosmas.api.repository.IDireccionDao
+import com.comunicamosmas.api.repository.IEmpresaDao
 import com.comunicamosmas.api.repository.IListaDepartamentoDao
 import com.comunicamosmas.api.repository.IListaMunicipioDao
 import com.comunicamosmas.api.repository.ISystemConfigDao
@@ -20,18 +22,27 @@ import com.comunicamosmas.api.repository.ITipoTecnologiaDao
 import com.comunicamosmas.api.repository.IUsuarioDao
 import com.comunicamosmas.api.service.ITarifaService
 import com.google.gson.Gson
+import com.hjsolutions.isp_api.domain.Templates
+import com.hjsolutions.isp_api.repository.TemplateRepository
 import com.hjsolutions.isp_api.service.dto.ClausulaContrato
 import com.hjsolutions.isp_api.service.dto.ClienteContrato
 import com.hjsolutions.isp_api.service.dto.ContratoInfo
 import com.hjsolutions.isp_api.service.dto.DatosContrato
 import com.hjsolutions.isp_api.service.dto.DireccionContrato
 import com.hjsolutions.isp_api.service.dto.TarifaContrato
+import com.hjsolutions.isp_api.service.dto.TypeService
 import com.hjsolutions.isp_api.service.dto.VendedorContrato
 import io.appwrite.Client
 import io.appwrite.services.Databases
 import org.springframework.stereotype.Service
 import io.appwrite.ID
+import io.appwrite.Query
 import io.appwrite.exceptions.AppwriteException
+import io.appwrite.models.Document
+import io.appwrite.models.DocumentList
+import io.appwrite.models.RowList
+import io.appwrite.services.TablesDB
+import liquibase.pro.packaged.da
 
 @Service
 class ContratoDigitalService(
@@ -44,34 +55,110 @@ class ContratoDigitalService(
     private val departamentoRepository: IListaDepartamentoDao,
     private val listaMunicipioRepository: IListaMunicipioDao,
     private val systemConfingRepository: ISystemConfigDao,
-    private val tipoTecnologiaRepository: ITipoTecnologiaDao
+    private val tipoTecnologiaRepository: ITipoTecnologiaDao,
+    private val templateRepository: TemplateRepository,
+    private val empresaRepository: IEmpresaDao
 ) {
+
+    suspend fun findContratoByImplementacion(contrato:String): RowList<Map<String , Any>>
+    {
+        val client : Client = AppWriteClient().client()
+        val database_id = AppWriteClient().app_database()
+        val tablesDB = TablesDB(client)
+        val implementacion : SystemConfig = systemConfingRepository.findByOrigen("implementacion")
+        try{
+
+            val response: RowList<Map<String, Any>> = tablesDB.listRows(
+                databaseId = database_id,
+                tableId = "contratos",
+                queries = listOf(
+                    Query.equal("id_contrato" , contrato ),
+                    Query.equal("implementacion" , implementacion.comando)
+
+                )
+            )
+
+            return response
+
+        }catch (e: AppwriteException){
+            throw Exception("fallo al consultar : ${e.message}")
+        }catch (e: Exception){
+            throw Exception("error al generar el envio ${e.message}")
+        }
+
+    }
+
+    suspend fun templateAndInfoContrato(idContrato:Long):Map<String, Any?>{
+
+        val (contratoInfo , contrato) = generateInformationContrato(idContrato)
+        val empresa: Empresa = empresaRepository.findById(contrato.idEmpresa).get()
+
+        val template: Templates? = templateRepository.findOneByIdServicioAndName(idServicio = contrato.idServicio , name = "contrato")
+        val response = mapOf(
+            "empresa" to empresa,
+            "contrato" to contratoInfo,
+            "template" to template?.template
+        )
+        return response
+    }
+
+    private fun generateInformationContrato(idContrato:Long): Pair<ContratoInfo , Contrato>{
+        val contrato: Contrato = contratoRepository.findById(idContrato).get()
+        val cliente: Cliente = clienteRepository.findById(contrato.idCliente).get()
+        val tarifa: Tarifa = tarifaRepository.findById(contrato.idTarifaPromo)
+        val vendedor: Usuario = userRepository.findById(contrato.idVendedor).get()
+        val clausula: ClausulaPermanencia = clausulaRepository.findByIdContrato(idContrato)
+        var dtoContrato: DatosContrato = datosContratoMapper(contrato)
+        var dtoCliente: ClienteContrato = datosClienteMapper(cliente)
+        var dtoTarifa: TarifaContrato = datosTarifasMapper(tarifa)
+        var dtoVendedor: VendedorContrato = datosVendedorMapper(vendedor)
+        var dtoClausula: ClausulaContrato = datosClausula(clausula)
+        var contratoDigital: ContratoInfo = ContratoInfo(
+            cliente = dtoCliente,
+            contrato = dtoContrato,
+            tarifa = dtoTarifa,
+            clausula = dtoClausula,
+            vendedor = dtoVendedor
+        )
+
+        return Pair(contratoDigital , contrato)
+    }
+
+    suspend fun findContratoAppwrite(idContrato:String): DocumentList<Map<String, Any>>? {
+        val client: Client = AppWriteClient().client()
+        val database_id = AppWriteClient().app_database()
+        val database = Databases(client)
+
+        try {
+            val response = database.listDocuments(
+                database_id,
+                "contratos",
+                listOf(
+                     Query.equal("id_contrato" , idContrato)
+                )
+            )
+
+            return response
+        }catch (e: Exception){
+            e.printStackTrace()
+
+            return null
+        }
+
+
+    }
 
       suspend fun sincronice(idContrato:Long){
         val client: Client = AppWriteClient().client()
           val database_id = AppWriteClient().app_database()
         val database = Databases(client)
         try {
-            val contrato: Contrato = contratoRepository.findById(idContrato).get()
-            val cliente: Cliente = clienteRepository.findById(contrato.idCliente).get()
-            val tarifa: Tarifa = tarifaRepository.findById(contrato.idTarifaPromo)
-            val vendedor: Usuario = userRepository.findById(contrato.idVendedor).get()
-            val clausula: ClausulaPermanencia = clausulaRepository.findByIdContrato(idContrato)
+
             val systemConfig: SystemConfig = systemConfingRepository.findByOrigen("implementacion")
             val systemConfigPath: SystemConfig = systemConfingRepository.findByOrigen("apk_path_contrato")
 
-            var dtoContrato: DatosContrato = datosContratoMapper(contrato)
-            var dtoCliente: ClienteContrato = datosClienteMapper(cliente)
-            var dtoTarifa: TarifaContrato = datosTarifasMapper(tarifa)
-            var dtoVendedor: VendedorContrato = datosVendedorMapper(vendedor)
-            var dtoClausula: ClausulaContrato = datosClausula(clausula)
-            var contratoDigital: ContratoInfo = ContratoInfo(
-                    cliente = dtoCliente,
-                    contrato = dtoContrato,
-                    tarifa = dtoTarifa,
-                    clausula = dtoClausula,
-                    vendedor = dtoVendedor
-            )
+            val (contratoDigital , contrato) = generateInformationContrato(idContrato)
+
             val gson = Gson()
             val json = gson.toJson(contratoDigital)
             val documentData: Map<String, Any> = mapOf(
@@ -128,8 +215,8 @@ class ContratoDigitalService(
         val typotecnologia = tipoTecnologiaRepository.findById(tarifa.idTecnologia).get()
         return TarifaContrato(
             valor = tarifa.valor.toDouble(),
-            tecnologia = typotecnologia.nombre
-
+            tecnologia = typotecnologia.nombre,
+            velocidad = tarifa.velocidad.toString()
         )
     }
 
@@ -152,6 +239,7 @@ class ContratoDigitalService(
         val direccionResidencia: Direccion = direccionRepository.findById(contrato.idDireccionFactura).get()
 
         return DatosContrato(
+
             id_contrato = contrato.id,
             estrato = contrato.estrato,
             consecutivo = contrato.fisico,
@@ -161,7 +249,7 @@ class ContratoDigitalService(
             direccionResidencia = datosDireccionMapper(direccionResidencia),
             valor_instalacion = 0,
             valor_traslado = 0,
-            valor_reconexion = 0,
+            valor_reconexion = 0
         )
     }
 

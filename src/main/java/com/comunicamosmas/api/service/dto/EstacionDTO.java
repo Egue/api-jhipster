@@ -3,30 +3,34 @@ package com.comunicamosmas.api.service.dto;
 public class EstacionDTO {
 
 	private Integer id;
-	
+
 	private String nombreEstacion;
-	
+
 	private String tipo;
-	
+
 	private String nombreComercial;
-	
+
 	private String nombreServicio;
-	
+
 	private String nombreCiudad;
-	
+
 	private String nombreZona;
-	
+
 	private String codigo;
-	
+
 	private String ip;
 
+    private String latitud;
+
+    private String longitud;
+
 	public EstacionDTO() {
-		 
+
 	}
 
 	public EstacionDTO(Integer id, String nombreEstacion, String tipo, String nombreComercial, String nombreServicio,
 			String nombreCiudad, String nombreZona, String codigo, String ip) {
-		 
+
 		this.id = id;
 		this.nombreEstacion = nombreEstacion;
 		this.tipo = tipo;
@@ -38,7 +42,15 @@ public class EstacionDTO {
 		this.ip = ip;
 	}
 
-	public Integer getId() {
+    public String getLatitud() {
+        return latitud;
+    }
+
+    public void setLatitud(String latitud) {
+        this.latitud = latitud;
+    }
+
+    public Integer getId() {
 		return id;
 	}
 
@@ -116,9 +128,13 @@ public class EstacionDTO {
 				+ nombreComercial + ", nombreServicio=" + nombreServicio + ", nombreCiudad=" + nombreCiudad
 				+ ", nombreZona=" + nombreZona + ", codigo=" + codigo + ", ip=" + ip + "]";
 	}
-	
-	
-	
-	
-	
+
+
+    public String getLongitud() {
+        return longitud;
+    }
+
+    public void setLongitud(String longitud) {
+        this.longitud = longitud;
+    }
 }
