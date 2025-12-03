@@ -19,13 +19,20 @@ class TemplateController(private val templateService: TemplateService , private 
 
     @PostMapping("/template")
     fun save(@RequestBody template: TemplateDTO): ResponseEntity<Templates> {
-        var savedTemplate = templateService.save(template)
+        val savedTemplate: Templates;
+        if(template.id?.isNotEmpty() == true){
+                //actualizar
+            savedTemplate = templateService.updated(template)
+        }else{
+             savedTemplate = templateService.save(template)
+        }
+
         return ResponseEntity.created(URI("/api/kt/template/${savedTemplate.name}"))
             .body(savedTemplate)
     }
 
     @GetMapping("/template")
-    fun getTemplateOne(@RequestParam("name") name:String ,  @RequestParam("idServicio") idServicio:String): ResponseEntity<Templates?>{
+    fun getTemplateOne(@RequestParam("name") name:String ,  @RequestParam("idServicio") idServicio:String): ResponseEntity<TemplateDTO?>{
         val findOneTemplate = templateService.findOneNameAndIdService(name = name , idService = idServicio.toInt())
 
         return ResponseEntity.ok()
@@ -37,6 +44,23 @@ class TemplateController(private val templateService: TemplateService , private 
         try {
 
             val response = contratoDigitalService.templateAndInfoContrato(contrato.toLong())
+            return ResponseEntity.ok().body(response)
+        }catch (e: Exception){
+            val response: HashMap<String, String> = HashMap()
+            response.put("error" , e.message.toString())
+            return ResponseEntity.badRequest().body(response)
+        }
+    }
+
+    @GetMapping("template/consecutivo")
+    suspend fun generateConsecutiv(
+        @RequestParam("contrato")contrato:String,
+        @RequestParam("name")name:String): ResponseEntity<Any>{
+
+        try {
+            val response : HashMap<String, String> = HashMap()
+            val consecutivo = templateService.generateConsecutivo(contrato , name)
+            response.put("consecutivo" , consecutivo.toString())
             return ResponseEntity.ok().body(response)
         }catch (e: Exception){
             val response: HashMap<String, String> = HashMap()

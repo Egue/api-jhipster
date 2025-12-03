@@ -9,6 +9,7 @@ import com.comunicamosmas.api.domain.ListaDepartamento
 import com.comunicamosmas.api.domain.ListaMunicipio
 import com.comunicamosmas.api.domain.SystemConfig
 import com.comunicamosmas.api.domain.Tarifa
+import com.comunicamosmas.api.domain.TarifaInstalacion
 import com.comunicamosmas.api.domain.Usuario
 import com.comunicamosmas.api.repository.IClausulaPermanenciaDao
 import com.comunicamosmas.api.repository.IClienteDao
@@ -18,17 +19,22 @@ import com.comunicamosmas.api.repository.IEmpresaDao
 import com.comunicamosmas.api.repository.IListaDepartamentoDao
 import com.comunicamosmas.api.repository.IListaMunicipioDao
 import com.comunicamosmas.api.repository.ISystemConfigDao
+import com.comunicamosmas.api.repository.ITarifaInstalacionDao
 import com.comunicamosmas.api.repository.ITipoTecnologiaDao
 import com.comunicamosmas.api.repository.IUsuarioDao
 import com.comunicamosmas.api.service.ITarifaService
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import com.hjsolutions.isp_api.domain.Templates
 import com.hjsolutions.isp_api.repository.TemplateRepository
+import com.hjsolutions.isp_api.repositoryMysql.ContratoRepository
+import com.hjsolutions.isp_api.service.dto.AppWriteContrato
 import com.hjsolutions.isp_api.service.dto.ClausulaContrato
 import com.hjsolutions.isp_api.service.dto.ClienteContrato
 import com.hjsolutions.isp_api.service.dto.ContratoInfo
 import com.hjsolutions.isp_api.service.dto.DatosContrato
 import com.hjsolutions.isp_api.service.dto.DireccionContrato
+import com.hjsolutions.isp_api.service.dto.DocumentImages
 import com.hjsolutions.isp_api.service.dto.TarifaContrato
 import com.hjsolutions.isp_api.service.dto.TypeService
 import com.hjsolutions.isp_api.service.dto.VendedorContrato
@@ -42,7 +48,10 @@ import io.appwrite.models.Document
 import io.appwrite.models.DocumentList
 import io.appwrite.models.RowList
 import io.appwrite.services.TablesDB
+import liquibase.pro.packaged.ac
 import liquibase.pro.packaged.da
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Service
 class ContratoDigitalService(
@@ -57,8 +66,17 @@ class ContratoDigitalService(
     private val systemConfingRepository: ISystemConfigDao,
     private val tipoTecnologiaRepository: ITipoTecnologiaDao,
     private val templateRepository: TemplateRepository,
-    private val empresaRepository: IEmpresaDao
+    private val empresaRepository: IEmpresaDao,
+    private val tarifaInstalacionRepository: ITarifaInstalacionDao
 ) {
+
+    private val gson = Gson()
+
+    suspend fun link_contrato_pdf(): SystemConfig{
+        val system : SystemConfig = systemConfingRepository.findByOrigen("services_pdf_contrato")
+
+        return system;
+    }
 
     suspend fun findContratoByImplementacion(contrato:String): RowList<Map<String , Any>>
     {
@@ -112,40 +130,67 @@ class ContratoDigitalService(
         var dtoCliente: ClienteContrato = datosClienteMapper(cliente)
         var dtoTarifa: TarifaContrato = datosTarifasMapper(tarifa)
         var dtoVendedor: VendedorContrato = datosVendedorMapper(vendedor)
-        var dtoClausula: ClausulaContrato = datosClausula(clausula)
+        var dtoInstalacion: TarifaInstalacion = tarifaInstalacionRepository.findById(contrato.idTarifaInstalacion.toLong()).get()
+        var dtoClausula: ClausulaContrato = datosClausula(clausula , dtoInstalacion.valor , contrato.duracion  , contrato.marca)
+        var medios : SystemConfig = systemConfingRepository.findByOrigen("medios_atencion")
         var contratoDigital: ContratoInfo = ContratoInfo(
             cliente = dtoCliente,
             contrato = dtoContrato,
             tarifa = dtoTarifa,
             clausula = dtoClausula,
-            vendedor = dtoVendedor
+            vendedor = dtoVendedor,
+            mediosAtencion = medios.comando
         )
 
         return Pair(contratoDigital , contrato)
     }
 
-    suspend fun findContratoAppwrite(idContrato:String): DocumentList<Map<String, Any>>? {
+    suspend fun findContratoAppwrite(idContrato:String): List<AppWriteContrato?> {
         val client: Client = AppWriteClient().client()
         val database_id = AppWriteClient().app_database()
         val database = Databases(client)
-
+        val implementacion : SystemConfig = systemConfingRepository.findByOrigen("implementacion")
         try {
             val response = database.listDocuments(
                 database_id,
                 "contratos",
                 listOf(
-                     Query.equal("id_contrato" , idContrato)
+                     Query.equal("id_contrato" , idContrato),
+                    Query.equal("implementacion" , implementacion.comando)
                 )
             )
 
-            return response
+            val contrato:List<AppWriteContrato> = response.documents.map { document->
+                val images = parseDocumentJson(document.data["documentos"] as? String?: "")
+                AppWriteContrato(
+                    id_contrato = document.data["id_contrato"] as? String?: "",
+                    id_servicio = document.data["id_servicio"] as? String?: "",
+                    id_cliente = document.data["id_cliente"] as? String?: "",
+                    firma = document.data["firma"] as? String ?: "",
+                    documentos = images
+                )
+            }
+
+            return contrato
         }catch (e: Exception){
             e.printStackTrace()
 
-            return null
+            return emptyList()
         }
 
 
+    }
+
+    private fun parseDocumentJson(document:String): DocumentImages?{
+        return try {
+            if(document.isEmpty()){
+                null
+            }else{
+                gson.fromJson(document , DocumentImages::class.java)
+            }
+        }catch (e: JsonSyntaxException){
+            null
+        }
     }
 
       suspend fun sincronice(idContrato:Long){
@@ -182,14 +227,17 @@ class ContratoDigitalService(
         }
     }
 
-    private fun datosClausula(c: ClausulaPermanencia): ClausulaContrato{
-        val conexion: Double = listOf(
-            c.mes1, c.mes2, c.mes3, c.mes4, c.mes5, c.mes6,
-            c.mes7, c.mes8, c.mes9, c.mes10, c.mes11, c.mes12
-        ).sumOf { (it ?: 0L).toDouble() }
-
+    private fun datosClausula(c: ClausulaPermanencia , instalacion:Long , duracion: Long , registro:String): ClausulaContrato{
+        val conexion = c.mes1.toLong() + instalacion
+        val inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S")
+        val fecha = LocalDateTime.parse(registro, inputFormatter)
+        val fechaNueva = fecha.plusMonths(duracion)
+        val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val resultado = fechaNueva.format(outputFormatter)
         return ClausulaContrato(
             conexion = conexion,
+            instalacion = instalacion,
+            duracion = resultado,
             mes_1 = c.mes1,
             mes_2 = c.mes2,
             mes_3 = c.mes3,
@@ -237,7 +285,12 @@ class ContratoDigitalService(
     private fun datosContratoMapper(contrato:Contrato): DatosContrato{
         val direccionServicio: Direccion = direccionRepository.findById(contrato.idDireccionServicio).get()
         val direccionResidencia: Direccion = direccionRepository.findById(contrato.idDireccionFactura).get()
-
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S")
+        val fecha = LocalDateTime.parse(contrato.marca  , formatter)
+        val activacion = fecha.plusDays(6)
+        val formatterNueva = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val fechaActivacion = activacion.format(formatterNueva)
+        val fechaRegistro = fecha.format(formatterNueva)
         return DatosContrato(
 
             id_contrato = contrato.id,
@@ -247,9 +300,11 @@ class ContratoDigitalService(
             observacion = contrato.nota,
             direccionServicio = datosDireccionMapper(direccionServicio),
             direccionResidencia = datosDireccionMapper(direccionResidencia),
-            valor_instalacion = 0,
             valor_traslado = 0,
-            valor_reconexion = 0
+            valor_reconexion = 0,
+            vigencia = contrato.duracion,
+            registro = fechaRegistro.toString(),
+            activacion = fechaActivacion.toString()
         )
     }
 
@@ -264,4 +319,6 @@ class ContratoDigitalService(
 
         )
     }
+
+
 }

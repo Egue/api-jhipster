@@ -1,6 +1,7 @@
 package com.hjsolutions.isp_api.web
 
 import com.hjsolutions.isp_api.service.ContratoDigitalService
+import com.hjsolutions.isp_api.service.dto.AppWriteContrato
 import io.appwrite.models.DocumentList
 import kotlinx.coroutines.CoroutineScope
 import org.springframework.http.ResponseEntity
@@ -28,7 +29,7 @@ class ContratosDigitales(private val contratoDigitalService: ContratoDigitalServ
     }
 
     @GetMapping("appWrite/contrato")
-    suspend fun getContratoAppWrite(@RequestParam("contrato") contrato:String): ResponseEntity<DocumentList<Map<String,Any>>>?{
+    suspend fun getContratoAppWrite(@RequestParam("contrato") contrato:String): ResponseEntity<List<AppWriteContrato?>>{
         try {
             val response = contratoDigitalService.findContratoAppwrite(contrato)
             return ResponseEntity.ok().body(response)
@@ -48,6 +49,16 @@ class ContratosDigitales(private val contratoDigitalService: ContratoDigitalServ
 
             return ResponseEntity.ok().body(response)
 
+        }catch (e: Exception){
+            return ResponseEntity.badRequest().body(e.message)
+        }
+    }
+
+    @GetMapping("/digital/link_service_pdf")
+    suspend fun linkGeneratePdf(): ResponseEntity<Any>{
+        try {
+            val response = contratoDigitalService.link_contrato_pdf()
+            return ResponseEntity.ok().body(response)
         }catch (e: Exception){
             return ResponseEntity.badRequest().body(e.message)
         }

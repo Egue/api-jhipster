@@ -9,4 +9,5 @@ interface TemplateRepository : MongoRepository<Templates , String> {
 
 
     fun findOneByIdServicioAndName(idServicio:Number , name:String): Templates?
+
 }

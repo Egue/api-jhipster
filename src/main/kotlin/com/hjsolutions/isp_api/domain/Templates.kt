@@ -10,5 +10,13 @@ data class Templates (
     var id: String = UUID.randomUUID().toString(),
     var name:String? = "",
     var template:String? = "",
-    var idServicio:Number? = 0
+    var idServicio:Number? = 0,
+    var consecutivoA: Consecutivo?,
+    var consecutivoB: Consecutivo?
+){}
+
+
+data class Consecutivo(
+    var prefijo : String,
+    var consecutivo: Number
 ){}

@@ -38,7 +38,7 @@ import com.comunicamosmas.api.service.mapper.EmailCampaingDetalleMapper;
 import com.comunicamosmas.api.serviceMongo.IFacturasEmitidasService;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 import com.fasterxml.jackson.databind.ObjectMapper;
- 
+
 
 @Service
 public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleService {
@@ -77,7 +77,7 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 
 	/**
 	 * Enviando mail a al cliente por mailrelay api
-	 * 
+	 *
 	 * @param datos                     del api de mailrelay
 	 * @param destino                   detalle de la campaña 1 a 1
 	 * @param fondo
@@ -86,7 +86,7 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 	@Override
 	public String mailRelaySendMail(EmailCampaignApi datos, EmailCampaignDetalle destino, String fondo,
 			RespuestaGeneracionPDFFactura responseGeneracionFactura) {
-		
+
 		log.debug("═══════════════════════════════════════════════════════════");
 		log.debug("📤 MAILRELAY API - Enviando email");
 		log.debug("═══════════════════════════════════════════════════════════");
@@ -94,18 +94,18 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 		log.debug("🧾 Factura: {}", destino.getFactura());
 		log.debug("🔤 Origen: {}", destino.getOrigen());
 		log.debug("🌐 URL API: {}", datos.getUrl());
-		
+
 		try {
 			// ===== Construcción del mensaje =====
 			log.debug("🔨 Construyendo estructura del mensaje...");
-			
+
 			RestTemplate restTemplate = new RestTemplate();
 			HttpHeaders headers = new HttpHeaders();
 			MailRelaySendMail mailRelay = new MailRelaySendMail();
-			
+
 			// Mail json
 			MailRelaySendMail.Send send = mailRelay.new Send();
-			
+
 			// From
 			MailRelaySendMail.From from = mailRelay.new From();
 			from.setEmail(datos.getMail_envio());
@@ -120,48 +120,48 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 			List<MailRelaySendMail.To> listTo = new ArrayList<MailRelaySendMail.To>();
 			listTo.add(to);
 			send.setTo(listTo);
-			log.debug("   ✅ Destinatario: {} <{}>", 
-					 responseGeneracionFactura.getDestinatario(), 
+			log.debug("   ✅ Destinatario: {} <{}>",
+					 responseGeneracionFactura.getDestinatario(),
 					 destino.getEmail());
-			
+
 			// Subject
-			String subject = responseGeneracionFactura.getNit() + ";" + 
-							 responseGeneracionFactura.getRazon_social() + ";" + 
-							 responseGeneracionFactura.getPrefijo() + 
+			String subject = responseGeneracionFactura.getNit() + ";" +
+							 responseGeneracionFactura.getRazon_social() + ";" +
+							 responseGeneracionFactura.getPrefijo() +
 							 responseGeneracionFactura.getFactura() + ";" +
 							 responseGeneracionFactura.getCodigoDocumento() + ";" +
 							 responseGeneracionFactura.getNameComercial();
 			send.setSubject(subject);
 			log.debug("   ✅ Asunto: {}", subject);
-			
+
 			// Body
 			send.setHtml_part(fondo);
 			send.setText_part("Factura");
 			send.setTxt_part_auto(false);
 			log.debug("   ✅ Cuerpo HTML configurado");
-			
+
 			// Attachment
 			log.debug("📎 Preparando archivo adjunto...");
 			MailRelaySendMail.Attachment attachment = mailRelay.new Attachment();
 			List<MailRelaySendMail.Attachment> listAttachments = new ArrayList<MailRelaySendMail.Attachment>();
-			
+
 			// Determinar ruta del archivo según origen
-			String pathConverter = destino.getOrigen().equals("A") ? 
-								   responseGeneracionFactura.getPathZIP() : 
+			String pathConverter = destino.getOrigen().equals("A") ?
+								   responseGeneracionFactura.getPathZIP() :
 								   responseGeneracionFactura.getPathPDF();
-			
+
 			if (pathConverter == null || pathConverter.trim().isEmpty()) {
 				throw new ExceptionNullSql(
 					new Date(),
 					"Ruta de archivo vacía",
-					String.format("No se encontró ruta de archivo %s para factura %s", 
+					String.format("No se encontró ruta de archivo %s para factura %s",
 						destino.getOrigen().equals("A") ? "ZIP" : "PDF",
 						destino.getFactura())
 				);
 			}
-			
+
 			log.debug("   📁 Ruta archivo: {}", pathConverter);
-			
+
 			// Verificar que el archivo existe
 			File archivoAdjunto = new File(pathConverter);
 			if (!archivoAdjunto.exists()) {
@@ -171,15 +171,15 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 					"El archivo no existe en ruta: " + pathConverter
 				);
 			}
-			
-			log.debug("   ✅ Archivo existe: {} ({} bytes)", 
-					 archivoAdjunto.getName(), 
+
+			log.debug("   ✅ Archivo existe: {} ({} bytes)",
+					 archivoAdjunto.getName(),
 					 archivoAdjunto.length());
-			
+
 			// Codificar en base64
 			log.debug("   🔐 Codificando archivo en Base64...");
 			String contentCodificadoBase64 = zipCreatorService.codificarBase64(pathConverter);
-			
+
 			if (contentCodificadoBase64 == null || contentCodificadoBase64.trim().isEmpty()) {
 				throw new ExceptionNullSql(
 					new Date(),
@@ -187,23 +187,23 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 					"La codificación Base64 del archivo retornó vacío"
 				);
 			}
-			
+
 			log.debug("   ✅ Base64 generado: {} caracteres", contentCodificadoBase64.length());
-			
+
 			attachment.setContent(contentCodificadoBase64);
-			
+
 			// Nombre del archivo
-			Path filePath = destino.getOrigen().equals("A") ? 
-							Paths.get(responseGeneracionFactura.getPathZIP()) : 
+			Path filePath = destino.getOrigen().equals("A") ?
+							Paths.get(responseGeneracionFactura.getPathZIP()) :
 							Paths.get(responseGeneracionFactura.getPathPDF());
-			
+
 			attachment.setFile_name(filePath.getFileName().toString());
 			String typeFile = destino.getOrigen().equals("A") ? "application/zip" : "application/pdf";
 			attachment.setContent_type(typeFile);
 			attachment.setContent_id("");
 			listAttachments.add(attachment);
 			send.setAttachments(listAttachments);
-			
+
 			log.debug("   ✅ Adjunto: {} ({})", filePath.getFileName().toString(), typeFile);
 
 			// Headers
@@ -213,52 +213,52 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 
 			// ===== Envío HTTP =====
 			log.debug("🌐 Enviando petición HTTP a MailRelay...");
-			
+
 			restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 			headers.setContentType(MediaType.APPLICATION_JSON);
-			
+
 			String url = datos.getUrl() + "send_emails";
 			headers.set("X-AUTH-TOKEN", datos.getToken());
 			log.debug("   🔑 Token configurado: {}***", datos.getToken().substring(0, Math.min(10, datos.getToken().length())));
-			
+
 			ObjectMapper objectMapper = new ObjectMapper();
 			String json = objectMapper.writeValueAsString(send);
 			log.debug("   📦 Payload JSON: {} caracteres", json.length());
-			
+
 			HttpEntity<String> sendMail = new HttpEntity<>(json, headers);
-			
+
 			log.debug("   📡 POST → {}", url);
 			ResponseEntity<String> response = restTemplate.postForEntity(url, sendMail, String.class);
-			
-			log.debug("   ✅ Respuesta HTTP: {} {}", 
-					 response.getStatusCode().value(), 
+
+			log.debug("   ✅ Respuesta HTTP: {} {}",
+					 response.getStatusCode().value(),
 					 response.getStatusCode().getReasonPhrase());
 
 			String respuestaFinal = response.getBody();
-			log.debug("   📝 Body respuesta: {}", 
-					 respuestaFinal != null && respuestaFinal.length() > 200 ? 
+			log.debug("   📝 Body respuesta: {}",
+					 respuestaFinal != null && respuestaFinal.length() > 200 ?
 					 respuestaFinal.substring(0, 200) + "..." : respuestaFinal);
 
 			// ===== Guardar en BD =====
 			log.debug("💾 Actualizando detalle en base de datos...");
 			destino.setRespuestaMailRelay(respuestaFinal);
 			destino.setProcesado(1);
-			
-			String urlDocument = destino.getOrigen().equals("A") ? 
-								 responseGeneracionFactura.getPathZIP() : 
+
+			String urlDocument = destino.getOrigen().equals("A") ?
+								 responseGeneracionFactura.getPathZIP() :
 								 responseGeneracionFactura.getPathPDF();
 			File file = new File(urlDocument);
 			destino.setNameDocument(file.getName());
-			
+
 			this.save(destino);
 			log.debug("   ✅ Detalle guardado con procesado=1");
 
 			log.debug("╔═══════════════════════════════════════════════════════════╗");
 			log.debug("║  ✅ EMAIL ENVIADO VÍA MAILRELAY                          ║");
 			log.debug("╚═══════════════════════════════════════════════════════════╝");
-			
+
 			return respuestaFinal;
-			
+
 		} catch (org.springframework.web.client.HttpClientErrorException e) {
 			log.error("╔═══════════════════════════════════════════════════════════╗");
 			log.error("║  ❌ ERROR HTTP 4xx - PROBLEMA DEL CLIENTE                ║");
@@ -274,21 +274,21 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 			log.error("   404 Not Found - Endpoint incorrecto");
 			log.error("   429 Too Many Requests - Límite de envíos excedido");
 			log.error("🔍 Stack trace:", e);
-			
-			String errorMsg = String.format("Error HTTP %d: %s", 
-				e.getStatusCode().value(), 
+
+			String errorMsg = String.format("Error HTTP %d: %s",
+				e.getStatusCode().value(),
 				e.getResponseBodyAsString());
-			
+
 			destino.setRespuestaMailRelay(errorMsg);
 			destino.setProcesado(2); // Marcar como error
 			this.save(destino);
-			
+
 			throw new ExceptionNullSql(
-				new Date(), 
-				"Error HTTP al enviar a MailRelay", 
+				new Date(),
+				"Error HTTP al enviar a MailRelay",
 				errorMsg
 			);
-			
+
 		} catch (org.springframework.web.client.HttpServerErrorException e) {
 			log.error("╔═══════════════════════════════════════════════════════════╗");
 			log.error("║  ❌ ERROR HTTP 5xx - PROBLEMA DEL SERVIDOR               ║");
@@ -303,21 +303,21 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 			log.error("   503 Service Unavailable - Servicio temporalmente no disponible");
 			log.error("   504 Gateway Timeout - Timeout en servidor");
 			log.error("🔍 Stack trace:", e);
-			
-			String errorMsg = String.format("Error servidor MailRelay %d: %s", 
-				e.getStatusCode().value(), 
+
+			String errorMsg = String.format("Error servidor MailRelay %d: %s",
+				e.getStatusCode().value(),
 				e.getResponseBodyAsString());
-			
+
 			destino.setRespuestaMailRelay(errorMsg);
 			destino.setProcesado(2);
 			this.save(destino);
-			
+
 			throw new ExceptionNullSql(
-				new Date(), 
-				"Error del servidor MailRelay", 
+				new Date(),
+				"Error del servidor MailRelay",
 				errorMsg
 			);
-			
+
 		} catch (org.springframework.web.client.ResourceAccessException e) {
 			log.error("╔═══════════════════════════════════════════════════════════╗");
 			log.error("║  ❌ ERROR DE CONEXIÓN / TIMEOUT                          ║");
@@ -333,17 +333,17 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 			log.error("   - URL incorrecta");
 			log.error("   - Sin conexión a internet");
 			log.error("🔍 Stack trace:", e);
-			
+
 			destino.setRespuestaMailRelay("Error de conexión: " + e.getMessage());
 			destino.setProcesado(2);
 			this.save(destino);
-			
+
 			throw new ExceptionNullSql(
-				new Date(), 
-				"No se pudo conectar con MailRelay", 
+				new Date(),
+				"No se pudo conectar con MailRelay",
 				e.getMessage()
 			);
-			
+
 		} catch (HttpMessageConversionException e) {
 			log.error("╔═══════════════════════════════════════════════════════════╗");
 			log.error("║  ❌ ERROR DE CONVERSIÓN JSON                             ║");
@@ -357,14 +357,14 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 			log.error("   - Encoding incorrecto en HTML");
 			log.error("   - Base64 malformado");
 			log.error("🔍 Stack trace:", e);
-			
+
 			destino.setRespuestaMailRelay("Error JSON: " + e.getMessage());
 			destino.setProcesado(2);
 			this.save(destino);
-			
+
 			throw new ExceptionNullSql(
-				new Date(), 
-				"Error al convertir datos a JSON", 
+				new Date(),
+				"Error al convertir datos a JSON",
 				e.getMessage()
 			);
 
@@ -383,8 +383,8 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 			this.save(destino);
 
 			throw new ExceptionNullSql(
-				new Date(), 
-				"Error inesperado con MailRelay", 
+				new Date(),
+				"Error inesperado con MailRelay",
 				e.getMessage()
 			);
 		}
@@ -399,7 +399,7 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 
 	/**
 	 * buscar los contratos
-	 * 
+	 *
 	 * @param idEmailCampaign
 	 *                        id de la campaña para guardar en el detalle
 	 * @param fecha
@@ -421,10 +421,10 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 		{
 			invoiceByPortalWeb(idEmailCampaign , campaign);
 		}else{
-			
+
 
 			String fechaFactura = campaign.getAnno() + campaign.getMes();
-		
+
 			List<Object[]> result = emailCampaignDetalleDao.findEmailBySend(campaign.getIdEmpresa(), fechaFactura);
 
 			if (result != null) {
@@ -442,7 +442,7 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 				}
 			}
 		}
-		
+
 
 	}
 
@@ -465,9 +465,9 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 		}else{
 			Optional<List<Object[]>> result = emailCampaignDetalleDao.findByIdEmailCampaign(id);
 
-		List<EmailCampaignDetalleDTO> email = result.map(resp -> 
+		List<EmailCampaignDetalleDTO> email = result.map(resp ->
 			resp.stream().map(rs ->{
-				
+
 			EmailCampaignDetalleDTO obj = new EmailCampaignDetalleDTO();
 
 			obj.setFactura((String) rs[0]);
@@ -482,15 +482,15 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 			obj.setIdCampaign((Integer) rs[9]);
 			obj.setOrigen((String) rs[10]);
 			obj.setNameDocument((String) rs[11]);
-				
+
 			return obj;
-		
+
 			}).collect(Collectors.toList())).orElse(new ArrayList<>());
 
 		return email;
 		}
 
-		
+
 	}
 
 	/**
@@ -556,7 +556,7 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 		}
 
 		String[] html_part = api.getHtml_part().split("@");
-		 
+
 		// ultimo dia del mes
 		LocalDate fecha = LocalDate.now();
 		int year = fecha.getYear();
@@ -587,31 +587,31 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 		log.info("🆔 ID Detalle: {}", detalle.getId());
 		log.info("🆔 ID Campaña: {}", detalle.getIdCampaign());
 		log.info("🔤 Origen: {}", detalle.getOrigen());
-		
+
 		try {
 			// ===== PASO 1: Obtener campaña =====
 			log.debug("🔍 PASO 1/6: Obteniendo datos de campaña...");
 			EmailCampaign campaña = emailCampaignService.findById(detalle.getIdCampaign());
-			
+
 			if (campaña == null) {
 				throw new ExceptionNullSql(
-					new Date(), 
-					"Campaña no encontrada", 
+					new Date(),
+					"Campaña no encontrada",
 					"No existe campaña con ID: " + detalle.getIdCampaign()
 				);
 			}
-			
+
 			log.debug("✅ Campaña obtenida: {} (ID: {})", campaña.getNombre(), campaña.getId());
 			log.debug("   📅 Período: {}/{}", campaña.getMes(), campaña.getAnno());
 			log.debug("   🏢 Empresa: {}", campaña.getIdEmpresa());
-			
+
 			// ===== PASO 2: Calcular período de facturación =====
 			log.debug("🔍 PASO 2/6: Calculando período de facturación...");
 			String fecha = campaña.getAnno() + campaña.getMes();
 			String primeroscaracteres = fecha.substring(0, 6);
 			Long mesServicio = Long.parseLong(primeroscaracteres);
 			log.debug("✅ Mes servicio calculado: {}", mesServicio);
-			
+
 			// ===== PASO 3: Consultar deudas =====
 			log.debug("� PASO 3/6: Consultando deudas asociadas a la factura...");
 			log.debug("   🧾 Factura: {}", detalle.getFactura());
@@ -619,34 +619,34 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 			log.debug("   🏢 Empresa: {}", campaña.getIdEmpresa());
 			log.debug("   👤 Cliente: {}", detalle.getIdCliente());
 			log.debug("   � Origen: {}", detalle.getOrigen());
-			
+
 			List<DeudasForFacturaDTO> deudas = deudaService.findDeudaByFacturaAndMesServiceAndIdEmpresa(
-					Long.parseLong(detalle.getFactura()), 
-					mesServicio, 
-					campaña.getIdEmpresa(), 
-					detalle.getIdCliente(), 
+					Long.parseLong(detalle.getFactura()),
+					mesServicio,
+					campaña.getIdEmpresa(),
+					detalle.getIdCliente(),
 					detalle.getOrigen()
 			);
-			
+
 			if (deudas == null || deudas.isEmpty()) {
 				throw new ExceptionNullSql(
 					new Date(),
 					"Sin deudas asociadas",
-					String.format("No se encontraron deudas para factura %s, cliente %d", 
+					String.format("No se encontraron deudas para factura %s, cliente %d",
 						detalle.getFactura(), detalle.getIdCliente())
 				);
 			}
-			
+
 			log.debug("✅ Deudas encontradas: {} registros", deudas.size());
-			
+
 			// ===== PASO 4: Generar PDF de factura =====
 			log.debug("🔍 PASO 4/6: Generando PDF de factura...");
 			RespuestaGeneracionPDFFactura generacionPDF = generatePDFService.generateFacturaPDF(
-				detalle, 
+				detalle,
 				deudas,
 				campaña
 			);
-			
+
 			if (generacionPDF == null) {
 				throw new ExceptionNullSql(
 					new Date(),
@@ -654,7 +654,7 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 					"El servicio de generación PDF retornó null"
 				);
 			}
-			
+
 			log.debug("✅ PDF generado exitosamente");
 			log.debug("   📄 Ruta PDF: {}", generacionPDF.getPathPDF());
 			log.debug("   👤 Destinatario: {}", generacionPDF.getDestinatario());
@@ -663,10 +663,10 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 			// ===== PASO 5: Generar ZIP si origen es 'A' =====
 			if(detalle.getOrigen().equals("A")) {
 				log.debug("🔍 PASO 5/6: Origen 'A' detectado - Generando ZIP...");
-				
+
 				try {
 					String pathZip = zipCreatorService.zipFileFactura(generacionPDF, detalle);
-					
+
 					if (pathZip == null || pathZip.trim().isEmpty()) {
 						throw new ExceptionNullSql(
 							new Date(),
@@ -674,28 +674,28 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 							"El servicio de ZIP retornó ruta vacía"
 						);
 					}
-					
+
 					generacionPDF.setPathZIP(pathZip);
 					log.debug("✅ ZIP generado: {}", pathZip);
-					
+
 					// Eliminar archivos temporales
 					log.debug("🗑️ Eliminando archivos temporales (PDF y XML)...");
 					File pdf = new File(generacionPDF.getPathPDF());
 					File xml = new File(generacionPDF.getPathXML());
-					
+
 					boolean pdfDeleted = false;
 					boolean xmlDeleted = false;
-					
+
 					if (pdf.exists()) {
 						pdfDeleted = pdf.delete();
 						log.debug("   📄 PDF temporal: {}", pdfDeleted ? "✅ Eliminado" : "❌ No eliminado");
 					}
-					
+
 					if (xml.exists()) {
 						xmlDeleted = xml.delete();
 						log.debug("   📄 XML temporal: {}", xmlDeleted ? "✅ Eliminado" : "❌ No eliminado");
 					}
-					
+
 				} catch (Exception zipEx) {
 					log.error("❌ Error al crear ZIP:");
 					log.error("   💥 Mensaje: {}", zipEx.getMessage());
@@ -714,9 +714,9 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 			log.info("   📧 Destinatario: {}", detalle.getEmail());
 			log.info("   📎 Adjunto: {}", detalle.getOrigen().equals("A") ? "ZIP" : "PDF");
 			log.info("   🧾 Factura: {}", detalle.getFactura());
-			
+
 			String send = this.sendMail(detalle.getId(), generacionPDF);
-			
+
 			if (send == null) {
 				throw new ExceptionNullSql(
 					new Date(),
@@ -724,7 +724,7 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 					"El servicio de email retornó respuesta nula"
 				);
 			}
-			
+
 			log.info("╔════════════════════════════════════════════════════════════╗");
 			log.info("║  ✅ EMAIL ENVIADO EXITOSAMENTE                            ║");
 			log.info("╚════════════════════════════════════════════════════════════╝");
@@ -750,7 +750,7 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 			log.error("   - Datos incompletos en base de datos");
 			log.error("🔍 Stack trace:", ex);
 			throw ex;
-			
+
 		} catch (NumberFormatException ex) {
 			log.error("╔════════════════════════════════════════════════════════════╗");
 			log.error("║  ❌ ERROR DE FORMATO NUMÉRICO                             ║");
@@ -764,11 +764,11 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 			log.error("   - ID de cliente no numérico");
 			log.error("🔍 Stack trace:", ex);
 			throw new ExceptionNullSql(
-				new Date(), 
-				"Error de formato numérico", 
+				new Date(),
+				"Error de formato numérico",
 				"Número de factura o fecha con formato inválido: " + ex.getMessage()
 			);
-			
+
 		} catch (Exception e) {
 			log.error("╔════════════════════════════════════════════════════════════╗");
 			log.error("║  ❌ ERROR INESPERADO                                      ║");
@@ -781,8 +781,8 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 			log.error("💥 Mensaje: {}", e.getMessage());
 			log.error("🔍 Stack trace completo:", e);
 			throw new ExceptionNullSql(
-				new Date(), 
-				"Error inesperado al generar envío", 
+				new Date(),
+				"Error inesperado al generar envío",
 				e.getMessage()
 			);
 		}
@@ -855,7 +855,7 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 				.map(emailCampaingDetalleMapper::toDto);
 	}
 
-	 
+
 	private void invoiceByPortalWeb(Integer idEmailCampaign , EmailCampaign campaign) {
 		// TODO Auto-generated method stub
 		//EmailCampaign campaign = emailCampaignService.findById(idEmailCampaign);
@@ -868,7 +868,7 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 						.map(data->converterFacturasEmitidas(data, campaign))
 						.collect(Collectors.toList()))
 						.orElseGet(Collections::emptyList);
-	
+
 		List<FacturasEmitidas> group = emitidas.stream().collect(Collectors.collectingAndThen(
 			Collectors.toMap(
 				FacturasEmitidas::getFactura,
@@ -881,19 +881,19 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 		if(searchMongo.isEmpty() || searchMongo == null)
 		{
 			facturasEmitidasService.saveAll(group);
-			
+
 		}else{
 
 			List<FacturasEmitidas> notCoincide = group.stream().filter(data -> searchMongo.stream()
-							.noneMatch(mongo -> data.getFactura().equals(mongo.getFactura()) 
+							.noneMatch(mongo -> data.getFactura().equals(mongo.getFactura())
 							&& data.getIdCliente().equals(mongo.getIdCliente()))
 							).collect(Collectors.toList());
 
 			facturasEmitidasService.saveAll(notCoincide);
 		}
 
-		 
-		 	
+
+
 	}
 
 	private FacturasEmitidas converterFacturasEmitidas(Object[] object , EmailCampaign campaign)
@@ -929,7 +929,7 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 	/**
 	 * Cuenta el total de detalles de una campaña.
 	 * Útil para estadísticas y cálculo de progreso.
-	 * 
+	 *
 	 * @param campaignId ID de la campaña
 	 * @return Cantidad total de detalles
 	 */
@@ -944,7 +944,7 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 	/**
 	 * Cuenta detalles pendientes de envío (estado = 0 o NULL).
 	 * Los detalles pendientes son aquellos que aún no han sido procesados.
-	 * 
+	 *
 	 * @param campaignId ID de la campaña
 	 * @return Cantidad de detalles pendientes
 	 */
@@ -958,7 +958,7 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 
 	/**
 	 * Cuenta detalles enviados exitosamente (estado = 1).
-	 * 
+	 *
 	 * @param campaignId ID de la campaña
 	 * @return Cantidad de detalles enviados
 	 */
@@ -973,7 +973,7 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 	/**
 	 * Cuenta detalles con error (estado = 2).
 	 * Emails que fallaron durante el proceso de envío.
-	 * 
+	 *
 	 * @param campaignId ID de la campaña
 	 * @return Cantidad de detalles con error
 	 */
@@ -988,7 +988,7 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 	/**
 	 * Sobrecarga del método findEmailCampaignDetalleSinProcesar para aceptar Long.
 	 * Busca detalles pendientes de procesamiento (estado != 1).
-	 * 
+	 *
 	 * @param campaignId ID de la campaña (Long)
 	 * @return Lista de detalles sin procesar
 	 */
@@ -1000,6 +1000,6 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 		return findEmailCampaignDetalleSinProcesar(campaignId.intValue());
 	}
 
-	 
+
 
 }

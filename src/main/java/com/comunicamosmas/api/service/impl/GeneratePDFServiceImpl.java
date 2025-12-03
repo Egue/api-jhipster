@@ -634,6 +634,17 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 					fontTable2Bold, 1, 1, 1, 1));
 
 			document.add(table2);
+            /**Mecanismos seguros**/
+            PdfPTable tableMecanismo = new PdfPTable(1);
+            float[] columnWidthMecanismo = {1f};
+            tableMecanismo.setWidthPercentage(98);
+            tableMecanismo.getDefaultCell().setBorder(Rectangle.NO_BORDER);
+
+            tableMecanismo.setWidths(columnWidthMecanismo);
+            Font fontMecanismo = FontFactory.getFont("HELVETICA" , 9, Font.NORMAL);
+            tableMecanismo.addCell(createCell("En cumplimiento de la normativa colombiana, se bloquea el acceso a sitios con contenido ilegal (pornografía infantil y juegos de azar no autorizados, entre otros).\n" +
+                "Para más información, visita nuestra página web en el apartado 'Mecanismos Seguros'", PdfPCell.ALIGN_CENTER, Element.ALIGN_CENTER , fontMecanismo, 0, 0 , 0, 0));
+            document.add(tableMecanismo);
 
 			if (detalle.getOrigen().equals("A")) {
 				// Configurar la segunda página

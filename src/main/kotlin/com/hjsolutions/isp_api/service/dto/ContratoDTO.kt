@@ -7,7 +7,8 @@ data class ContratoInfo(
     val contrato:DatosContrato,
     val tarifa:TarifaContrato,
     val clausula:ClausulaContrato,
-    val vendedor: VendedorContrato
+    val vendedor: VendedorContrato,
+    val mediosAtencion:String
 )
 data class ClienteContrato(
     val id_cliente:Long,
@@ -25,9 +26,11 @@ data class DatosContrato(
     val observacion:String,
     val direccionServicio:DireccionContrato,
     val direccionResidencia: DireccionContrato,
-    val valor_instalacion: Number,
     val valor_reconexion : Number,
-    val valor_traslado : Number
+    val valor_traslado : Number,
+    val vigencia:Number,
+    val registro:String,
+    val activacion:String
 ){}
 data class TypeService(
     val type:String,
@@ -47,6 +50,8 @@ data class TarifaContrato(
 
 data class  ClausulaContrato(
     val conexion:Number,
+    val instalacion:Number,
+    val duracion:String,
     val mes_1:Number,
     val mes_2:Number,
     val mes_3:Number,
@@ -63,4 +68,18 @@ data class  ClausulaContrato(
 
 data class VendedorContrato(
     val nombre:String
+){}
+
+data class AppWriteContrato(
+    val id_contrato:String ="",
+    val id_cliente:String ="",
+     val id_servicio:String = "",
+    val firma:String = "",
+    val documentos: DocumentImages? = null
+){}
+
+data class DocumentImages(
+    val photo:String = "",
+    val document:List<String>  = emptyList<String>(),
+    val anexos:List<String> = emptyList<String>()
 ){}
