@@ -80,6 +80,7 @@ fun PdfViewScreen(url:String, title:String, atras: () -> Unit){
                             isLoading = false
                         }
 
+                        @Deprecated("Deprecated in Java")
                         override fun onReceivedError(
                             view: WebView?,
                             errorCode: Int,

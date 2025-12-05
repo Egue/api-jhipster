@@ -207,3 +207,5 @@ CHECKLIST_DESPLIEGUE_RAPIDO.md
 GUIA_DESPLIEGUE_SISTEMA_AUTOMATICO.md
 COMPARATIVA_DAG_ANTIGUO_VS_NUEVO.md
 CREATE_TABLE_EMAIL_CAMPAIGN_REPORT_PRODUCCION.sql
+app/contratos_isp/app/release/app-release.apk
+src/main/resources/config/application-dev_magangue.yml
