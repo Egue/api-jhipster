@@ -43,7 +43,7 @@ public class Usuario implements Serializable {
 
     private String impresora;
 
-    private String marca;
+    //private String marca;
 
     private String pushover;
 
@@ -217,13 +217,13 @@ public class Usuario implements Serializable {
         this.impresora = impresora;
     }
 
-    public String getMarca() {
+   /* public String getMarca() {
         return marca;
     }
 
     public void setMarca(String marca) {
         this.marca = marca;
-    }
+    }*/
 
     public String getPushover() {
         return pushover;

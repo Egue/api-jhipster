@@ -7,6 +7,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import com.comunicamosmas.api.domain.EmailCampaign;
+import com.comunicamosmas.api.domain.EmailCampaignDetalle;
 
 public interface IEmailCampanignDao extends CrudRepository< EmailCampaign, Integer>{
 
@@ -57,4 +58,31 @@ public interface IEmailCampanignDao extends CrudRepository< EmailCampaign, Integ
 	+ "WHERE camp.id_empresa = :idEmpresa AND camp.fecha LIKE concat('%' , :fecha , '%')" , nativeQuery = true)
 	public List<Object[]> filterEmailCampaign(@Param("idEmpresa")Long idEmpresa , @Param("fecha") String fecha);
 
+
+    @Query(value = "SELECT * FROM email_campaign WHERE MONTH(fecha) = :mes AND YEAR(fecha) = :anio", nativeQuery = true)
+    List<EmailCampaign> findByMesAndAnio(@Param("mes") int mes, @Param("anio") int anio);
+
+	@Query(value = "SELECT * FROM email_campaign_detalle WHERE id_email_campaign = :idCampaign", nativeQuery = true)
+	List<EmailCampaignDetalle> findDetallesByIdCampaign(@Param("idCampaign") int idCampaign);
+
+	/**
+	 * Busca campañas cuyo estado NO esté en la lista de estados excluidos.
+	 * Utilizado para obtener campañas activas para procesamiento batch.
+	 * 
+	 * @param excludedStates Lista de estados a excluir (ej: PortalWeb, Finalizado, Inactivo)
+	 * @return Lista de campañas con estados válidos para procesamiento
+	 */
+	@Query(value = "SELECT * FROM email_campaign WHERE estado NOT IN (:excludedStates)", nativeQuery = true)
+	List<EmailCampaign> findByEstadoNotIn(@Param("excludedStates") List<String> excludedStates);
+
+	/**
+	 * Busca campañas por estado específico.
+	 * Utilizado para encontrar campañas "Abiertas" en el proceso automático.
+	 * 
+	 * @param estado Estado de la campaña (ej: "Abierto", "Finalizado")
+	 * @return Lista de campañas con ese estado
+	 */
+	@Query(value = "SELECT * FROM email_campaign WHERE estado = :estado", nativeQuery = true)
+	List<EmailCampaign> findByEstado(@Param("estado") String estado);
+	
 }

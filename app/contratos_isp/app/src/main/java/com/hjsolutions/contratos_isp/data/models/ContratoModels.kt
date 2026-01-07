@@ -44,7 +44,6 @@ data class DatosContrato(
     val observacion:String,
     val direccionServicio:DireccionContrato,
     val direccionResidencia: DireccionContrato,
-    val valor_instalacion: Number,
     val valor_reconexion : Number,
     val valor_traslado : Number
 )
@@ -56,11 +55,13 @@ data class DireccionContrato(
 ){}
 data class TarifaContrato(
     val valor: Double,
-    val tecnologia:String
+    val tecnologia:String,
+    val velocidad:String
 ){}
 
 data class  ClausulaContrato(
     val conexion:Number,
+    val instalacion:Number,
     val mes_1:Number,
     val mes_2:Number,
     val mes_3:Number,

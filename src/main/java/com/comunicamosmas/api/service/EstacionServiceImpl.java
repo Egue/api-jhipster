@@ -91,6 +91,8 @@ public class EstacionServiceImpl implements IEstacionService {
                         obj.setNombreZona((String) rs[6].toString());
                         obj.setCodigo((String) rs[7].toString());
                         obj.setIp((String) rs[8].toString());
+                        obj.setLatitud((String) rs[9].toString());
+                        obj.setLongitud((String) rs[10].toString());
                         estacion.add(obj);
                     }
 

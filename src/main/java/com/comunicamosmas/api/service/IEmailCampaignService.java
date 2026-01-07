@@ -3,6 +3,7 @@ package com.comunicamosmas.api.service;
 import java.util.List;
 
 import com.comunicamosmas.api.domain.EmailCampaign;
+import com.comunicamosmas.api.domain.EmailCampaignDetalle;
 import com.comunicamosmas.api.service.dto.EmailCampanignDTO;
 
 public interface IEmailCampaignService {
@@ -22,5 +23,38 @@ public interface IEmailCampaignService {
 	public EmailCampaign findEmailCampaignLimitOne();
 
 	public List<EmailCampanignDTO> filterEmailCampaign(Long idEmpresa , String fecha);
+
+	public List<EmailCampaignDetalle> findByMesAndAnio(int mes, int anio);
+
+	/**
+	 * Busca campañas activas disponibles para procesamiento batch.
+	 * Excluye campañas con estado 'PortalWeb', 'Finalizado' o 'Inactivo'.
+	 * 
+	 * Este método es utilizado por:
+	 * - EmailCampaignAirflowController para obtener campañas pendientes
+	 * - Procesos batch automáticos
+	 * 
+	 * @return Lista de campañas activas listas para procesar
+	 */
+	public List<EmailCampaign> findActiveCampaignsForBatch();
+
+	/**
+	 * Busca una campaña por ID (sobrecarga para Long)
+	 * 
+	 * @param id ID de la campaña (Long)
+	 * @return EmailCampaign o null si no existe
+	 */
+	public EmailCampaign findById(Long id);
+
+	/**
+	 * Busca campañas por estado específico.
+	 * 
+	 * Utilizado por el proceso automático para encontrar
+	 * campañas en estado "Abierto" disponibles para procesamiento.
+	 * 
+	 * @param estado Estado de la campaña (ej: "Abierto", "Finalizado")
+	 * @return Lista de campañas con el estado especificado
+	 */
+	public List<EmailCampaign> findByEstado(String estado);
 	 
 }

@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.comunicamosmas.api.domain.EmailCampaign;
+import com.comunicamosmas.api.domain.EmailCampaignDetalle;
 import com.comunicamosmas.api.repository.IEmailCampanignDao;
+import com.comunicamosmas.api.repository.IEmailCampaignDetalleDao;
 import com.comunicamosmas.api.service.dto.EmailCampanignDTO;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 
@@ -17,6 +19,9 @@ public class EmailCampaignServiceImp implements IEmailCampaignService{
 
 	@Autowired
 	IEmailCampanignDao emailCampaignDao;
+
+	@Autowired
+	IEmailCampaignDetalleDao emailCampaignDetalleDao;
 	
 	@Override
 	public void save(EmailCampaign emailCampaign) {
@@ -131,4 +136,66 @@ public class EmailCampaignServiceImp implements IEmailCampaignService{
 		 return email;
 	}
 
+	
+	@Override
+	public List<EmailCampaignDetalle> findByMesAndAnio(int mes, int anio) {
+	    // Ejecutar query optimizada con INNER JOIN en una sola consulta SQL
+	    // Esto reemplaza el problema N+1 (1 query para campañas + N queries para detalles)
+	    return emailCampaignDetalleDao.findDetallesByMesAndAnio(mes, anio);
+	}
+
+	/**
+	 * Implementación de findActiveCampaignsForBatch
+	 * Busca campañas activas excluyendo estados no procesables por batch.
+	 * 
+	 * Estados excluidos:
+	 * - PortalWeb: Se procesan de forma diferente (MongoDB)
+	 * - Finalizado: Ya no requieren procesamiento
+	 * - Inactivo: Campañas deshabilitadas
+	 * 
+	 * @return Lista de campañas activas listas para procesamiento batch
+	 */
+	@Override
+	public List<EmailCampaign> findActiveCampaignsForBatch() {
+		// Lista de estados que NO deben procesarse en batch
+		List<String> excludedStates = new ArrayList<>();
+		excludedStates.add("PortalWeb");
+		excludedStates.add("Finalizado");
+		excludedStates.add("Inactivo");
+		
+		// Buscar campañas que NO estén en los estados excluidos
+		return emailCampaignDao.findByEstadoNotIn(excludedStates);
+	}
+
+	/**
+	 * Sobrecarga del método findById para aceptar Long
+	 * Facilita la integración con otros componentes que usan Long como ID
+	 * 
+	 * @param id ID de la campaña (Long)
+	 * @return EmailCampaign o null si no existe
+	 */
+	@Override
+	public EmailCampaign findById(Long id) {
+		if (id == null) {
+			return null;
+		}
+		return emailCampaignDao.findById(id.intValue()).orElse(null);
+	}
+
+	/**
+	 * Busca campañas por estado específico.
+	 * Utilizado por el proceso automático para encontrar campañas "Abiertas".
+	 * 
+	 * @param estado Estado de la campaña (ej: "Abierto", "Finalizado")
+	 * @return Lista de campañas con ese estado
+	 */
+	@Override
+	public List<EmailCampaign> findByEstado(String estado) {
+		if (estado == null || estado.trim().isEmpty()) {
+			return new ArrayList<>();
+		}
+		return emailCampaignDao.findByEstado(estado);
+	}
+
 }
+

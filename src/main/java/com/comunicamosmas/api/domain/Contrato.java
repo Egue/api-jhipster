@@ -80,7 +80,7 @@ public class Contrato implements Serializable {
     @Column(name = "id_direccion_factura")
     private Long idDireccionFactura;
 
-    //private String marca;
+    private String marca;
 
     @Column(name = "otr_imp")
     private Long otrImp;
@@ -325,13 +325,13 @@ public class Contrato implements Serializable {
         this.idDireccionFactura = idDireccionFactura;
     }
 
-    /*public String getMarca() {
+    public String getMarca() {
         return marca;
     }
 
     public void setMarca(String marca) {
         this.marca = marca;
-    }*/
+    }
 
     public Long getOtrImp() {
         return otrImp;

@@ -64,7 +64,7 @@ public interface IEmailCampaignDetalleDao extends CrudRepository<EmailCampaignDe
 	+ "			case\n"
 	+ "				when cl.tipo_cliente = 'N' then concat(cl.apellido_paterno, ' ', cl.apellido_materno, ' ', cl.nombre_primer, ' ', cl.nombre_segundo)\n"
 	+ "			    when cl.tipo_cliente = 'J' then cl.razon_social\n"
-	+ "			end nombreCliente , detalle.id  , detalle.id_email_campaing\n"
+	+ "			end nombreCliente , detalle.id  , detalle.id_email_campaing , detalle.origen\n"
 	+ "			FROM email_campaing_detalle detalle\n"
 	+ "			inner join clientes cl on cl.id_cliente = detalle.id_cliente\n"
 	+ "			inner join servicios sr on sr.id_servicio = detalle.id_servicio\n"
@@ -83,6 +83,59 @@ public interface IEmailCampaignDetalleDao extends CrudRepository<EmailCampaignDe
 	nativeQuery = true)
 	public Page<Object[]> findListByIdClienteAndService(@Param("idCliente") Long idCliente , Pageable page);
 
+	@Query(value = "SELECT * FROM email_campaign_detalle WHERE id_email_campaign = :idCampaign", nativeQuery = true)
+    List<EmailCampaignDetalle> findDetallesByIdCampaign(@Param("idCampaign") int idCampaign);
 
+	/**
+	 * Obtiene todos los detalles de campañas filtradas por mes y año.
+	 * Optimizado con INNER JOIN para evitar múltiples queries (problema N+1).
+	 * 
+	 * @param mes Mes de la campaña (1-12)
+	 * @param anio Año de la campaña
+	 * @return Lista de detalles de todas las campañas que coincidan con mes y año
+	 */
+	@Query(value = "SELECT ecd.* FROM email_campaign_detalle ecd " +
+				   "INNER JOIN email_campaign ec ON ec.id = ecd.id_email_campaign " +
+				   "WHERE ec.mes = :mes AND ec.anno = :anio", nativeQuery = true)
+	List<EmailCampaignDetalle> findDetallesByMesAndAnio(@Param("mes") int mes, @Param("anio") int anio);
+
+	/**
+	 * Cuenta el total de detalles de una campaña.
+	 * 
+	 * @param campaignId ID de la campaña
+	 * @return Cantidad total de detalles
+	 */
+	@Query(value = "SELECT COUNT(*) FROM email_campaing_detalle WHERE id_email_campaing = :campaignId", nativeQuery = true)
+	long countByCampaignId(@Param("campaignId") Long campaignId);
+
+	/**
+	 * Cuenta detalles pendientes (procesado = 0 o procesado IS NULL).
+	 * 
+	 * @param campaignId ID de la campaña
+	 * @return Cantidad de detalles pendientes
+	 */
+	@Query(value = "SELECT COUNT(*) FROM email_campaing_detalle WHERE id_email_campaing = :campaignId " +
+				   "AND (procesado = 0 OR procesado IS NULL)", nativeQuery = true)
+	long countPendingByCampaignId(@Param("campaignId") Long campaignId);
+
+	/**
+	 * Cuenta detalles enviados exitosamente (procesado = 1).
+	 * 
+	 * @param campaignId ID de la campaña
+	 * @return Cantidad de detalles enviados
+	 */
+	@Query(value = "SELECT COUNT(*) FROM email_campaing_detalle WHERE id_email_campaing = :campaignId " +
+				   "AND procesado = 1", nativeQuery = true)
+	long countSentByCampaignId(@Param("campaignId") Long campaignId);
+
+	/**
+	 * Cuenta detalles con error (procesado = 2).
+	 * 
+	 * @param campaignId ID de la campaña
+	 * @return Cantidad de detalles con error
+	 */
+	@Query(value = "SELECT COUNT(*) FROM email_campaing_detalle WHERE id_email_campaing = :campaignId " +
+				   "AND procesado = 2", nativeQuery = true)
+	long countErrorByCampaignId(@Param("campaignId") Long campaignId);
 
 }

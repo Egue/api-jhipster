@@ -8,6 +8,19 @@
 /target/classes/static/**
 /src/test/javascript/coverage/
 /src/main/resources/config/application-dev.yml
+
+######################
+# Apache Airflow
+######################
+# DAGs con credenciales y configuración sensible
+airflow/
+airflow/**
+*.pyc
+__pycache__/
+airflow.cfg
+airflow.db
+logs/
+dags/__pycache__/
 ######################
 # Node
 ######################
@@ -164,6 +177,10 @@ Desktop.ini
 airflow/sincronice_portalweb.py
 airflow/reporte_clausuras.py
 src/main/resources/config/application-dev.yml
+
+IMPLEMENTACION_BACKEND.md
+PROXI MOS_PASOS.md
+src/main/resources/config/application.yml
 src/main/resources/config/application-dev.yml
 inventory_agente/target/inventory_agente-0.0.1-SNAPSHOT.jar.original
 inventory_agente/target/maven-archiver/pom.properties
@@ -172,3 +189,23 @@ inventory_agente/target/maven-status/maven-compiler-plugin/testCompile/default-t
 inventory_agente/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst
 inventory_agente/target/test-classes/META-INF/inventory_agente.kotlin_module
 
+
+SEGURIDAD_TOKEN_AIRFLOW.md
+.gitignore
+CAMBIOS_TOKEN_AIRFLOW.md
+RESUMEN_COMPLETO.md
+CREATE_TABLE_PRODUCTION.sql
+DESPLIEGUE_PRODUCCION_SIN_LIQUIBASE.md
+INSTRUCCIONES_RAPIDAS_SQL.md
+ADD_COLUMNS_EXECUTION_WINDOW.sql
+GUIA_RAPIDA_SISTEMA_AUTOMATIZADO.md
+.gitignore
+PLAN_CAMBIOS_ARQUITECTURA_MVC.md
+SISTEMA_LOGGING_ROBUSTO.md
+CHECKLIST_DESPLIEGUE_RAPIDO.md
+.gitignore
+GUIA_DESPLIEGUE_SISTEMA_AUTOMATICO.md
+COMPARATIVA_DAG_ANTIGUO_VS_NUEVO.md
+CREATE_TABLE_EMAIL_CAMPAIGN_REPORT_PRODUCCION.sql
+app/contratos_isp/app/release/app-release.apk
+src/main/resources/config/application-dev_magangue.yml

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "58664971524",
+    "project_id": "contratos-isp",
+    "storage_bucket": "contratos-isp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:58664971524:android:e717cfa8a9cdd5a0b87451",
+        "android_client_info": {
+          "package_name": "com.hjsolutions.contratos_isp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAV9gI1ZlKgW48AnJt6aJh9BK_CpjN67_U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

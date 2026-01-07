@@ -8,6 +8,10 @@ android {
     namespace = "com.hjsolutions.contratos_isp"
     compileSdk = 35
 
+    lint {
+        disable += setOf("NullSafeMutableLiveData")
+    }
+
     defaultConfig {
         applicationId = "com.hjsolutions.contratos_isp"
         minSdk = 29
@@ -16,6 +20,15 @@ android {
         versionName = "1.1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    signingConfigs{
+        create("release"){
+            storeFile = file(project.property("KEYSTORE_FILE") as String)
+            storePassword = project.property("KEYSTORE_PASSWORD") as String
+            keyAlias = project.property("KEY_ALIAS") as String
+            keyPassword = project.property("KEY_PASSWORD") as String
+        }
     }
 
     buildTypes {
