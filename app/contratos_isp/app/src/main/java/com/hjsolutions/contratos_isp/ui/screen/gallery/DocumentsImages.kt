@@ -38,7 +38,6 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import android.Manifest
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.ui.graphics.Color
 
@@ -152,7 +151,9 @@ fun DocumentsImages(
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF6200EE)
             ),
-            onClick = {},
+            onClick = {
+                onSaveToAppwrite(currentDocument)
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),

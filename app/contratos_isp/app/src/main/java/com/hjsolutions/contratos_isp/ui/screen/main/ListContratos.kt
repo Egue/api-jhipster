@@ -2,7 +2,6 @@ package com.hjsolutions.contratos_isp.ui.screen.main
 
 import android.util.Log
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,7 +35,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import com.hjsolutions.contratos_isp.data.models.UiStateContrato
 import androidx.compose.runtime.getValue
-import com.hjsolutions.contratos_isp.ui.screen.gallery.GalleryScreen
 
 @Composable
 fun ListContratos(
@@ -44,7 +42,8 @@ fun ListContratos(
     implementacion: String,
     onViewPdf:(path:String) -> Unit ,
     onSignature:(documentId:String) -> Unit,
-    onDoc:(documentId:String) -> Unit
+    onDoc:(documentId:String) -> Unit,
+    onStatus:(documentId:String)->Unit
     ) {
 
     val uiState by contratosViewModel.uiState.collectAsState()
@@ -89,6 +88,10 @@ fun ListContratos(
                                     },
                                     onDoc = {
                                         onDoc(contrato.id)
+                                    },
+
+                                    onStatus = {
+                                        onStatus(contrato.id)
                                     }
 
                                 )

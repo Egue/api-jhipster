@@ -43,7 +43,8 @@ fun CardContrato(
     contrato: ContratoModels ,
     onViewPdf:()-> Unit ,
     onFirma:()-> Unit ,
-    onDoc: () -> Unit){
+    onDoc: () -> Unit ,
+    onStatus:() ->Unit){
 
     Card(modifier = Modifier
         .fillMaxWidth()
@@ -168,7 +169,9 @@ fun CardContrato(
                 }
                 Spacer(Modifier.width(8.dp))
                 ElevatedButton(
-                    onClick = {},
+                    onClick = {
+                        onStatus()
+                    },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF4CAF50)
 

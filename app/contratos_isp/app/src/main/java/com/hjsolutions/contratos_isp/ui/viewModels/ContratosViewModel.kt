@@ -1,10 +1,12 @@
 package com.hjsolutions.contratos_isp.ui.viewModels
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
+import com.hjsolutions.contratos_isp.data.api.Response
 import com.hjsolutions.contratos_isp.data.models.ContratoInfo
 import com.hjsolutions.contratos_isp.data.models.ContratoModels
 import com.hjsolutions.contratos_isp.data.models.Documentos
@@ -20,6 +22,8 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 class ContratosViewModel() : ViewModel() {
 
@@ -29,6 +33,7 @@ class ContratosViewModel() : ViewModel() {
     private var _document = MutableStateFlow<UiStateOneContrato>(UiStateOneContrato.Loading)
     var document:StateFlow<UiStateOneContrato> = _document.asStateFlow()
 
+    var response by mutableStateOf(Response())
 
     val contratoRepository = ContratoRepository()
 
@@ -153,6 +158,23 @@ class ContratosViewModel() : ViewModel() {
 
     fun refreshContrato(implementacion :String){
         loadContratos(implementacion = implementacion)
+    }
+
+    fun updatedContrato(id:String){
+        viewModelScope.launch {
+            response = response.copy(isLoading = true)
+            contratoRepository.updatedStatus(id)
+                .onSuccess { document ->
+                    response = response.copy(isLoading = false , data = document)
+                }
+                .onFailure { error ->
+                    response = response.copy(isLoading = false , errorMessage = error.message)
+                }
+        }
+    }
+
+    fun refreshData(){
+        response = response.copy(isLoading = false, data = null , errorMessage = null)
     }
 
 

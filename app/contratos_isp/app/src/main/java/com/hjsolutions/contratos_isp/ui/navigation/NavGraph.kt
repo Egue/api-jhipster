@@ -16,6 +16,7 @@ import com.hjsolutions.contratos_isp.ui.screen.signature.SignatureScreen
 import com.hjsolutions.contratos_isp.ui.viewModels.ContratosViewModel
 import com.hjsolutions.contratos_isp.ui.viewModels.LoginViewModel
 import com.hjsolutions.contratos_isp.ui.viewModels.SignatureViewModel
+import com.hjsolutions.contratos_isp.ui.viewModels.UploadFileViewModel
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
@@ -30,7 +31,8 @@ fun NavGraph(
     navController: NavHostController,
     loginViewModel: LoginViewModel = viewModel(),
     contratosViewModel : ContratosViewModel = viewModel(),
-    singatureViewModel: SignatureViewModel = viewModel()
+    singatureViewModel: SignatureViewModel = viewModel(),
+    uploadFileViewModel: UploadFileViewModel = viewModel()
 ) {
     val uiState = loginViewModel.uiState
 
@@ -85,7 +87,8 @@ fun NavGraph(
             GalleryScreen(
                 documentId = decodeDocument,
                 atras = {navController.popBackStack()},
-                contratosViewModel = contratosViewModel
+                contratosViewModel = contratosViewModel,
+                uploadFileViewModel = uploadFileViewModel
             )
         }
     }

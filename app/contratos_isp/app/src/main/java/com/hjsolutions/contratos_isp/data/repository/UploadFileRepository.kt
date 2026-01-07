@@ -16,12 +16,12 @@ class UploadFileRepository {
 
     private val storage = Storage(client)
 
-    suspend fun uploadFile(filePath:String):String?{
-        return withContext(Dispatchers.IO){
+    suspend fun uploadFile(filePath: String): Result<String> {
+        return withContext(Dispatchers.IO) {
             try {
                 val file = File(filePath)
-                if(!file.exists()){
-                    return@withContext null
+                if (!file.exists()) {
+                    return@withContext Result.failure(Exception("El archivo no existe: $filePath"))
                 }
 
                 val inputFile = InputFile.fromFile(file)
@@ -32,19 +32,23 @@ class UploadFileRepository {
                     fileId = fileId,
                     file = inputFile
                 )
-                uploadedFile.id
-            }catch (e:Exception){
+                Result.success(uploadedFile.id)
+            } catch (e: Exception) {
                 e.printStackTrace()
-                null
+                Result.failure(Exception(e.message))
             }
         }
     }
 
-    suspend fun uploadMultipleFiles(filePaths: List<String>):List<String>{
-        return withContext(Dispatchers.IO){
-            filePaths.mapNotNull { path ->
-                uploadFile(path)
-               }
+    suspend fun uploadMultipleFiles(filePaths: List<String>): List<Result<String>> {
+        return withContext(Dispatchers.IO) {
+            filePaths.map { path ->
+                try {
+                    uploadFile(path)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Result.failure(e)
+                }
             }
         }
     }
