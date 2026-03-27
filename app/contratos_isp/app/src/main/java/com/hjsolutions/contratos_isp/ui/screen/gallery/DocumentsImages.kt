@@ -136,7 +136,9 @@ fun DocumentsImages(
             title = "Documentos",
             documents = currentDocument.document,
             onAddClik = {launchCamera(CaptureType.DOCUMENT)},
-            onRemoveClick = {}
+            onRemoveClick = { id ->
+
+            }
         )
 
         HorizontalDivider()

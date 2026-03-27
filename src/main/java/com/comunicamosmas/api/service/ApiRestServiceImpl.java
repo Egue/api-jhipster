@@ -61,7 +61,8 @@ public class ApiRestServiceImpl implements IApiRestService {
 			token = this.getAuthToken();
 		}
 
-		headers.set("Authorization", "Bearer " + token);
+		//headers.set("Authorization", "Bearer " + token);
+        headers.set("X-Auth-Token" , token);
 
 		HttpEntity<Void> authenticatedRequest = new HttpEntity<>(headers);
 
@@ -81,7 +82,8 @@ public class ApiRestServiceImpl implements IApiRestService {
 		} catch (HttpClientErrorException.Unauthorized ex) {
 			token = this.getAuthToken();
 
-			headers.set("Authorization", "Bearer " + token);
+			//headers.set("Authorization", "Bearer " + token);
+            headers.set("X-Auth-Token" , token);
 
 			authenticatedRequest = new HttpEntity<>(headers);
 
@@ -118,8 +120,8 @@ public class ApiRestServiceImpl implements IApiRestService {
 			token = this.getAuthToken();
 		}
 
-		headers.set("Authorization", "Bearer " + token);
-
+		//headers.set("Authorization", "Bearer " + token);
+        headers.set("X-Auth-Token" , token);
 		HttpEntity<Void> authenticatedRequest = new HttpEntity<>(headers);
 
 		String url = "https://apps.internetinalambrico.com.co/repositories/backend_jwt_3_slim/public/pagos/actualizarcargue/"
@@ -133,8 +135,8 @@ public class ApiRestServiceImpl implements IApiRestService {
 		} catch (HttpClientErrorException.Unauthorized ex) {
 			token = this.getAuthToken();
 
-			headers.set("Authorization", "Bearer " + token);
-
+			//headers.set("Authorization", "Bearer " + token);
+            headers.set("X-Auth-Token" , token);
 			authenticatedRequest = new HttpEntity<>(headers);
 
 			ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, authenticatedRequest,
@@ -245,32 +247,32 @@ public class ApiRestServiceImpl implements IApiRestService {
 	 * MappingJackson2HttpMessageConverter());
 	 * try {
 	 * HttpHeaders header = new HttpHeaders();
-	 * 
+	 *
 	 * header.setContentType(MediaType.APPLICATION_JSON);
-	 * 
+	 *
 	 * String jsonBody =
 	 * "{\"email\":\"web@internetinalambrico.com.co\",\"password\":\"E$LaClav3\"}";
-	 * 
+	 *
 	 * HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, header);
-	 * 
+	 *
 	 * String url =
 	 * "https://apps.internetinalambrico.com.co/repositories/backend_jwt_3_slim/public/auth/login";
-	 * 
+	 *
 	 * ResponseEntity<ResponseSlimLoginDTO> responseEntity =
 	 * restTemplate.postForEntity(url, requestEntity, ResponseSlimLoginDTO.class);
-	 * 
+	 *
 	 * ResponseSlimLoginDTO response = responseEntity.getBody();
-	 * 
+	 *
 	 * jwt = response.getResponse();
-	 * 
+	 *
 	 * System.out.print(response.getResponse());
-	 * 
-	 * 
+	 *
+	 *
 	 * }catch(Exception e)
 	 * {
 	 * System.out.print(e.getMessage());
-	 * 
-	 * 
+	 *
+	 *
 	 * }
 	 * }
 	 */
@@ -308,7 +310,7 @@ public class ApiRestServiceImpl implements IApiRestService {
 
 	@Override
 	public FacturaElectronicaResponseDTO unSerializablePHP(String factura , Integer mesServicio , Long idEmpresa) {
-		 
+
 		restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
 		FacturaElectronicaResponseDTO facturaElectronica = new FacturaElectronicaResponseDTO();
@@ -317,7 +319,7 @@ public class ApiRestServiceImpl implements IApiRestService {
 		//String url = "http://10.112.109.2/api/scriptPhp/index.php";
 		String url = "http://131.221.41.20:8050/api/scriptPhp/index.php";
 
-		 
+
 		JsonString jsonString = new JsonString(factura, mesServicio , idEmpresa);
 
 		HttpHeaders headers = new HttpHeaders();
@@ -332,14 +334,14 @@ public class ApiRestServiceImpl implements IApiRestService {
 		if(responseEntity.getStatusCode().is2xxSuccessful())
 		{
 			facturaElectronica = responseEntity.getBody();
-			
+
 			return facturaElectronica;
 		}else{
 			System.out.print("Error al enviar info");
 		}
 		}catch (HttpClientErrorException ex) {
 			// Manejar una respuesta de error 4xx
-			 
+
 			throw new ExceptionNullSql(new Date(), "Error 4xx" , ex.getResponseBodyAsString());
 		} catch (HttpServerErrorException ex) {
 			// Manejar una respuesta de error 5xx
@@ -361,7 +363,7 @@ public class ApiRestServiceImpl implements IApiRestService {
 		private Long idEmpresa;
 
 		public JsonString(String factura , Integer facturado_fecha, Long idEmpresa)
-		{ 
+		{
 			this.factura = factura;
 			this.facturado_fecha = facturado_fecha;
 			this.idEmpresa = idEmpresa;

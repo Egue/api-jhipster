@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID; 
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +18,7 @@ import com.comunicamosmas.api.domain.Contrato;
 import com.comunicamosmas.api.domain.Deuda;
 import com.comunicamosmas.api.domain.Pago;
 import com.comunicamosmas.api.domain.PagoLineaVersionDos;
-import com.comunicamosmas.api.domain.SystemConfig; 
+import com.comunicamosmas.api.domain.SystemConfig;
 import com.comunicamosmas.api.repository.IPagoDao;
 import com.comunicamosmas.api.repository.ISystemConfigDao;
 import com.comunicamosmas.api.service.ICacheContratoSaldoService;
@@ -30,7 +30,7 @@ import com.comunicamosmas.api.service.IPagoService;
 import com.comunicamosmas.api.service.dto.DeudasForFacturaDTO;
 import com.comunicamosmas.api.service.dto.InfoPagosDTO;
 import com.comunicamosmas.api.service.dto.PagosEstadoCuentaDTO;
-import com.comunicamosmas.api.service.dto.PaymentOnlineDTO;  
+import com.comunicamosmas.api.service.dto.PaymentOnlineDTO;
 
 import com.comunicamosmas.api.service.dto.ReciboCajaDTO;
 import com.comunicamosmas.api.service.dto.ReporteMediosPagosDTO;
@@ -66,7 +66,7 @@ public class PagoServiceImpl implements IPagoService {
     private final IDeudaService deudasService;
     private final IContratoSaldoFavorLogService saldoFavorLogService;
 
-    public PagoServiceImpl(IPagoDao pagoDao , ISystemConfigDao systemDao , ICacheContratoSaldoService saldoService , 
+    public PagoServiceImpl(IPagoDao pagoDao , ISystemConfigDao systemDao , ICacheContratoSaldoService saldoService ,
     IPagoRetencionService retencionService , IDeudaService deudaService , IContratoSaldoFavorLogService saldoFavorLogService)
     {
         this.pagoDao = pagoDao;
@@ -109,7 +109,7 @@ public class PagoServiceImpl implements IPagoService {
         SystemConfig origen = systemDao.findByOrigen("origen");
         String[] caracteres = origen.getComando().split(",");
         List<String> listOrigen = new ArrayList<>(Arrays.asList(caracteres));
-        
+
         Optional<List<Object[]>> result = pagoDao.reciboCaja(ciudades, fecha_inicial, fecha_final, listOrigen);
 
         List<ReciboCajaDTO> reciboCaja = result.map(resp -> resp.stream().map(rs -> {
@@ -124,7 +124,7 @@ public class PagoServiceImpl implements IPagoService {
             dto.setServicio((String) rs[18].toString() + "/" + rs[22].toString());
             // concetp
             String concepto = this.findConcepto((Integer) rs[24], (Integer) rs[25], (Integer) rs[26],
-                    (Integer) rs[27], (Integer) rs[28], (String) rs[29]);
+                (Integer) rs[27], (Integer) rs[28], (String) rs[29]);
             dto.setConcepto(concepto);
             // perido
             String periodo = this.converDateFormat((String) rs[6].toString());
@@ -140,17 +140,17 @@ public class PagoServiceImpl implements IPagoService {
             dto.setComprobante((String) rs[11].toString());
             return dto;
         }).collect(Collectors.toList())).orElse(new ArrayList<>());
-         
+
 
         // cargar saldo a favor
         List<ReciboCajaDTO> saldo_favor = saldoService.reporte_saldo_favor(ciudades, fecha_inicial, fecha_final,
-                listOrigen);
+            listOrigen);
         if (!reciboCaja.isEmpty()) {
 
             reciboCaja.addAll(saldo_favor);
         }
         List<ReciboCajaDTO> retenciones = retencionService.reporte_recibo_caja(ciudades, fecha_inicial, fecha_final,
-                listOrigen);
+            listOrigen);
         if (!retenciones.isEmpty()) {
             reciboCaja.addAll(retenciones);
         }
@@ -160,7 +160,7 @@ public class PagoServiceImpl implements IPagoService {
     }
 
     private String findConcepto(Integer instalacion, Integer reconexion, Integer materiales, Integer traslado,
-            Integer otros, String concepto) {
+                                Integer otros, String concepto) {
         String concepto_aux = "Mensualidad";
         if (instalacion.equals(1)) {
             concepto_aux = "Instalacion";
@@ -227,13 +227,13 @@ public class PagoServiceImpl implements IPagoService {
     }
 
     @Override
-    public void registerPagoSupergiros(Contrato contrato, int valorTotal , String comprobante) {
+    public void registerPagoSupergiros(Contrato contrato, int valorTotal, String comprobante) {
         // TODO Auto-generated method stub
         if (contrato != null) {
             // consultar deudas del contrato de la menor a la mayor
             List<DeudasForFacturaDTO> deudas = deudasService.deudasByIdContrato(contrato.getId());
-            Float resultado = (float) valorTotal;
-            List<Pago> listPago = new ArrayList<>();
+            Float resultado = (float) valorTotal; // total de supergiros
+            List<Pago> listPago = new ArrayList<>(); //lista de pagos vacia
             String uniqueId = UUID.randomUUID().toString();
             int reciboCaja = this.findLastRc(contrato.getIdServicio(), contrato.getGrupo());
 
@@ -242,70 +242,70 @@ public class PagoServiceImpl implements IPagoService {
 
             for (DeudasForFacturaDTO rs : deudas) {
 
+                if (resultado <= 1L) break; // si no hay saldo en supegiros saltar
+
                 Float valor_parcial = (float) (rs.getValor_total() - rs.getValor_parcial());
+
+                if (valor_parcial <= 1L) continue;
 
                 Deuda deuda = deudasService.findById(rs.getId_deuda().longValue());
 
                 float valorDado = 0L;
 
-                if (resultado > 0L) {
-                    if (resultado >= valor_parcial) { //12000 > 500
-                        resultado = resultado - valor_parcial;
-                        valorDado = valor_parcial;
-                        Float parcial = rs.getValor_parcial() + valor_parcial;
-                        deuda.setEstado(2L);
-                        deuda.setValorParcial(parcial.doubleValue());
-                    } else {
-                        Float parcial = rs.getValor_parcial() + resultado;
-                        valorDado = resultado;
-                        resultado = resultado - resultado;
-                        deuda.setEstado(3L);
-                        deuda.setValorParcial(parcial.doubleValue());
-                    }
-                    deudasService.save(deuda);
-                    //register pago
-                    
-                    Pago pago = new Pago();
-                    pago.setIdReciboCaja(((long)(reciboCaja + 1)));
-                    pago.setIdCiudad(contrato.getIdCiudad());
-                    pago.setIdServicio(contrato.getIdServicio());
-                    pago.setIdDeuda(rs.getId_deuda().longValue());
-                    pago.setIdCliente(rs.getId_cliente().longValue());
-                    pago.setIdCajero(2L);
-                    
-                    pago.setFechaf( Long.parseLong(fechaActual.format(formato)));
-                    pago.setIdMedioPago(32L);
-                    pago.setComprobante(comprobante);
-                    pago.setValorDado(valorDado);
-                    pago.setValorCobro(valorDado);
-                    pago.setValorVueltas((float) 0);
-                    pago.setValorRedondeo((float) 0);
-                    pago.setEstado(1L);
-                    pago.setAnulaIdUsuario(0L);
-                    pago.setAnulaMarca("");
-                    pago.setAnulaJustifica("");
-                    pago.setLugar(contrato.getGrupo());
-                    pago.setTurno(uniqueId);
-                    pago.setIdContrato(contrato.getId());
-                    pago.setIdEmpresa(contrato.getIdEmpresa());
-                    pago.setMesServicio((Long)rs.getMes_servicio().longValue());
-                    pago.setInstalacion(0L);
-                    pago.setReconexion(0L);
-                    pago.setMateriales(0L);
-                    listPago.add(pago);
-                    
-                    //
-                }else{
-                    break;
+                if (resultado >= valor_parcial) { //12000 > 500
+                    resultado -= valor_parcial;
+                    valorDado = valor_parcial;
+                    Float parcial = rs.getValor_parcial() + valor_parcial;
+                    deuda.setEstado(2L);
+                    deuda.setValorParcial(parcial.doubleValue());
+                } else {
+                    Float parcial = rs.getValor_parcial() + resultado;
+                    valorDado = resultado;
+                    resultado = resultado - resultado;
+                    deuda.setEstado(3L);
+                    deuda.setValorParcial(parcial.doubleValue());
                 }
+                deudasService.save(deuda);
+                //register pago
+
+                Pago pago = new Pago();
+                pago.setIdReciboCaja(((long) (reciboCaja + 1)));
+                pago.setIdCiudad(contrato.getIdCiudad());
+                pago.setIdServicio(contrato.getIdServicio());
+                pago.setIdDeuda(rs.getId_deuda().longValue());
+                pago.setIdCliente(rs.getId_cliente().longValue());
+                pago.setIdCajero(2L);
+
+                pago.setFechaf(Long.parseLong(fechaActual.format(formato)));
+                pago.setIdMedioPago(32L);
+                pago.setComprobante(comprobante);
+                pago.setValorDado(valorDado);
+                pago.setValorCobro(valorDado);
+                pago.setValorVueltas((float) 0);
+                pago.setValorRedondeo((float) 0);
+                pago.setEstado(1L);
+                pago.setAnulaIdUsuario(0L);
+                pago.setAnulaMarca("");
+                pago.setAnulaJustifica("");
+                pago.setLugar(contrato.getGrupo());
+                pago.setTurno(uniqueId);
+                pago.setIdContrato(contrato.getId());
+                pago.setIdEmpresa(contrato.getIdEmpresa());
+                pago.setMesServicio((Long) rs.getMes_servicio().longValue());
+                pago.setInstalacion(0L);
+                pago.setReconexion(0L);
+                pago.setMateriales(0L);
+                listPago.add(pago);
+
+                //
+
                 //update deuda
-                               
+
             }
             saveAll(listPago);
             //validar si queda saldo
-            if(resultado > 0)
-            {
-                this.saldoFavorLogService.addSaldoBySupergiros(contrato, resultado, uniqueId ,fechaActual.format(formato) );
+            if (resultado > 0) {
+                this.saldoFavorLogService.addSaldoBySupergiros(contrato, resultado, uniqueId, fechaActual.format(formato));
             }
         }
     }
@@ -317,12 +317,12 @@ public class PagoServiceImpl implements IPagoService {
     }
 
     @Override
-    public int findLastRc(Long idServicio , String origen) {
+    public int findLastRc(Long idServicio, String origen) {
         // TODO Auto-generated method stub
-        Optional<List<Object[]>> result = pagoDao.findLastRc(idServicio , origen);
-        int recibo_pago = result.map(resp->{
+        Optional<List<Object[]>> result = pagoDao.findLastRc(idServicio, origen);
+        int recibo_pago = result.map(resp -> {
             int rc = 0;
-            for(Object[] rs : resp){
+            for (Object[] rs : resp) {
                 rc = (int) rs[0];
             }
 
@@ -333,52 +333,52 @@ public class PagoServiceImpl implements IPagoService {
 
     @Override
     public List<ReporteMediosPagosDTO> findMedioPago(List<Integer> medio, String inicio, String fin) {
-    
-        Optional<List<Object[]>> result = pagoDao.pagosByMedioPago(medio, inicio, fin);        
+
+        Optional<List<Object[]>> result = pagoDao.pagosByMedioPago(medio, inicio, fin);
         List<ReporteMediosPagosDTO> pagos = result.map(resp -> resp.stream().map(rs -> {
             ReporteMediosPagosDTO obj = new ReporteMediosPagosDTO();
-            obj.setCodigo((int)rs[0]);
+            obj.setCodigo((int) rs[0]);
             obj.setRc((int) rs[1]);
             obj.setCiudad((String) rs[2]);
             obj.setServicio((String) rs[3]);
             obj.setCliente((String) rs[4]);
             obj.setCajero((String) rs[5]);
             obj.setValor((float) rs[6]);
-             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                   String timestampAsString = dateFormat.format(rs[7]);
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String timestampAsString = dateFormat.format(rs[7]);
             obj.setMarca(timestampAsString);
             obj.setOrigen((String) rs[8]);
             obj.setContrato((int) rs[9]);
             obj.setPayments((String) rs[10]);
             return obj;
-        }).collect(Collectors.toList())).orElse(new ArrayList<>()); 
+        }).collect(Collectors.toList())).orElse(new ArrayList<>());
 
         return pagos;
     }
 
     @Override
-    public List<ReporteSiustOneThreeDTO>  reporteOneToThree(List<Integer> servicios, Integer firts, Integer end) {
-      
-            Optional<List<Object[]>> result = pagoDao.reporteSIUSTOneToThree(servicios, firts, end);
-            List<ReporteSiustOneThreeDTO> reporte = result.map(resp -> resp.stream().map(rs->{
-                ReporteSiustOneThreeDTO obj = new ReporteSiustOneThreeDTO();
-                obj.setServicio((String) rs[0]);
-                obj.setTipoCliente((String) rs[1]);
-                obj.setDeuda((Integer) rs[2]);
-                obj.setContrato((Integer) rs[3]);
-                obj.setFactura((Integer) rs[4]);
-                obj.setBase((Double) rs[5]);
-                obj.setIva((float) rs[6]);
-                obj.setTarifa((Integer) rs[7]);
-                obj.setEstrato((Integer) rs[8]);
-                obj.setVelocidad((Integer) rs[9]);
-                obj.setTecnologia((Integer) rs[10]);
-                obj.setConcepto((String) rs[11]);
-                obj.setNcBase((Float) rs[12]);
-                obj.setNcIva((Float) rs[13]);
-                return obj;
-            }).collect(Collectors.toList())).orElse(new ArrayList<>());
-            return reporte;
+    public List<ReporteSiustOneThreeDTO> reporteOneToThree(List<Integer> servicios, Integer firts, Integer end) {
+
+        Optional<List<Object[]>> result = pagoDao.reporteSIUSTOneToThree(servicios, firts, end);
+        List<ReporteSiustOneThreeDTO> reporte = result.map(resp -> resp.stream().map(rs -> {
+            ReporteSiustOneThreeDTO obj = new ReporteSiustOneThreeDTO();
+            obj.setServicio((String) rs[0]);
+            obj.setTipoCliente((String) rs[1]);
+            obj.setDeuda((Integer) rs[2]);
+            obj.setContrato((Integer) rs[3]);
+            obj.setFactura((Integer) rs[4]);
+            obj.setBase((Double) rs[5]);
+            obj.setIva((float) rs[6]);
+            obj.setTarifa((Integer) rs[7]);
+            obj.setEstrato((Integer) rs[8]);
+            obj.setVelocidad((Integer) rs[9]);
+            obj.setTecnologia((Integer) rs[10]);
+            obj.setConcepto((String) rs[11]);
+            obj.setNcBase((Float) rs[12]);
+            obj.setNcIva((Float) rs[13]);
+            return obj;
+        }).collect(Collectors.toList())).orElse(new ArrayList<>());
+        return reporte;
     }
 
     @Override
@@ -387,12 +387,11 @@ public class PagoServiceImpl implements IPagoService {
         List<Object[]> pagos = pagoDao.findByIdDeuda(idDeuda);
 
         return pagos.stream()
-                    .map(this::convertPagosEstadoCuentaDTO)
-                    .collect(Collectors.toList());
+            .map(this::convertPagosEstadoCuentaDTO)
+            .collect(Collectors.toList());
     }
 
-    private PagosEstadoCuentaDTO convertPagosEstadoCuentaDTO(Object[] pago)
-    {
+    private PagosEstadoCuentaDTO convertPagosEstadoCuentaDTO(Object[] pago) {
         PagosEstadoCuentaDTO pagosCuentaDTO = new PagosEstadoCuentaDTO();
 
         pagosCuentaDTO.setIdPago((Integer) pago[0]);
@@ -404,52 +403,47 @@ public class PagoServiceImpl implements IPagoService {
     }
 
     @Override
-    public void registerPagosOnline(String reference ,   PaymentOnlineDTO.Facturas facturas) {
+    public void registerPagosOnline(String reference, PaymentOnlineDTO.Facturas facturas) {
         // TODO Auto-generated method stub
-         //find deudas in deudas
-         String[] deudasArray = facturas.getId_deudas().split(","); 
-         List<Long> deudasLong = Arrays.stream(deudasArray)
-                                .map(Long::parseLong)
-                                .collect(Collectors.toList());
+        //find deudas in deudas
+        String[] deudasArray = facturas.getId_deudas().split(",");
+        List<Long> deudasLong = Arrays.stream(deudasArray)
+            .map(Long::parseLong)
+            .collect(Collectors.toList());
         /*Pagos */
         Double total = facturas.getValor();
         List<Pago> listPago = new ArrayList<>();
         String uniqueId = UUID.randomUUID().toString();
-        
+
 
         LocalDate fechaActual = LocalDate.now();
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("yyyyMMdd");
         //find id_deuda database
-         Optional<List<Deuda>> findDeudas = deudasService.findByIdDeudaIn(deudasLong);
+        Optional<List<Deuda>> findDeudas = deudasService.findByIdDeudaIn(deudasLong);
 
-         Integer reciboCaja = 0;
-        //recorregemos cada deuda y actualizamos 
-        if(findDeudas.isPresent())
-        {
+        Integer reciboCaja = 0;
+        //recorregemos cada deuda y actualizamos
+        if (findDeudas.isPresent()) {
             List<Deuda> deudas = findDeudas.get();
 
-            for(Deuda rs : deudas)
-            {
-                if(rs.getEstado() != 2)
-                {
-                    if(reciboCaja == 0)
-                    {
-                    reciboCaja = this.findLastRc(rs.getIdServicio(), rs.getRefiere());
+            for (Deuda rs : deudas) {
+                if (rs.getEstado() != 2) {
+                    if (reciboCaja == 0) {
+                        reciboCaja = this.findLastRc(rs.getIdServicio(), rs.getRefiere());
                     }
-                
+
                     Double resultado = rs.getValorTotal() - rs.getValorParcial();
-                    
+
                     Double valorDado = 0.0;
-                     
+
                     int intResultado = resultado.intValue();
-                   
-                    if(total > 0)
-                    {
+
+                    if (total > 0) {
                         rs.setEstado(2L);
                         valorDado = rs.getValorParcial() + resultado;
                         rs.setValorParcial(valorDado);
-                                            
-                    }else{
+
+                    } else {
                         valorDado = total;
                         rs.setEstado(2L);
                         rs.setValorParcial(total);
@@ -457,19 +451,18 @@ public class PagoServiceImpl implements IPagoService {
 
                     total = total - intResultado;
 
-                    if(valorDado > 1)
-                    {
+                    if (valorDado > 1) {
                         deudasService.save(rs);
 
                         Pago pago = new Pago();
-                        pago.setIdReciboCaja(((long)(reciboCaja + 1)));
+                        pago.setIdReciboCaja(((long) (reciboCaja + 1)));
                         pago.setIdCiudad(rs.getIdCiudad());
                         pago.setIdServicio(rs.getIdServicio());
                         pago.setIdDeuda(rs.getId());
                         pago.setIdCliente(rs.getIdCliente());
                         pago.setIdCajero(2L);
 
-                        pago.setFechaf( Long.parseLong(fechaActual.format(formato)));
+                        pago.setFechaf(Long.parseLong(fechaActual.format(formato)));
                         pago.setIdMedioPago(27L);
                         pago.setComprobante(reference);
                         pago.setValorDado(valorDado.floatValue());
@@ -508,34 +501,30 @@ public class PagoServiceImpl implements IPagoService {
                     pagoLineaVersionDosService.save(pagov2);
 
                 }
-                
-                
+
+
                 //save descarga
-                
+
 
             }
-            if(!listPago.isEmpty())
-            {
+            if (!listPago.isEmpty()) {
                 saveAll(listPago);
             }
 
-            
 
-            
         }
-         
+
 
     }
 
     @Override
     public List<InfoPagosDTO> infoRc(Long idContrato, Long rc) {
         // TODO Auto-generated method stub
-        return  pagoDao.pagoInfo(idContrato, rc).get().stream().map(this::mapToInfoPagos).collect(Collectors.toList());
- 
+        return pagoDao.pagoInfo(idContrato, rc).get().stream().map(this::mapToInfoPagos).collect(Collectors.toList());
+
     }
 
-    private InfoPagosDTO mapToInfoPagos(Object[] item)
-    {
+    private InfoPagosDTO mapToInfoPagos(Object[] item) {
         InfoPagosDTO infoPago = new InfoPagosDTO();
 
         infoPago.setIdReciboPago((Integer) item[0]);
