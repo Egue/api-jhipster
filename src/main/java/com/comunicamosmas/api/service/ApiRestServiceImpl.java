@@ -20,6 +20,7 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import com.comunicamosmas.api.config.ApiSupergiros;
 import com.comunicamosmas.api.domain.Contrato;
 import com.comunicamosmas.api.domain.Orden;
 import com.comunicamosmas.api.service.dto.FacturaElectronicaResponseDTO;
@@ -28,6 +29,8 @@ import com.comunicamosmas.api.service.dto.SupergirosPagosDTO;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import liquibase.pro.packaged.ap;
 
 @Service
 public class ApiRestServiceImpl implements IApiRestService {
@@ -44,6 +47,13 @@ public class ApiRestServiceImpl implements IApiRestService {
 	RestTemplate restTemplate = new RestTemplate();
 
 	HttpHeaders headers = new HttpHeaders();
+
+	private final ApiSupergiros apiSupergiros;
+
+	public ApiRestServiceImpl(ApiSupergiros apiSupergiros){
+		this.apiSupergiros = apiSupergiros;
+
+		}
 
 	/*
 	 * REALIZA CONSULTA A INTERNETINALAMBRICO.COM.CO PARA CONSULTAR PAGOS SUPERGIROS
@@ -161,7 +171,11 @@ public class ApiRestServiceImpl implements IApiRestService {
 
 			header.setContentType(MediaType.APPLICATION_JSON);
 
-			String jsonBody = "{\"email\":\"web@internetinalambrico.com.co\",\"password\":\"E$LaClav3\"}";
+			 String jsonBody = String.format(
+            "{\"email\":\"%s\",\"password\":\"%s\"}",
+            apiSupergiros.getEmail(),
+            apiSupergiros.getPassword()
+        );
 
 			HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, header);
 
