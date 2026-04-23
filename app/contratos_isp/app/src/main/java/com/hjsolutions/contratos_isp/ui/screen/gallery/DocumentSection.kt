@@ -25,7 +25,7 @@ fun DocumentSection(
     title:String,
     documents : List<String?>,
     onAddClik:()->Unit,
-    onRemoveClick:(id:Int)->Unit
+    onRemoveClick:(id:String)->Unit
 ){
 
     Column {
@@ -59,7 +59,7 @@ fun DocumentSection(
             LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 items(documents.size){index ->
                     DocumentItem(imagePath = documents[index] , onRemove = {
-                        onRemoveClick(index)
+
                     })
                     }
                 }

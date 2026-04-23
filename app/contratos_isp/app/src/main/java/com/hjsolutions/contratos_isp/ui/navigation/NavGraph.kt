@@ -10,6 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.navArgument
 import com.hjsolutions.contratos_isp.ui.components.PdfViewScreen
 import com.hjsolutions.contratos_isp.ui.screen.gallery.GalleryScreen
+import com.hjsolutions.contratos_isp.ui.screen.gallery.v2.GalleryScreenv2
 import com.hjsolutions.contratos_isp.ui.screen.login.LoginScreen
 import com.hjsolutions.contratos_isp.ui.screen.main.MainScreen
 import com.hjsolutions.contratos_isp.ui.screen.signature.SignatureScreen

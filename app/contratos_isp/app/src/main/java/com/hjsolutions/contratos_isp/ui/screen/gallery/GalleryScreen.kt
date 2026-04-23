@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -17,6 +18,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -51,6 +53,7 @@ fun GalleryScreen( documentId:String  ,
     var errorMessage by remember { mutableStateOf("") }
     var loaginUplosf by remember { mutableStateOf(false) }
     var success by remember { mutableStateOf(false) }
+    val primaryRed = Color(0xFF86030E)
 
 
     LaunchedEffect(documentId) {
@@ -112,7 +115,7 @@ fun GalleryScreen( documentId:String  ,
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Color(0xFF6200EE)
+                containerColor = primaryRed
             )
         )
 
@@ -120,7 +123,9 @@ fun GalleryScreen( documentId:String  ,
          * */
         when(val state = uIstate){
             is UiStateOneContrato.Success ->{
-                DocumentsImages(state.contrato.documentos , onDocumentosUpdated = {} , onSaveToAppwrite = {documents ->
+                DocumentsImages(state.contrato.documentos ,
+                    onDocumentosUpdated = {} ,
+                    onSaveToAppwrite = {documents ->
                      uploadFileViewModel.saveDocuments(
                         documentos = documents,
                         idDocument = documentId
@@ -133,7 +138,12 @@ fun GalleryScreen( documentId:String  ,
 
             }
             is UiStateOneContrato.Loading -> {
-
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    color = primaryRed
+                )
             }
             is UiStateOneContrato.Error -> {
 

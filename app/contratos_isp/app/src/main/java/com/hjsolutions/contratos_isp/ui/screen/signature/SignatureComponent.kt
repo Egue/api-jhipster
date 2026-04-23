@@ -137,7 +137,7 @@ fun SignatureComponent(
                         }
                     }
                 },
-                enabled = paths.isNotEmpty(),
+               // enabled = paths.isNotEmpty(),
                 modifier = Modifier.weight(1f)
             ) {
                 if(signatureViewModel.response.isLoading){

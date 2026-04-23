@@ -139,7 +139,7 @@ fun ListContratos(
 
                             Button(
                                 onClick = {
-                                    contratosViewModel.refreshContrato(implementacion = implementacion)
+                                    contratosViewModel.refreshContrato(implementacion = implementacion )
                                 }
                             ) {
                                 Icon(
