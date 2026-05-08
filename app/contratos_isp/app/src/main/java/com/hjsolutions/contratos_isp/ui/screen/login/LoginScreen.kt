@@ -67,7 +67,10 @@ loginViewModel.uiState.errorMessage?.let { error->
         AlertDialogP(text = errorMessage!! , onDismissRequest = {
             showDialog = false
             errorMessage = null
-        } , onConfirmation = {})
+            loginViewModel.clearError()
+        } , onConfirmation = {
+            showDialog = false
+        })
     }
 
     Surface(modifier = Modifier

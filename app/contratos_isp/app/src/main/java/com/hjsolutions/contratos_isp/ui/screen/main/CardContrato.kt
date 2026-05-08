@@ -5,18 +5,26 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.DriveFileRenameOutline
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.EditNote
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.PictureAsPdf
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -25,6 +33,7 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,7 +44,10 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.hjsolutions.contratos_isp.data.models.ContratoModels
 
 @Composable
@@ -46,7 +58,9 @@ fun CardContrato(
     onDoc: () -> Unit ,
     onStatus:() ->Unit){
 
-    Card(modifier = Modifier
+    val primaryRed = Color(0xFF86030E)
+
+    /*Card(modifier = Modifier
         .fillMaxWidth()
         .drawWithContent {
             drawContent()
@@ -64,7 +78,8 @@ fun CardContrato(
             containerColor = Color.White,
             contentColor = Color.Black
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)) {
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp))
+     {
         Column(modifier = Modifier.padding(16.dp)) {
             contrato.contratoClass?.let { detalle ->
                 Row(
@@ -190,7 +205,149 @@ fun CardContrato(
                 }
 
             }
-            //
+
         }
+    }*/
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 4.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            // --- CABECERA: Título e ID ---
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Contrato de Servicio",
+                        style = MaterialTheme.typography.labelMedium,
+                        color = primaryRed,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = contrato.contratoClass?.cliente?.nombre_cliente ?: "Cliente sin nombre", // Ajusta a tus campos
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color(0xFF2D3142)
+                    )
+                }
+                // Badge de Estado (Opcional si tienes el campo)
+                Surface(
+                    color = primaryRed.copy(alpha = 0.1f),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = "#${contrato.id_contrato}",
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = primaryRed
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+            HorizontalDivider(thickness = 0.5.dp, color = Color.LightGray)
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // --- CUERPO: Detalles ---
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.LocationOn, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(16.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "Implementación: ${contrato.implementacion}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.DarkGray
+                )
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // --- ACCIONES: Botones Profesionales ---
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Botón Principal (Ver PDF)
+                ActionButton(
+                    icon = Icons.Default.PictureAsPdf,
+                    label = "PDF",
+                    containerColor = primaryRed,
+                    contentColor = Color.White,
+                    modifier = Modifier.weight(1f),
+                    onClick = onViewPdf
+                )
+
+                // Botón Firma
+                ActionButton(
+                    icon = Icons.Default.EditNote,
+                    label = "Firmar",
+                    containerColor = Color(0xFFF5F5F5),
+                    contentColor = Color.Black,
+                    modifier = Modifier.weight(1f),
+                    onClick = onFirma
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                // Botón Documentos
+                ActionButton(
+                    icon = Icons.Default.Description,
+                    label = "Docs",
+                    containerColor = Color(0xFFF5F5F5),
+                    contentColor = Color.Black,
+                    modifier = Modifier.weight(1f),
+                    onClick = onDoc
+                )
+
+                // Botón Estado
+                ActionButton(
+                    icon = Icons.Default.Info,
+                    label = "Estado",
+                    containerColor = Color(0xFFF5F5F5),
+                    contentColor = Color.Black,
+                    modifier = Modifier.weight(1f),
+                    onClick = onStatus
+                )
+            }
+        }
+    }
+
+}
+@Composable
+fun ActionButton(
+    icon: ImageVector,
+    label: String,
+    containerColor: Color,
+    contentColor: Color,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier.height(40.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = containerColor,
+            contentColor = contentColor
+        ),
+        shape = RoundedCornerShape(8.dp),
+        contentPadding = PaddingValues(horizontal = 8.dp)
+    ) {
+        Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(4.dp))
+        Text(text = label, fontSize = 12.sp, fontWeight = FontWeight.Medium)
     }
 }

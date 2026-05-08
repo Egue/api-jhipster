@@ -26,6 +26,10 @@ class LoginViewModel() : ViewModel() {
         checkout()
     }
 
+     fun clearError() {
+        uiState = uiState.copy(errorMessage = null)
+    }
+
     private fun checkout() {
 
         viewModelScope.launch {
@@ -42,7 +46,7 @@ class LoginViewModel() : ViewModel() {
                     uiState = uiState.copy(
                         isLoading = false,
                         isLoggedIn = false,
-                        errorMessage = error.message
+                        errorMessage = "Inicia nuevamente"
                         )
                 }
         }

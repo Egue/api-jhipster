@@ -49,7 +49,7 @@ fun DocumentsImages(
 ) {
 
     val context = LocalContext.current
-
+    val primaryRed = Color(0xFF86030E)
     var currentDocument by remember { mutableStateOf(documentos ?: Documentos()) }
     var photoUri by remember { mutableStateOf<Uri?>(null) }
     var currentCaptureType by remember { mutableStateOf<CaptureType>(CaptureType.PHOTO) }
@@ -137,7 +137,9 @@ fun DocumentsImages(
             documents = currentDocument.document,
             onAddClik = {launchCamera(CaptureType.DOCUMENT)},
             onRemoveClick = { id ->
-
+               currentDocument = currentDocument.copy(
+                   document = currentDocument.document.filter { it != id }
+               )
             }
         )
 
@@ -165,6 +167,8 @@ fun DocumentsImages(
         }
 
     }
+
+
 
 }
 
@@ -210,6 +214,8 @@ private fun compressImage(context: android.content.Context, uri: Uri): String? {
         e.printStackTrace()
         return null
     }
+
+
 }
 
 private fun createImageFile(context: android.content.Context): File {
@@ -217,3 +223,4 @@ private fun createImageFile(context: android.content.Context): File {
     val storageDir = context.cacheDir
     return File.createTempFile("IMG_${timeStamp}_", ".jpg", storageDir)
 }
+
