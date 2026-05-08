@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import com.comunicamosmas.api.service.dto.IntegrationFacturacionDTO;
 import org.apache.poi.hssf.record.ObjRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,7 +62,7 @@ public class SystemConfigServiceImpl implements ISystemConfigService {
 
             for (Object res : rs) {
                 String[] partes = ((String) res).split(",");
-                 
+
                 for (String val : partes) {
                     ValorStringDTO obj = new ValorStringDTO();
 
@@ -70,10 +71,10 @@ public class SystemConfigServiceImpl implements ISystemConfigService {
                     tipoList.add(obj);
                 }
             }
-            return tipoList;            
+            return tipoList;
 
         }).orElse(new ArrayList<>());
- 
+
 
         return tipo;
 
@@ -83,7 +84,7 @@ public class SystemConfigServiceImpl implements ISystemConfigService {
     public GrupoMailDTO grupoMail() {
         // TODO Auto-generated method stub
         SystemConfig result = systemDao.findByOrigen("user_mail_retiros");
-        
+
         try {
              ObjectMapper objetMapper = new ObjectMapper();
 
@@ -95,8 +96,8 @@ public class SystemConfigServiceImpl implements ISystemConfigService {
             throw new ExceptionNullSql(new Date(), "Convirtiendo Mail", e.getMessage());
         }
 
- 
-         
+
+
     }
 
     @Override
@@ -123,7 +124,7 @@ public class SystemConfigServiceImpl implements ISystemConfigService {
 
     @Override
     public List<NomenclaturaDTO> listNomenclatura() {
-        // TODO Auto-generated method stub 
+        // TODO Auto-generated method stub
         SystemConfig result = systemDao.findByOrigen("nomenclatura");
 
         try {
@@ -137,6 +138,20 @@ public class SystemConfigServiceImpl implements ISystemConfigService {
         return null;
     }
 
-    
+    @Override
+    public IntegrationFacturacionDTO configurationIntegration(String origen) {
+        SystemConfig result = systemDao.findByOrigen(origen);
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            return objectMapper.readValue(result.getComando(), new TypeReference<IntegrationFacturacionDTO>(){});
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
+        return null;
+
+    }
+
 
 }

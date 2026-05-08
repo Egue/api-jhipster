@@ -7,7 +7,7 @@
 ######################
 /target/classes/static/**
 /src/test/javascript/coverage/
-/src/main/resources/config/application-dev.yml
+/src/main/resources/config/application-dev_intinalambrico.yml
 
 ######################
 # Apache Airflow
@@ -54,7 +54,7 @@ local.properties
 .loadpath
 .factorypath
 /src/main/resources/rebel.xml
-/src/main/resources/config/application-dev.yml
+/src/main/resources/config/application-dev_intinalambrico.yml
 # External tool builders
 .externalToolBuilders/**
 
@@ -176,12 +176,12 @@ Desktop.ini
 /src/main/resources/config/application-dev copy.yml
 airflow/sincronice_portalweb.py
 airflow/reporte_clausuras.py
-src/main/resources/config/application-dev.yml
+src/main/resources/config/application-dev_intinalambrico.yml
 
 IMPLEMENTACION_BACKEND.md
 PROXI MOS_PASOS.md
 src/main/resources/config/application.yml
-src/main/resources/config/application-dev.yml
+src/main/resources/config/application-dev_intinalambrico.yml
 inventory_agente/target/inventory_agente-0.0.1-SNAPSHOT.jar.original
 inventory_agente/target/maven-archiver/pom.properties
 inventory_agente/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
@@ -208,4 +208,6 @@ GUIA_DESPLIEGUE_SISTEMA_AUTOMATICO.md
 COMPARATIVA_DAG_ANTIGUO_VS_NUEVO.md
 CREATE_TABLE_EMAIL_CAMPAIGN_REPORT_PRODUCCION.sql
 app/contratos_isp/app/release/app-release.apk
-src/main/resources/config/application-dev_magangue.yml
+src/main/resources/config/application-dev.yml
+/src/main/resources/config/application-dev_intinalambrico.yml
+/src/main/resources/config/application-dev.yml

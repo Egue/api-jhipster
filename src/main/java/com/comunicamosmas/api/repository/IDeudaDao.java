@@ -146,4 +146,11 @@ public Optional<List<Object[]>> invoiceByServiceAndDate(@Param("servicios")List<
         """, nativeQuery = true)
     public List<Object[]> listDeudasxContrato(@Param("idServicio") Long idServicio);
 
+    @Query("""
+        SELECT t FROM Deuda t
+        WHERE t.facElectronica = 1 AND t.facturadoFecha BETWEEN :inicio AND :fin
+        AND (t.resultadoFacturaElectronica IS NULL OR t.resultadoFacturaElectronica = '')
+        """)
+    public List<Deuda> findNullResultadoElectronica(@Param("inicio") Long fechaInicio , @Param("fin") Long fechaFin);
+
 }

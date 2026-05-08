@@ -16,4 +16,8 @@ public interface ISystemConfigDao extends CrudRepository<SystemConfig , Integer>
 
     @Query(value="SELECT system_config.comando FROM system_config WHERE system_config.origen = 'tipo_retiros'" , nativeQuery = true)
     public Optional<Object[]> findTipoPqr();
+
+
+
+
 }

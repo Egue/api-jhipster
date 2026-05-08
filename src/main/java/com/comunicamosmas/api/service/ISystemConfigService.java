@@ -4,11 +4,12 @@ import java.util.List;
 
 import com.comunicamosmas.api.domain.SystemConfig;
 import com.comunicamosmas.api.service.dto.GrupoMailDTO;
+import com.comunicamosmas.api.service.dto.IntegrationFacturacionDTO;
 import com.comunicamosmas.api.service.dto.NomenclaturaDTO;
 import com.comunicamosmas.api.service.dto.ValorStringDTO;
 
 public interface ISystemConfigService {
-    
+
     public void save(SystemConfig system);
 
     public List<SystemConfig> findAll();
@@ -26,4 +27,6 @@ public interface ISystemConfigService {
     public void saveNomenclatura(List<NomenclaturaDTO> nomenclaturaDTOs);
 
     public List<NomenclaturaDTO> listNomenclatura();
+
+    public IntegrationFacturacionDTO configurationIntegration(String origen);
 }
