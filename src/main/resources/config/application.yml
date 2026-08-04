@@ -183,6 +183,14 @@ jhipster:
 # application:
 
 # ===================================================================
+# Hablame SMS API Configuration
+# ===================================================================
+hablame:
+    account: ${HABLAME_ACCOUNT}
+    apikey: ${HABLAME_APIKEY}
+    token: ${HABLAME_TOKEN}
+
+# ===================================================================
 # Configuración de Email Campaign Batch Processing
 # Parámetros para procesamiento automático de campañas de email
 # ===================================================================

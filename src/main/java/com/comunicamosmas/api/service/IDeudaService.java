@@ -8,6 +8,7 @@ import com.comunicamosmas.api.service.dto.EstadoCuentaDeudasDTO;
 import java.util.List;
 import java.util.Optional;
 
+import com.comunicamosmas.api.service.dto.InfoFacturaDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -23,12 +24,12 @@ public interface IDeudaService {
 
     //buscar por id
     public Deuda findById(Long id);
-    
+
     //buscar por contrado
     public Page<EstadoCuentaDeudasDTO> findByIdContrato(Long contrato , Pageable page);
-    
+
     public String findDeudaByIdContrato(Long idContrato);
-    
+
     /**
      * buscar facturas por mes servicio*/
     public List<DeudasForFacturaDTO> findDeudaByFacturaAndMesServiceAndIdEmpresa(Long factura , Long mesServicio, Long idEmpresa , Integer idCliente , String origen);
@@ -45,4 +46,7 @@ public interface IDeudaService {
 
     //find deudas by id_deuda
     public Optional<List<Deuda>> findByIdDeudaIn(List<Long> idDeuda);
+
+    //facturas con erores
+    public List<Deuda> facturaswithFallos(Long inicio , Long fin);
 }

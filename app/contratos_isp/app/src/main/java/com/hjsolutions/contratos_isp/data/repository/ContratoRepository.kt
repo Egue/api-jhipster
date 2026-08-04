@@ -3,12 +3,14 @@ package com.hjsolutions.contratos_isp.data.repository
 import android.util.Log
 import com.google.gson.Gson
 import com.hjsolutions.contratos_isp.api.client.AppWriteClient
+import com.hjsolutions.contratos_isp.constants.APPWRITE_BUNKET_ID
 import com.hjsolutions.contratos_isp.constants.APPWRITE_DATABASE_ID
 import io.appwrite.Query
 import io.appwrite.exceptions.AppwriteException
 import io.appwrite.models.Document
 import io.appwrite.models.DocumentList
 import io.appwrite.services.Databases
+import io.appwrite.services.Storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -16,6 +18,27 @@ class ContratoRepository {
 
     private val cliente = AppWriteClient.client
     private val databases = Databases(cliente)
+
+    private val storage = Storage(cliente)
+
+    suspend fun deleteFileFromStorage(filedId:String) = try {
+        storage.deleteFile(bucketId = APPWRITE_BUNKET_ID ,fileId = filedId)
+        Result.success(true)
+    }catch (e:Exception){
+        Result.failure(e)
+    }
+
+    suspend fun updatedDocumentsJson(documentId: String , jsonString : String) = try {
+        databases.updateDocument(
+            databaseId = APPWRITE_DATABASE_ID,
+            collectionId = "contratos",
+            documentId = documentId,
+            data = mapOf("documentos" to jsonString)
+        )
+        Result.success(true)
+    }catch (e:Exception){
+        Result.failure(e)
+    }
 
 
     suspend fun getAllContratoByImplementation(implementacion: String): Result<DocumentList<Map<String,Any>>>{

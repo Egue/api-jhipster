@@ -14,8 +14,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -43,6 +45,7 @@ fun PhotoSection(
     onRemoveClick: () -> Unit
 ){
 
+    val primaryRed = Color(0xFF86030E)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
@@ -87,6 +90,15 @@ fun PhotoSection(
                                 .border(2.dp , Color(0xFF6200EE), CircleShape),
                             contentScale = ContentScale.Crop
                         )
+
+                            //icon
+                            IconButton(onClick = onRemoveClick , modifier = Modifier.align(Alignment.BottomEnd)) {
+                                Icon(imageVector = Icons.Default.Delete,
+                                    contentDescription = "eliminar",
+                                    modifier = Modifier.size(20.dp),
+                                    tint = primaryRed)
+                            }
+
 
                         //eliminar
 

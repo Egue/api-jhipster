@@ -8,7 +8,7 @@ import com.comunicamosmas.api.repository.IContratoSaldoFavorLogDao;
 import com.comunicamosmas.api.repository.IDeudaDao;
 import com.comunicamosmas.api.repository.IFinancieroNcDao;
 import com.comunicamosmas.api.repository.IPagoDao;
-import com.comunicamosmas.api.service.dto.DeudasForFacturaDTO; 
+import com.comunicamosmas.api.service.dto.DeudasForFacturaDTO;
 import com.comunicamosmas.api.service.dto.EmailCampaignDetalleDTO;
 import com.comunicamosmas.api.service.dto.EstadoCuentaDeudasDTO;
 import com.comunicamosmas.api.service.dto.PagosEstadoCuentaDTO;
@@ -48,7 +48,7 @@ public class DeudaServiceImpl implements IDeudaService {
 	@Autowired
 	IContratoSaldoFavorLogDao contratoSaldoaFavorlogDao;
 
-	/*private final IDeudaDao deudaDao; 
+	/*private final IDeudaDao deudaDao;
 	private final IPagoService pagoService;
 	private final IEmailCampaignService emailCampaignService;
 
@@ -67,7 +67,7 @@ public class DeudaServiceImpl implements IDeudaService {
 
 	@Override
 	public Deuda save(Deuda deuda) {
-		 
+
 		return deudaDao.save(deuda);
 	}
 
@@ -87,7 +87,7 @@ public class DeudaServiceImpl implements IDeudaService {
 	public Page<EstadoCuentaDeudasDTO> findByIdContrato(Long contrato , Pageable page) {
 		Page<Object[]> deudas = deudaDao.findByIdContrato(contrato , page);
 		return deudas.map(this::convertirAEstadoCuentaDeudasDTO);
-		 
+
 	}
 
 	private EstadoCuentaDeudasDTO convertirAEstadoCuentaDeudasDTO(Object[] resultado)
@@ -102,13 +102,13 @@ public class DeudaServiceImpl implements IDeudaService {
 		obj.setValor((Double) resultado[4]);
 		obj.setAbono((Float) resultado[5]);
 		String concepto = "";
-		if((Integer) resultado[6] == 1){ 
+		if((Integer) resultado[6] == 1){
 			concepto = "Instalación";
-		}else if((Integer) resultado[7] == 1){ 
-			concepto = "Reconexión"; 
-		}else if((Integer) resultado[8] == 1){ 
-			concepto = "Materiales"; 
-		}else if((Integer) resultado[9] == 1){ 
+		}else if((Integer) resultado[7] == 1){
+			concepto = "Reconexión";
+		}else if((Integer) resultado[8] == 1){
+			concepto = "Materiales";
+		}else if((Integer) resultado[9] == 1){
 			concepto = "Traslado";
 		}else if((Integer) resultado[10] == 1){
 			concepto = (String) resultado[11] ;
@@ -120,7 +120,7 @@ public class DeudaServiceImpl implements IDeudaService {
 		List<PagosEstadoCuentaDTO> pagos = pagosBydeuda.stream()
 									.map(this::convertPagosEstadoCuentaDTO)
 										.collect(Collectors.toList());
-		 
+
 		obj.setPagos(pagos);
 		//nc
 		Integer id_deuda = (Integer) resultado[0];
@@ -130,7 +130,7 @@ public class DeudaServiceImpl implements IDeudaService {
 		obj.setSaldosFavor(sal);
 		//saldo favor
 		return obj;
-	} 
+	}
 
 	private String convertPeriodoToString(Integer periodo)
 	{
@@ -166,7 +166,7 @@ public class DeudaServiceImpl implements IDeudaService {
 		// TODO Auto-generated method stub
 		Optional<List<Object[]>> result = deudaDao.findDeudaByFacturaAndMesServiceAndIdEmpresa(factura, mesServicio, idEmpresa,idCliente,origen);
 
-		List<DeudasForFacturaDTO> listDeudas = result.map(resp -> 			 
+		List<DeudasForFacturaDTO> listDeudas = result.map(resp ->
 			resp.stream().map( rs -> {
 				DeudasForFacturaDTO obj = new DeudasForFacturaDTO();
 				obj.setId_deuda((Integer) rs[0]);
@@ -315,5 +315,10 @@ public class DeudaServiceImpl implements IDeudaService {
 		// TODO Auto-generated method stub
 		 return deudaDao.findByIdIn(idDeuda);
 	}
+
+    @Override
+    public List<Deuda> facturaswithFallos(Long inio , Long fin) {
+        return deudaDao.findNullResultadoElectronica(inio , fin);
+    }
 
 }

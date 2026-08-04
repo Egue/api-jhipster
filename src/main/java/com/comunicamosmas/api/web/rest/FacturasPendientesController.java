@@ -1,11 +1,14 @@
 package com.comunicamosmas.api.web.rest;
 
-import java.util.HashMap; 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.comunicamosmas.api.domain.Deuda;
+import com.comunicamosmas.api.service.IDeudaService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity; 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,12 +17,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.comunicamosmas.api.domainMongo.FacturasEmitidas; 
-import com.comunicamosmas.api.service.IFacturasServices; 
+import com.comunicamosmas.api.domainMongo.FacturasEmitidas;
+import com.comunicamosmas.api.service.IFacturasServices;
 import com.comunicamosmas.api.service.dto.FacturasControlmasDTO;
 import com.comunicamosmas.api.service.dto.InfoFacturaDTO;
 import com.comunicamosmas.api.serviceMongo.IFacturasEmitidasService;
- 
+
 
 @RestController
 @RequestMapping("/api/controlmas")
@@ -31,11 +34,15 @@ public class FacturasPendientesController {
 
     private final IFacturasEmitidasService facturasEmitidasService;
 
-    FacturasPendientesController(IFacturasServices facturasServices , IFacturasEmitidasService facturasEmitidasService)
+    private final IDeudaService deudaService;
+
+    FacturasPendientesController(IFacturasServices facturasServices , IFacturasEmitidasService facturasEmitidasService , IDeudaService deudaService)
     {
         this.facturasServices = facturasServices;
 
         this.facturasEmitidasService = facturasEmitidasService;
+
+        this.deudaService = deudaService;
     }
 
     @GetMapping("/search/pendient")
@@ -58,7 +65,7 @@ public class FacturasPendientesController {
     public ResponseEntity<?> findListByIdCliente(@RequestParam("cliente") Long idCliente , @RequestParam("init") int page , @RequestParam("size") int size)
 	{
 		try {
-			
+
 			PageRequest pageable =  PageRequest.of(page, size);
 
 			return ResponseEntity.status(HttpStatus.OK).body(
@@ -76,7 +83,7 @@ public class FacturasPendientesController {
     @PostMapping("/facturas/info")
     public ResponseEntity<?> facturasInfo(@RequestBody  FacturasEmitidas facturaEmitidas)
     {
-         
+
             try {
                 InfoFacturaDTO facturaDTO = facturasServices.informationInFactura(facturaEmitidas);
 
@@ -85,7 +92,19 @@ public class FacturasPendientesController {
                 // TODO: handle exception
                 return ResponseEntity.internalServerError().build();
             }
-         
+
     }
-    
+
+    @GetMapping("/pendiente/facturar")
+    public ResponseEntity<?> pendienteFacturas(@RequestParam("init") Long inicio , @RequestParam("fin") Long fin){
+        try {
+            List<Deuda> deudas = deudaService.facturaswithFallos(inicio , fin);
+
+            return ResponseEntity.ok().body(deudas);
+        } catch (Exception e) {
+            // TODO: handle exception
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
 }

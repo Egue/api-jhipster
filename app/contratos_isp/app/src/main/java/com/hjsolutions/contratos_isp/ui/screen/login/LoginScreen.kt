@@ -67,7 +67,10 @@ loginViewModel.uiState.errorMessage?.let { error->
         AlertDialogP(text = errorMessage!! , onDismissRequest = {
             showDialog = false
             errorMessage = null
-        } , onConfirmation = {})
+            loginViewModel.clearError()
+        } , onConfirmation = {
+            showDialog = false
+        })
     }
 
     Surface(modifier = Modifier
@@ -165,7 +168,7 @@ loginViewModel.uiState.errorMessage?.let { error->
                             shape = RoundedCornerShape(8.dp),
                             onClick = {
                                 loginViewModel.login(email = email , password = password)
-
+                                //loginViewModel.ping()
                             }, colors = ButtonDefaults.buttonColors(Color(0xFF86030E))) {
                             if (loginViewModel.uiState.isLoading){
                                 CircularProgressIndicator(

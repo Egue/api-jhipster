@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -19,7 +18,6 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-
 import com.comunicamosmas.api.config.ApiSupergiros;
 import com.comunicamosmas.api.domain.Contrato;
 import com.comunicamosmas.api.domain.Orden;
@@ -29,8 +27,6 @@ import com.comunicamosmas.api.service.dto.SupergirosPagosDTO;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import liquibase.pro.packaged.ap;
 
 @Service
 public class ApiRestServiceImpl implements IApiRestService {
@@ -76,7 +72,7 @@ public class ApiRestServiceImpl implements IApiRestService {
 
 		HttpEntity<Void> authenticatedRequest = new HttpEntity<>(headers);
 
-		String url = "https://apps.internetinalambrico.com.co/repositories/backend_jwt_3_slim/public/pagos/estado/cargue";
+		String url = apiSupergiros.getUrldescargue();
 
 		try {
 			ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, authenticatedRequest,
@@ -134,7 +130,7 @@ public class ApiRestServiceImpl implements IApiRestService {
         headers.set("X-Auth-Token" , token);
 		HttpEntity<Void> authenticatedRequest = new HttpEntity<>(headers);
 
-		String url = "https://apps.internetinalambrico.com.co/repositories/backend_jwt_3_slim/public/pagos/actualizarcargue/"
+		String url = apiSupergiros.getUrlcargue()
 				+ id;
 
 		try {
@@ -179,7 +175,7 @@ public class ApiRestServiceImpl implements IApiRestService {
 
 			HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, header);
 
-			String url = "https://apps.internetinalambrico.com.co/repositories/backend_jwt_3_slim/public/auth/login";
+			String url = apiSupergiros.getApiauth();
 
 			ResponseEntity<ResponseSlimLoginDTO> responseEntity = restTemplate.postForEntity(url, requestEntity,
 					ResponseSlimLoginDTO.class);
@@ -254,46 +250,7 @@ public class ApiRestServiceImpl implements IApiRestService {
 		return fechaFormateada;
 	}
 
-	/*
-	 * private void login()
-	 * {
-	 * restTemplate.getMessageConverters().add(new
-	 * MappingJackson2HttpMessageConverter());
-	 * try {
-	 * HttpHeaders header = new HttpHeaders();
-	 *
-	 * header.setContentType(MediaType.APPLICATION_JSON);
-	 *
-	 * String jsonBody =
-	 * "{\"email\":\"web@internetinalambrico.com.co\",\"password\":\"E$LaClav3\"}";
-	 *
-	 * HttpEntity<String> requestEntity = new HttpEntity<>(jsonBody, header);
-	 *
-	 * String url =
-	 * "https://apps.internetinalambrico.com.co/repositories/backend_jwt_3_slim/public/auth/login";
-	 *
-	 * ResponseEntity<ResponseSlimLoginDTO> responseEntity =
-	 * restTemplate.postForEntity(url, requestEntity, ResponseSlimLoginDTO.class);
-	 *
-	 * ResponseSlimLoginDTO response = responseEntity.getBody();
-	 *
-	 * jwt = response.getResponse();
-	 *
-	 * System.out.print(response.getResponse());
-	 *
-	 *
-	 * }catch(Exception e)
-	 * {
-	 * System.out.print(e.getMessage());
-	 *
-	 *
-	 * }
-	 * }
-	 */
 
-	/**
-	 * CLASE PRIVATE
-	 */
 
 	static class ResponseRecaudo {
 		private boolean success;
@@ -329,9 +286,7 @@ public class ApiRestServiceImpl implements IApiRestService {
 
 		FacturaElectronicaResponseDTO facturaElectronica = new FacturaElectronicaResponseDTO();
 
-		//String url = "http://10.111.39.2/controlmas/scriptPhp/index.php";
-		//String url = "http://10.112.109.2/api/scriptPhp/index.php";
-		String url = "http://131.221.41.20:8050/api/scriptPhp/index.php";
+		String url = apiSupergiros.getDeserializacion();
 
 
 		JsonString jsonString = new JsonString(factura, mesServicio , idEmpresa);

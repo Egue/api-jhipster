@@ -10,6 +10,49 @@ public class ApiSupergiros {
 
     private String password;
 
+    private String urldescargue;
+
+    private String urlcargue;
+
+    private String apiauth;
+
+    private String deserializacion;
+
+    public String getDeserializacion(){
+        return deserializacion;
+    }
+
+    public void setDeserializacion(String deserializacion){
+        this.deserializacion = deserializacion;
+    }
+
+    public String getApiauth(){
+        return apiauth;
+    }
+
+    public void setApiauth(String apiauth){
+        this.apiauth = apiauth;
+    }
+
+    public String getUrlcargue() {
+        return urlcargue;
+    }
+
+    public void setUrlcargue(String urlcargue) {
+        this.urlcargue = urlcargue;
+    }
+
+    public String getUrldescargue() {
+        return urldescargue;
+    }
+
+    public void setUrldescargue(String urldescargue) {
+        this.urldescargue = urldescargue;
+    }
+
+
+
+
     public String getEmail() {
         return email;
     }
@@ -27,5 +70,5 @@ public class ApiSupergiros {
     }
 
 
-    
+
 }

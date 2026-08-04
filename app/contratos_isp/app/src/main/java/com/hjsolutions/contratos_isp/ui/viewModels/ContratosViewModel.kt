@@ -156,7 +156,21 @@ class ContratosViewModel() : ViewModel() {
         }
     }
 
-    fun refreshContrato(implementacion :String){
+    fun filterContratos(idDocument :String){
+        val currentState = _uiState.value
+        if(currentState is UiStateContrato.Success){
+            val filtrados = currentState.contratos.filter { contrato ->
+                contrato.id != idDocument
+            }
+            _uiState.value = if(filtrados.isEmpty()){
+                UiStateContrato.Empty
+            }else{
+                UiStateContrato.Success(filtrados)
+            }
+        }
+    }
+
+    fun refreshContrato(implementacion: String){
         loadContratos(implementacion = implementacion)
     }
 
@@ -190,6 +204,55 @@ class ContratosViewModel() : ViewModel() {
                 id = documentId,
                 path = signature
             )
+        }
+    }
+
+    fun deleteFile(documentId: String, fileId: String, type: String) {
+        viewModelScope.launch {
+            response = response.copy(isLoading = true)
+
+            // 1. Borrar el archivo físico del Storage de Appwrite
+            contratoRepository.deleteFileFromStorage(fileId)
+                .onSuccess {
+                    // 2. Si se borró del storage, actualizamos el JSON en la DB
+                    val currentState = _document.value
+                    if (currentState is UiStateOneContrato.Success) {
+                        val currentDocs = currentState.contrato.documentos ?: Documentos()
+
+                        // 3. Modificamos la lista correspondiente (document o anexos)
+                        val updatedDocs = when (type) {
+                            "document" -> {
+                                currentDocs.copy(document = currentDocs.document.filter { it != fileId })
+                            }
+                            "anexos" -> {
+                                currentDocs.copy(anexos = currentDocs.anexos.filter { it != fileId })
+                            }
+                            else -> currentDocs
+                        }
+
+                        // 4. Convertimos el objeto de nuevo a JSON string
+                        val jsonString = gson.toJson(updatedDocs)
+
+                        // 5. Guardamos el JSON actualizado en Appwrite
+                        contratoRepository.updatedDocumentsJson(documentId, jsonString)
+                            .onSuccess {
+                                response = response.copy(isLoading = false)
+                                // Refrescamos los datos para que la UI se actualice
+                                getContratoByDocumentId(documentId)
+                            }
+                            .onFailure { error ->
+                                response = response.copy(
+                                    isLoading = false,
+                                    errorMessage = "Error al actualizar DB: ${error.message}"
+                                )
+                            }
+                    }
+                }
+                .onFailure { error ->
+                    // Si falla el borrado del archivo (ej. no existe o sesión expirada)
+                    val msg = if (error.message?.contains("401") == true) "Vuelve a iniciar sesión" else error.message
+                    response = response.copy(isLoading = false, errorMessage = msg)
+                }
         }
     }
 

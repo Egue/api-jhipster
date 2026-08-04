@@ -37,7 +37,7 @@ fun AlertDialogP(text:String , onDismissRequest: () -> Unit , onConfirmation : (
                         modifier = Modifier.padding(8.dp),
                         colors = ButtonDefaults.buttonColors(Color(0xFF86030E))
                     ) {
-                        Text("Cerrar")
+                        Text("Cerrar" , color = Color.White)
                     }
                     /*TextButton(
                       onClick = { onConfirmation() },

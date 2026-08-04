@@ -1,12 +1,8 @@
 package com.comunicamosmas.api.web.rest;
- 
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
- 
+
+import com.comunicamosmas.api.service.dto.IntegrationFacturacionDTO;
+import org.springframework.web.bind.annotation.*;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,7 +12,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource; 
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,16 +24,16 @@ import com.comunicamosmas.api.service.dto.NomenclaturaDTO;
 import com.comunicamosmas.api.service.dto.ValorStringDTO;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
 
-import io.jsonwebtoken.io.IOException; 
- 
- 
+import io.jsonwebtoken.io.IOException;
+
+
 @RestController
 @RequestMapping("/api/controlmas")
 public class SystemController {
 
     @Autowired
     ISystemConfigService systemService;
-    
+
     @GetMapping("/systemConfig/tipo_pqr")
     public ResponseEntity<?> findTipoRetiro()
     {
@@ -49,8 +45,8 @@ public class SystemController {
 
             response.put("response" , result);
 
-            
-            return new ResponseEntity<Map<String, Object>>(response , HttpStatus.OK); 
+
+            return new ResponseEntity<Map<String, Object>>(response , HttpStatus.OK);
 
         }catch(ExceptionNullSql e)
         {
@@ -59,7 +55,7 @@ public class SystemController {
             return new ResponseEntity<Map<String, Object>>(response , HttpStatus.BAD_REQUEST);
 
         }catch(Exception e)
-        {   
+        {
             response.put("response" , e.getMessage());
 
             return new ResponseEntity<Map<String, Object>>(response , HttpStatus.BAD_REQUEST);
@@ -77,9 +73,9 @@ public class SystemController {
 
             response.put("response" , result);
 
-            
+
             return new ResponseEntity<Map<String, Object>>(response , HttpStatus.OK);
-            
+
         }catch(ExceptionNullSql e)
         {
             response.put("response" , e.getDetails());
@@ -95,7 +91,7 @@ public class SystemController {
 
     //buscar nombre de archivos
     @PostMapping("/systemConfig/findDocument")
-    public ResponseEntity<Resource> nameDocument(@RequestParam String tipo , @RequestParam String document)  
+    public ResponseEntity<Resource> nameDocument(@RequestParam String tipo , @RequestParam String document)
     {
             SystemConfig ruta = systemService.findByOrigen(tipo);
             System.out.println(tipo + ":" + document);
@@ -116,15 +112,15 @@ public class SystemController {
                 return ResponseEntity.ok()
                     .header("Content-Disposition", "attachment; filename="+document)
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                  
+
                     .body(resource);
             }else{
                 throw  new Exception("No existe el archivo");
-            } 
+            }
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ByteArrayResource(e.getMessage().getBytes()));
         } catch (Exception e) {
-             
+
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ByteArrayResource(e.getMessage().getBytes()));
         }
@@ -135,7 +131,7 @@ public class SystemController {
     {
         Map<String, Object> response = new HashMap<>();
         try {
-            
+
             systemService.saveNomenclatura(nomenclatura);
             response.put("nomenclatura", "OK");
 
@@ -166,8 +162,19 @@ public class SystemController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
- 
-    
 
-    
+    @GetMapping("/systemConfig/system/{origen}")
+    public ResponseEntity<?> findOrigen(@PathVariable String origen){
+        try{
+            IntegrationFacturacionDTO syst = systemService.configurationIntegration(origen);
+
+            return ResponseEntity.ok().body(syst);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+
+
+
 }

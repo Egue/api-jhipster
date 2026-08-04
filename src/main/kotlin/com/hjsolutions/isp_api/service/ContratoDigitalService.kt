@@ -27,7 +27,6 @@ import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import com.hjsolutions.isp_api.domain.Templates
 import com.hjsolutions.isp_api.repository.TemplateRepository
-import com.hjsolutions.isp_api.repositoryMysql.ContratoRepository
 import com.hjsolutions.isp_api.service.dto.AppWriteContrato
 import com.hjsolutions.isp_api.service.dto.ClausulaContrato
 import com.hjsolutions.isp_api.service.dto.ClienteContrato
@@ -36,7 +35,6 @@ import com.hjsolutions.isp_api.service.dto.DatosContrato
 import com.hjsolutions.isp_api.service.dto.DireccionContrato
 import com.hjsolutions.isp_api.service.dto.DocumentImages
 import com.hjsolutions.isp_api.service.dto.TarifaContrato
-import com.hjsolutions.isp_api.service.dto.TypeService
 import com.hjsolutions.isp_api.service.dto.VendedorContrato
 import io.appwrite.Client
 import io.appwrite.services.Databases
@@ -44,12 +42,8 @@ import org.springframework.stereotype.Service
 import io.appwrite.ID
 import io.appwrite.Query
 import io.appwrite.exceptions.AppwriteException
-import io.appwrite.models.Document
-import io.appwrite.models.DocumentList
 import io.appwrite.models.RowList
 import io.appwrite.services.TablesDB
-import liquibase.pro.packaged.ac
-import liquibase.pro.packaged.da
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 

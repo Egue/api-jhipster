@@ -37,17 +37,17 @@ fun ImageCard(
         "${APPWRITE_PUBLIC_ENDPOINT}/storage/buckets/$bunkendId/files/$filedId/view?project=${APPWRITE_PROJECT_ID}"
     }
 
-    Card(modifier = modifier.fillMaxWidth().height(200.dp).padding(16.dp),
+    Card(modifier = modifier.fillMaxWidth().padding(8.dp),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Box(modifier = Modifier.fillMaxSize()){
+        Box(modifier = Modifier.fillMaxSize().padding(4.dp)){
 
             AsyncImage(
                 model = imagenUlr,
                 contentDescription = "Imagen",
                 modifier = Modifier.fillMaxSize().padding(4.dp),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.None
             )
 
             IconButton(
