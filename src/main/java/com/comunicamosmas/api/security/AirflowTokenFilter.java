@@ -31,7 +31,7 @@ import java.util.Collections;
  * 4. Si no es válido, rechaza con 401 Unauthorized
  *
  * Configuración:
- * - Token se configura en application-dev_intinalambrico.yml: airflow.security.tokenAir
+ * - Token se configura en application-dev.yml: airflow.security.tokenAir
  * - Header esperado: tokenAir
  *
  * @author Sistema de Email Campaigns
@@ -44,7 +44,7 @@ public class AirflowTokenFilter extends OncePerRequestFilter {
 
     /**
      * Token estático configurado para Airflow
-     * Se inyecta desde application-dev_intinalambrico.yml
+     * Se inyecta desde application-dev.yml
      */
     @Value("${airflow.security.tokenAir:}")
     private String airflowToken;
@@ -117,7 +117,7 @@ public class AirflowTokenFilter extends OncePerRequestFilter {
      */
     private boolean isValidToken(String token) {
         if (airflowToken == null || airflowToken.trim().isEmpty()) {
-            log.error("Token de Airflow no configurado en application-dev_intinalambrico.yml");
+            log.error("Token de Airflow no configurado en application-dev.yml");
             return false;
         }
         return airflowToken.equals(token.trim());

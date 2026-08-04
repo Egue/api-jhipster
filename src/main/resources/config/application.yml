@@ -2,7 +2,7 @@
 # Spring Boot configuration.
 #
 # This configuration will be overridden by the Spring profile you use,
-# for example application-dev_intinalambrico.yml if you use the "dev" profile.
+# for example application-dev.yml if you use the "dev" profile.
 #
 # More information on profiles: https://www.jhipster.tech/profiles/
 # More information on configuration properties: https://www.jhipster.tech/common-application-properties/
@@ -181,6 +181,14 @@ jhipster:
 # ===================================================================
 
 # application:
+
+# ===================================================================
+# Hablame SMS API Configuration
+# ===================================================================
+hablame:
+    account: ${HABLAME_ACCOUNT}
+    apikey: ${HABLAME_APIKEY}
+    token: ${HABLAME_TOKEN}
 
 # ===================================================================
 # Configuración de Email Campaign Batch Processing

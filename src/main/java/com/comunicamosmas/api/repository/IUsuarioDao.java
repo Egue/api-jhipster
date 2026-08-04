@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
+import javax.swing.text.html.Option;
+
 public interface IUsuarioDao extends CrudRepository<Usuario, Long> {
     @Query(value = "SELECT * FROM usuarios usr WHERE usr.mailnotifica = :email LIMIT 0,1 ", nativeQuery = true)
     Optional<Usuario> findByOneEmail(String email);
@@ -38,5 +40,7 @@ public interface IUsuarioDao extends CrudRepository<Usuario, Long> {
 
     public Optional<Usuario> findOneByPushover(@Param("pushover") String pushover);
 
-     
+    public Optional<List<Usuario>> findByIdCiudadAndEstado(Long idCiudad , Long estado);
+
+    public Optional<List<Usuario>> findByIdCiudadAndEstadoAndIdNivel(Long idCiudad , Long estado , Long idNivel);
 }

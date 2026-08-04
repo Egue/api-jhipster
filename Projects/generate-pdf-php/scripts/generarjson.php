@@ -12,7 +12,7 @@ function convertirFecha(string $fecha): string {
 
 function tipoIdentificacion(string $tipoPersona): int {
     // 13 = Cédula (Natural), 32 = NIT (Jurídica)
-    return str_contains(strtoupper($tipoPersona), 'NATURAL') ? 13 : 32;
+    return str_contains(strtoupper($tipoPersona), 'NATURAL') ? 13 : 31;
 }
 
 function tipoPersonaDian(string $tipoPersona): int {
@@ -60,7 +60,7 @@ function csvToJson(string $filePath, string $delimiter = ','): string {
                     "tipo_operacion"                => 1,
                     "nota_factura"                  => "servicios de Telecomunicaciones",
                     "factura_numero"                => $numFact,
-                    "fecha_emite"                   => "2026-04-28",
+                    "fecha_emite"                   => "2026-07-15",
                     "hora_emite"                    => "07:58:49-05:00",
                     "cliente_nombre"                => $row['NOMBRES / RAZON SOCIAL'],
                     "cliente_municipio_nombre"      => $row['MUNICIPIO'],
@@ -104,6 +104,6 @@ function csvToJson(string $filePath, string $delimiter = ','): string {
 }
 
 // Uso
-$json = csvToJson('facturado_email.csv');
+$json = csvToJson('facturas_email_julio_2.csv');
 file_put_contents('datos.json', $json);
 echo "JSON generado: " . count(json_decode($json)) . " facturas\n";

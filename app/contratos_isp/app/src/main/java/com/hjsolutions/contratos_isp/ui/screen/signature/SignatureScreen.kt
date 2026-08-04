@@ -275,7 +275,8 @@ fun SignatureScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(500.dp),
+                    //.height(500.dp)
+                    ,
                 elevation = CardDefaults.cardElevation(4.dp),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 border = androidx.compose.foundation.BorderStroke(1.dp, Color.LightGray)
