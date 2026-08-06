@@ -1,0 +1,77 @@
+### ==========================================
+### 1. MONITOREO Y SALUD
+### ==========================================
+
+### Ping de Salud
+GET http://localhost:8000/api/ping
+
+---
+
+### ==========================================
+### 2. GESTIÓN DE USUARIOS (DATOS DE EIDER)
+### ==========================================
+
+### Crear Usuario
+# Usamos los datos de eider que ya funcionan
+POST http://localhost:8000/api/user-group-manager
+Content-Type: application/json
+
+{
+    "email": "janus_test@casanare.com",
+    "username": "eider",
+    "password": "samuel89*",
+    "group_id": "50",
+    "group_role": "operators-user",
+    "id_contrato": "CONT-YOP-100"
+}
+
+### Actualizar Contraseña (PATCH)
+PATCH http://localhost:8000/api/user-group-manager/OKTV-6368
+Content-Type: application/json
+
+{
+    "group_id": "50",
+    "new_password": "YopalNuevaClave2026*"
+}
+
+### Actualizar Rol (PATCH) - ¡Verifica el cambio en el listado después!
+PATCH http://localhost:8000/api/user-group-manager/OKTV-6368
+Content-Type: application/json
+
+{
+    "group_id": "50",
+    "new_role": "operators-operator_admin"
+}
+
+### Publicar / Despublicar (PATCH)
+PATCH http://localhost:8000/api/user-group-manager/OKTV-6368
+Content-Type: application/json
+
+{
+    "group_id": "50",
+    "publish": true
+}
+
+### Eliminar de Operador / Suspensión Individual (DELETE)
+DELETE http://localhost:8000/api/user-group-manager/OKTV-6368/group/50
+
+---
+
+### ==========================================
+### 3. DASHBOARD Y PROCESOS CASANARE
+### ==========================================
+
+### Listado General para el Dashboard (Angular)
+# Úsalo después de cada PATCH para verificar que la DB local cambió
+GET http://localhost:8000/api/microok/cuentas
+
+### Consultar Contrato Específico
+GET http://localhost:8000/api/microok/cortes/CONT-YOP-100
+
+### Procesar Cortes Mensuales (Masivo)
+POST http://localhost:8000/api/cron/cortes/mensuales
+Content-Type: application/json
+
+{
+    "contratos": ["CONT-YOP-100", "TEMP-1775488621", "ABC1234"]
+}

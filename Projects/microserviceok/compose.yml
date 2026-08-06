@@ -1,0 +1,25 @@
+version: '3.8'
+services:
+  # SERVICIO DE LARAVEL (El que falta)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: microservice_oktv_app
+    restart: unless-stopped
+    working_dir: /var/www/html/microserviceoktv
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - mysql
+
+  # TU BASE DE DATOS (La que ya tienes)
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_oktv
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
