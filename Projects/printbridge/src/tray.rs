@@ -19,19 +19,11 @@ static DIRTY: AtomicBool = AtomicBool::new(false);
 
 /// Registra una línea para el panel de logs (y a stderr solo en debug).
 pub fn log(msg: &str) {
-    {
-        let mut t = LOG_TEXT.lock().unwrap();
-        t.push_str(msg);
-        t.push_str("\r\n");
-        if t.len() > MAX_CHARS {
-            if let Some(pos) = t[MAX_CHARS / 2..].find("\r\n") {
-                let cut = MAX_CHARS / 2 + pos + 2;
-                t.replace_range(..cut, "");
-            }
-        }
-    }
     if let Ok(mut q) = PENDING.lock() {
         q.push_back(msg.to_string());
+        while q.len() > 200 {
+            q.pop_front();
+        }
     }
     DIRTY.store(true, Ordering::SeqCst);
     #[cfg(debug_assertions)]
@@ -57,6 +49,7 @@ mod imp {
     use super::{log, DIRTY, PENDING};
     use std::ffi::c_void;
     use std::mem::zeroed;
+    use std::os::windows::process::CommandExt;
     use std::ptr;
     use std::sync::atomic::{AtomicUsize, Ordering};
     use windows_sys::Win32::Foundation::{HWND, LPARAM, LRESULT, RECT, TRUE, WPARAM};
@@ -69,12 +62,13 @@ mod imp {
         NOTIFYICONDATAW_0,
     };
     use windows_sys::Win32::UI::WindowsAndMessaging::{
-        AppendMenuW, CreateIconIndirect, CreatePopupMenu, CreateWindowExW, DefWindowProcW,
-        DestroyMenu, DispatchMessageW, GetClientRect, GetCursorPos, GetMessageW, IMAGE_ICON,
-        KillTimer, LoadImageW, LR_DEFAULTCOLOR, MoveWindow, PostQuitMessage, RegisterClassW,
-        SendMessageW, SetForegroundWindow, SetTimer, ShowWindow, TrackPopupMenu, TranslateMessage,
-        HMENU, MF_STRING, MSG, SW_HIDE, SW_SHOW, TPM_BOTTOMALIGN, TPM_RIGHTBUTTON,
-        WS_EX_CLIENTEDGE, WS_OVERLAPPEDWINDOW, WS_VISIBLE, WS_VSCROLL, WNDCLASSW, ICONINFO,
+        AppendMenuW, CheckMenuItem, CreateIconIndirect, CreatePopupMenu, CreateWindowExW,
+        DefWindowProcW, DestroyMenu, DispatchMessageW, GetClientRect, GetCursorPos, GetMessageW,
+        IMAGE_ICON, KillTimer, LoadImageW, LR_DEFAULTCOLOR, MoveWindow, PostQuitMessage,
+        RegisterClassW, SendMessageW, SetForegroundWindow, SetTimer, ShowWindow, TrackPopupMenu,
+        TranslateMessage, HMENU, MF_STRING, MSG, SW_HIDE, SW_SHOW, TPM_BOTTOMALIGN,
+        TPM_RIGHTBUTTON, WS_EX_CLIENTEDGE, WS_OVERLAPPEDWINDOW, WS_VISIBLE, WS_VSCROLL,
+        WNDCLASSW, ICONINFO,
     };
 
     // Constantes de mensajes/estilos que windows-sys agrupa por tipo; se definen
@@ -105,6 +99,10 @@ mod imp {
     const TIMER_LOGS: usize = 1;
     const MENU_SHOW: usize = 1;
     const MENU_EXIT: usize = 2;
+    const MENU_STARTUP: usize = 3;
+    const MF_CHECKED: u32 = 0x00000008;
+    const MF_UNCHECKED: u32 = 0x00000000;
+    const CREATE_NO_WINDOW: u32 = 0x0800_0000;
 
     static TRAY_HWND: AtomicUsize = AtomicUsize::new(0);
     static LOG_HWND: AtomicUsize = AtomicUsize::new(0);
@@ -169,7 +167,7 @@ mod imp {
         let nid = tray_nid(tray_hwnd, hicon);
         unsafe { Shell_NotifyIconW(NIM_ADD, &nid) };
 
-        let title_logs = wide("printbridge — logs");
+        let title_logs = wide("HJPrints — logs");
         let logwin = unsafe {
             CreateWindowExW(
                 0,
@@ -284,12 +282,60 @@ mod imp {
         }
     }
 
+    const REG_RUN_KEY: &str = r"HKCU\Software\Microsoft\Windows\CurrentVersion\Run";
+
+    fn is_startup_enabled() -> bool {
+        std::process::Command::new("reg")
+            .creation_flags(CREATE_NO_WINDOW)
+            .args(["query", REG_RUN_KEY, "/v", "printbridge"])
+            .output()
+            .map(|o| o.status.success())
+            .unwrap_or(false)
+    }
+
+    fn startup_full_cmd() -> String {
+        let exe = std::env::current_exe()
+            .map(|p| p.to_string_lossy().to_string())
+            .unwrap_or_default();
+        let args: Vec<String> = std::env::args().collect();
+        if args.len() <= 1 {
+            format!("\"{exe}\"")
+        } else {
+            format!("\"{exe}\" {}", args[1..].join(" "))
+        }
+    }
+
+    fn toggle_startup() {
+        if is_startup_enabled() {
+            let _ = std::process::Command::new("reg")
+                .creation_flags(CREATE_NO_WINDOW)
+                .args([
+                    "delete", REG_RUN_KEY, "/v", "printbridge", "/f",
+                ])
+                .status();
+            log("Inicio automático desactivado");
+        } else {
+            let cmd = startup_full_cmd();
+            let _ = std::process::Command::new("reg")
+                .creation_flags(CREATE_NO_WINDOW)
+                .args([
+                    "add", REG_RUN_KEY, "/v", "printbridge", "/t", "REG_SZ", "/d", &cmd, "/f",
+                ])
+                .status();
+            log(&format!("Inicio automático activado: {cmd}"));
+        }
+    }
+
     fn popup_tray_menu(hwnd: HWND) {
         let menu = unsafe { CreatePopupMenu() };
         let t_show = wide("&Mostrar panel de logs");
+        let t_startup = wide("Ejecutar al &inicio");
         let t_exit = wide("&Salir");
         unsafe {
             AppendMenuW(menu, MF_STRING, MENU_SHOW, t_show.as_ptr());
+            AppendMenuW(menu, MF_STRING, MENU_STARTUP, t_startup.as_ptr());
+            let flag = if is_startup_enabled() { MF_CHECKED } else { MF_UNCHECKED };
+            CheckMenuItem(menu, MENU_STARTUP as u32, flag);
             AppendMenuW(menu, MF_STRING, MENU_EXIT, t_exit.as_ptr());
             let mut pt = zeroed::<windows_sys::Win32::Foundation::POINT>();
             GetCursorPos(&mut pt);
@@ -317,6 +363,13 @@ mod imp {
                 while let Some(line) = q.pop_front() {
                     t.push_str(&line);
                     t.push_str("\r\n");
+                }
+            }
+            // Recortar si pasa de MAX_CHARS
+            if t.len() > super::MAX_CHARS {
+                if let Some(pos) = t[super::MAX_CHARS / 2..].find("\r\n") {
+                    let cut = super::MAX_CHARS / 2 + pos + 2;
+                    t.replace_range(..cut, "");
                 }
             }
             t.clone()
@@ -348,6 +401,7 @@ mod imp {
             WM_COMMAND => {
                 match wparam & 0xFFFF {
                     MENU_SHOW => show_logs(),
+                    MENU_STARTUP => toggle_startup(),
                     MENU_EXIT => quit(),
                     _ => {}
                 }

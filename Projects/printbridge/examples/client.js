@@ -4,7 +4,7 @@
  * Uso: <script src="printbridge-client.js"></script>
  */
 class PrintBridge {
-  constructor(url = "ws://127.0.0.1:8181") {
+  constructor(url = "ws://127.0.0.1:8183") {
     this.url = url;
     this.ws = null;
     this.pending = new Map(); // id -> {resolve, reject}

@@ -89,7 +89,7 @@ fn list_system_printers() -> Vec<String> {
 }
 
 fn parse_args() -> Result<(u16, Vec<String>), String> {
-    let mut port: u16 = 8181;
+    let mut port: u16 = 8183;
     let mut allowed: Vec<String> = Vec::new();
     let mut args = std::env::args().skip(1);
     while let Some(arg) = args.next() {
@@ -113,7 +113,7 @@ fn parse_args() -> Result<(u16, Vec<String>), String> {
                 }
                 "--help" | "-h" => {
                     tray::log(&format!(
-                        "HJPrints v{}\nUso: HJPrints [--port N] [--allow-origin URL]...\n  --port N             puerto a escuchar (default 8181)\n  --allow-origin URL    origen permitido (repetible). Sin él,\n                        CUALQUIER página puede imprimir.",
+                        "HJPrints v{}\nUso: HJPrints [--port N] [--allow-origin URL]...\n  --port N             puerto a escuchar (default 8183)\n  --allow-origin URL    origen permitido (repetible). Sin él,\n                        CUALQUIER página puede imprimir.",
                         env!("CARGO_PKG_VERSION")
                     ));
                     std::process::exit(0);
