@@ -2,6 +2,7 @@ package com.hjsolutions.isp_api.web
 
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql
 import com.hjsolutions.isp_api.service.OrdenArticuloService
+import com.hjsolutions.isp_api.service.ProrrogaService
 import okio.IOException
 import org.apache.commons.io.output.ByteArrayOutputStream
 import org.apache.poi.ss.usermodel.Workbook
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/kt/reportes")
-class ReporteControllerKT(private val ordenArticuloService : OrdenArticuloService) {
+class ReporteControllerKT(private val ordenArticuloService : OrdenArticuloService, private val prorrogaService: ProrrogaService) {
 
     @PostMapping("/consumo-materiales")
     fun reporteConsumoMateriales(@RequestParam("init") inicial:String , @RequestParam("last") last:String): ResponseEntity<Resource>{
@@ -79,5 +80,59 @@ class ReporteControllerKT(private val ordenArticuloService : OrdenArticuloServic
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ByteArrayResource((e.message ?: "").toByteArray()))
         }
 
+    }
+
+    @PostMapping("/prorroga")
+    fun reporteProrroga(@RequestParam("fecha") fecha: String, @RequestParam("contrato") contrato: String): ResponseEntity<Resource>{
+
+        val response = mutableMapOf<String, Any>()
+
+        return try {
+            val result = prorrogaService.find_all_by_state_fecha(fecha, contrato)
+
+            val workbook: Workbook = XSSFWorkbook()
+            val sheet = workbook.createSheet("ReporteProrroga")
+            val headerRow = sheet.createRow(0)
+
+            val headers = listOf(
+                "idContrato", "tipoCliente", "nameCliente", "nameServicio", "direccion", "parcial", "total", "fechaProrroga"
+            )
+            headers.forEachIndexed { index, title ->
+                headerRow.createCell(index).setCellValue(title)
+            }
+
+            var rowNum = 1
+            for(item in result.prorrogaList){
+                val row = sheet.createRow(rowNum++)
+
+                row.createCell(0).setCellValue(item.idContrato.toString())
+                row.createCell(1).setCellValue(item.tipo)
+                row.createCell(2).setCellValue(item.nameCliente)
+                row.createCell(3).setCellValue(item.servicio)
+                row.createCell(4).setCellValue(item.direccion)
+                row.createCell(5).setCellValue(item.parcial.toString())
+                row.createCell(6).setCellValue(item.total.toString())
+                row.createCell(7).setCellValue(item.fechaProrroga)
+            }
+
+            val byteArrayOutputStream = ByteArrayOutputStream()
+            workbook.write(byteArrayOutputStream)
+            workbook.close()
+
+            val resource = ByteArrayResource(byteArrayOutputStream.toByteArray())
+
+            ResponseEntity.ok()
+                .header("Content-Disposition" , "attachment; filename=reporte_prorroga.xlsx")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(resource)
+        } catch (e: IOException) {
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ByteArrayResource(e.message!!.toByteArray()))
+        } catch (e: ExceptionNullSql) {
+            response["error"] = "${e.message}-${e.details}"
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ByteArrayResource(e.message!!.toByteArray()))
+        } catch (e: Exception) {
+            response["error"] = e.message ?: ""
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ByteArrayResource((e.message ?: "").toByteArray()))
+        }
     }
 }

@@ -1,7 +1,7 @@
 package com.comunicamosmas.api.service.dto;
 
 public class RespuestaGeneracionPDFFactura {
-    
+
     private String pathPDF;
 
     private String pathXML;
@@ -10,7 +10,7 @@ public class RespuestaGeneracionPDFFactura {
 
     private String prefijo;
 
-    private String nit;  
+    private String nit;
 
     private String razon_social;
 
@@ -30,11 +30,20 @@ public class RespuestaGeneracionPDFFactura {
 
     private String logoPublico;
 
+    private String direccionEmpresa;
+
+    public String getDireccionEmpresa(){
+        return direccionEmpresa;
+    }
+
+    public void setDireccionEmpresa(String direccionEmpresa){
+        this.direccionEmpresa = direccionEmpresa;
+    }
     public String getPathPDF() {
         return pathPDF;
     }
 
-    
+
     public String getDestinatario() {
         return destinatario;
     }
@@ -103,7 +112,7 @@ public class RespuestaGeneracionPDFFactura {
         this.nit = nit;
     }
 
-     
+
 
     public String getRazon_social() {
         return razon_social;
@@ -164,5 +173,5 @@ public class RespuestaGeneracionPDFFactura {
         this.pathZIP = pathZIP;
     }
 
-    
+
 }

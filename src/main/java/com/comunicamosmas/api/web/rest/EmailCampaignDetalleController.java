@@ -27,7 +27,7 @@ import com.comunicamosmas.api.service.IFacturasServices;
 import com.comunicamosmas.api.service.dto.EmailCampaignDetalleDTO;
 import com.comunicamosmas.api.serviceMongo.IFacturasEmitidasService;
 import com.comunicamosmas.api.web.rest.errors.ExceptionNullSql;
- 
+
 @RestController
 @RequestMapping("/api/controlmas")
 public class EmailCampaignDetalleController {
@@ -40,7 +40,7 @@ public class EmailCampaignDetalleController {
 
 	private final IEmailCampaignService emailCampaignService;
 
-	public EmailCampaignDetalleController(IEmailCampaignDetalleService emailCampaignDetalleService , IFacturasServices facturasServices , 
+	public EmailCampaignDetalleController(IEmailCampaignDetalleService emailCampaignDetalleService , IFacturasServices facturasServices ,
 	IEmailCampaignService emailCampaignService , IFacturasEmitidasService facturasEmitidasService)
 	{
 		this.emailCampaignDetalleService = emailCampaignDetalleService;
@@ -69,7 +69,7 @@ public class EmailCampaignDetalleController {
 		}
 	}
 
-	 
+
 
 	/** GET BUSCAR POR IDEMAILCAMPAIGN */
 	@GetMapping("/emailCampaignDetalle/emailCampaign/{id}")
@@ -91,11 +91,11 @@ public class EmailCampaignDetalleController {
 		}
 	}
 
-	
+
 
 	/**
 	 * GET
-	 * 
+	 *
 	 * @param id informacion del contratounitario
 	 */
 	@PostMapping("/emailCampaingDetalle/sendMail")
@@ -109,16 +109,16 @@ public class EmailCampaignDetalleController {
 			if(campaign.getEstado().equals("PortalWeb"))
 			{
 				facturasEmitidasService.sendFactura(detalle , campaign);
-				
-			}else{ 
-				
+
+			}else{
+
 				String result = emailCampaignDetalleService.sendMailUnitario(detalle);
 
 				response.put("response", result);
 
 			}
- 
-			
+
+
 
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
 
@@ -129,7 +129,7 @@ public class EmailCampaignDetalleController {
 				return new ResponseEntity<Map<String, Object>>(response , HttpStatus.BAD_REQUEST);
 
 		}catch (Exception e) {
-			
+
 			response.put("response", e.getMessage());
 
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
@@ -142,7 +142,7 @@ public class EmailCampaignDetalleController {
 		Map<String, Object> response = new HashMap<>();
 
 		try {
- 
+
 			 emailCampaignDetalleService.addFactura(detalle);
 
 			response.put("response", "Factura agregada");
@@ -156,19 +156,19 @@ public class EmailCampaignDetalleController {
 				return new ResponseEntity<Map<String, Object>>(response , HttpStatus.BAD_REQUEST);
 
 		}catch (Exception e) {
-			
+
 			response.put("response", e.getMessage());
 
 			return new ResponseEntity<Map<String, Object>>(response, HttpStatus.BAD_REQUEST);
 		}
 	}
 
-	
+
 	@GetMapping("/emailCampaingDetalle/findlistbyidcliente")
 	public ResponseEntity<?> findListByIdCliente(@RequestParam("cliente") Long idCliente , @RequestParam("init") int page , @RequestParam("size") int size)
 	{
 		try {
-			
+
 			PageRequest pageable =  PageRequest.of(page, size);
 
 			List<EmailCampaignDetalleDTO> list = facturasServices.findListFacturaByIdCliente(idCliente, pageable);

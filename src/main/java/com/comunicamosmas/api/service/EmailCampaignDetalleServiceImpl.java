@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.comunicamosmas.api.domain.*;
+import com.comunicamosmas.api.repository.ISystemConfigDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +26,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.comunicamosmas.api.domain.EmailCampaign;
-import com.comunicamosmas.api.domain.EmailCampaignApi;
-import com.comunicamosmas.api.domain.EmailCampaignDetalle;
-import com.comunicamosmas.api.domain.MailRelaySendMail;
 import com.comunicamosmas.api.domainMongo.FacturasEmitidas;
 import com.comunicamosmas.api.repository.IEmailCampaignDetalleDao;
 import com.comunicamosmas.api.service.dto.DeudasForFacturaDTO;
@@ -74,6 +72,13 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 
 	@Autowired
 	IFacturasEmitidasService facturasEmitidasService;
+
+    @Autowired
+    ISystemConfigDao systemConfigDao;
+
+    @Autowired
+    ResendMailServiceImpl resendMailService;
+
 
 	/**
 	 * Enviando mail a al cliente por mailrelay api
@@ -501,35 +506,41 @@ public class EmailCampaignDetalleServiceImpl implements IEmailCampaignDetalleSer
 
 	private String sendMail(Integer id, RespuestaGeneracionPDFFactura responsePDF) {
 
-		// consultamos el id de emailcampaigndetalle
-		EmailCampaignDetalle unitario = this.findById(id);
+        SystemConfig systemConfig = systemConfigDao.findByOrigen("MAIL_SERVICE");
+        // consultamos el id de emailcampaigndetalle
+        EmailCampaignDetalle unitario = this.findById(id);
+        String response = "";
+        switch (systemConfig.getComando()){
+            case "MAILRELAY":
+                String unitarioIdService = Integer.toString(unitario.getIdServicio());
+                // buscar los datos de sesión en emailCampaignApi
+                EmailCampaignApi datos = new EmailCampaignApi();
+                List<EmailCampaignApiDTO> api = emailCampaignApiService.findAll();
+                outerloop: for (EmailCampaignApiDTO rs : api) {
+                    String[] idServicio = rs.getServicio().split(",");
+                    for (String service : idServicio) {
+                        // System.out.print("unitarios: "+unitario.getIdServicio()+ "service : " +
+                        // service);
+                        if (unitarioIdService.equals(service)) {
+                            datos.setToken(rs.getToken());
+                            datos.setUrl(rs.getUrl());
+                            datos.setMail_envio(rs.getMail_envio());
+                            datos.setNombre_envio(rs.getNombre_envio());
+                            datos.setHtml_part(rs.getHtml_part());
+                            break outerloop;
+                        }
+                    }
+                }
+                String fondo = this.fondoMail(responsePDF, datos);
+                // System.out.print(fondo);
+                response =  this.mailRelaySendMail(datos, unitario, fondo, responsePDF);
+                break;
+                case "RESEND":
+                response =  resendMailService.sendMailAttachments(responsePDF , unitario);
+                break;
+        }
 
-		String unitarioIdService = Integer.toString(unitario.getIdServicio());
-		// buscar los datos de sesión en emailCampaignApi
-		EmailCampaignApi datos = new EmailCampaignApi();
-
-		List<EmailCampaignApiDTO> api = emailCampaignApiService.findAll();
-
-		outerloop: for (EmailCampaignApiDTO rs : api) {
-			String[] idServicio = rs.getServicio().split(",");
-
-			for (String service : idServicio) {
-				// System.out.print("unitarios: "+unitario.getIdServicio()+ "service : " +
-				// service);
-
-				if (unitarioIdService.equals(service)) {
-					datos.setToken(rs.getToken());
-					datos.setUrl(rs.getUrl());
-					datos.setMail_envio(rs.getMail_envio());
-					datos.setNombre_envio(rs.getNombre_envio());
-					datos.setHtml_part(rs.getHtml_part());
-					break outerloop;
-				}
-			}
-		}
-		String fondo = this.fondoMail(responsePDF, datos);
-		// System.out.print(fondo);
-		return this.mailRelaySendMail(datos, unitario, fondo, responsePDF);
+        return response;
 
 	}
 

@@ -213,3 +213,5 @@ src/main/resources/config/application-dev_cablemag.yml
 /src/main/resources/config/application-dev_cablemag.yml
 /.envcontrol
 /.envcablemag
+/Projects/python-reports/venv/
+/Projects/script-actualizacion/venv/

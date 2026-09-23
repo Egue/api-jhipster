@@ -21,6 +21,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 
+import com.comunicamosmas.api.repository.ISystemConfigDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpMethod;
@@ -86,6 +87,9 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 	@Autowired
 	IContratoComboService comboService;
 
+    @Autowired
+    ISystemConfigDao systemConfigDao;
+
 	@Override
 	public RespuestaGeneracionPDFFactura generateFacturaPDF(EmailCampaignDetalleDTO detalle,
 			List<DeudasForFacturaDTO> deudas, EmailCampaign campaña) {
@@ -120,6 +124,8 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 
 		// instancia de la respuesta del resultado
 		RespuestaGeneracionPDFFactura responseFactura = new RespuestaGeneracionPDFFactura();
+        responseFactura.setMesGenerado(campaña.getAnno() + "-" + campaña.getMes());
+        responseFactura.setFechaLimite(campaña.getFechaLimitePago());
 		responseFactura.setFactura(detalle.getFactura());
 		responseFactura.setCodigoDocumento("01");
 		responseFactura.setNameComercial(empresa.getNombreComercial());
@@ -142,6 +148,7 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 
 		String nitEmpresa = "NIT:" + empresa.getNit() + "-" + empresa.getDv();
 		String direccionEmpresa = empresa.getCiudad() + " | " + empresa.getDireccion() + " | " + empresa.getTelefonos();
+        responseFactura.setDireccionEmpresa(direccionEmpresa);
 		String webEmpresa = empresa.getWeb();
 		String regimenEmpresa = empresa.getRegimen();
 		String actividadEmpresa = "Actividad Económica 6120 - 6110";
@@ -155,13 +162,13 @@ public class GeneratePDFServiceImpl implements IGeneratePDFService {
 		String cus = ""; // detalle.getIdContrato().toString();
 		String direccionCliente = cliente.getDireccion();
 		String telefonoCliente = cliente.getCelular();
-
+        SystemConfig pathFondoImage = systemConfigDao.findByOrigen("PATH_FONDO");
 		// link de fondo
 		//String fondoA = "http://10.112.109.2/control/archivos/fondo_factura/" + empresa.getFondoFactura();
-		String fondoA = "http://131.221.41.20:8050/control/archivos/fondo_factura/" + empresa.getFondoFactura();
+		String fondoA = pathFondoImage.getComando() + empresa.getFondoFactura();
 		//String fondoA = "http://190.121.145.227:9050/control/archivos/fondo_factura/" + empresa.getFondoFactura();
 		//String fondoB = "http://10.112.109.2/control/archivos/fondo_factura/" + empresa.getFondoFacturaB();
-		String fondoB = "http://131.221.41.20:8050/control/archivos/fondo_factura/" + empresa.getFondoFacturaB();
+		String fondoB = pathFondoImage.getComando() + empresa.getFondoFacturaB();
 		//String fondoB = "http://190.121.145.227:9050/control/archivos/fondo_factura/" + empresa.getFondoFacturaB();
 
 		// factura

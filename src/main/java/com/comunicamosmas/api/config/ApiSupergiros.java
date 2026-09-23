@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties(prefix = "app.apisupergiros")
+
 public class ApiSupergiros {
     private String email;
 
