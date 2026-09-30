@@ -1,0 +1,5 @@
+DB_API_FACTURACION=mysql+pymysql://root:%40%40%40server@mysql-56-db.server.internetinalambrico.com.co:3307/wwserv_api
+DB_CONTROLMAS=mysql+pymysql://root:mysql1234@192.168.131.11:33311/controlmas_marzo_4
+API_TOKEN=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+CORS=http://131.221.41.20,http://localhost:4200
+ENV=production

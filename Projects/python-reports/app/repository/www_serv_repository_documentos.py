@@ -16,7 +16,7 @@ def get_documentos_by_fecha(fecha_inicio : date , fecha_fin:date , type: int)->p
 
 def get_documentos_between_error(inicio : date , fin: date)-> pd.DataFrame:
     query = """
-    SELECT * FROM documentos d
+    SELECT d.id_documento , d.numero_documento , d.solicitud , d.marca , d.tipo , e.razon_social  , e.res_fecha_i  , e.res_fecha_f , e.res_prefijo FROM documentos d
     INNER JOIN empresas e on e.id_empresa = d.id_empresa
     WHERE d.marca >= %(first)s AND d.marca < %(last)s AND d.key_dian != 'Procesado Correctamente'
 """
